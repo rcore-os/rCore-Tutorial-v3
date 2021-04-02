@@ -73,10 +73,8 @@ disasm-vim: kernel
 
 run: run-inner
 
-	
-
-run-inner: build
-ifeq ($(BOARD),qemu)
+# use this after run-build
+run-qemu:
 	@qemu-system-riscv64 \
 		-machine virt \
 		-nographic \
@@ -84,6 +82,11 @@ ifeq ($(BOARD),qemu)
 		-device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) \
 		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
         -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+	
+
+run-inner: build
+ifeq ($(BOARD),qemu)
+	run-qemu
 else
 	(which $(K210-BURNER)) || (cd .. && git clone https://github.com/sipeed/kflash.py.git && mv kflash.py tools)
 	@cp $(BOOTLOADER) $(BOOTLOADER).copy
