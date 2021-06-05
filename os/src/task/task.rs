@@ -131,7 +131,7 @@ impl TaskControlBlock {
                 )
             })
             .collect();
-        *argv[args.len()] = 0;
+        // *argv[args.len()] = 0;
         for i in 0..args.len() {
             user_sp -= args[i].len() + 1;
             *argv[i] = user_sp;
