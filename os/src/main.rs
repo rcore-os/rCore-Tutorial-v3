@@ -3,7 +3,6 @@
 #![feature(global_asm)]
 #![feature(llvm_asm)]
 #![feature(panic_info_message)]
-#![feature(const_in_array_repeat_expressions)]
 #![feature(alloc_error_handler)]
 
 extern crate alloc;
