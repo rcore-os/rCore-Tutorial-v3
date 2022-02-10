@@ -1,0 +1,19 @@
+on: [push, pull_request]
+name: Cross Compile
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: riscv64gc-unknown-none-elf
+        override: true
+    - uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: build
+        args: --target riscv64gc-unknown-none-elf

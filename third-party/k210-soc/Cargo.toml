@@ -1,0 +1,12 @@
+[package]
+name = "k210-soc"
+version = "0.1.0"
+authors = ["Yifan Wu <shinbokuow@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+k210-hal = { path = "../k210-hal" }
+k210-pac = { path = "../k210-pac" }
+riscv = { path = "../riscv", features = ["inline-asm"] }

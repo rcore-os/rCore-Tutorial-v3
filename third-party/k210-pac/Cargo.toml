@@ -1,0 +1,19 @@
+[package]
+name = "k210-pac"
+version = "0.2.0"
+authors = ["The RISC-V Team <risc-v@teams.rust-embedded.org>"]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Peripheral access API for K210 SoC"
+repository = "https://github.com/riscv-rust/k210-pac"
+keywords = ["riscv", "k210", "register", "peripheral"]
+license = "ISC"
+edition = "2018"
+
+[dependencies]
+bare-metal = "0.2.4"
+riscv = "0.6.0"
+riscv-rt = { version = "0.8", optional = true }
+vcell = "0.1.2"
+
+[features]
+rt = ["riscv-rt"]

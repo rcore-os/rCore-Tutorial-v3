@@ -1,0 +1,41 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Check code format
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+      - name: Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --all-features
+    - name: Docs
+      uses: actions-rs/cargo@v1
+      with:
+        command: doc

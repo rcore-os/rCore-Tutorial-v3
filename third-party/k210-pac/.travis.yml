@@ -1,0 +1,28 @@
+language: rust
+
+env:
+  - TARGET=x86_64-unknown-linux-gnu
+  - TARGET=riscv64gc-unknown-none-elf
+
+rust:
+  - nightly
+  - stable
+
+if: (branch = staging OR branch = trying OR branch = master) OR (type = pull_request AND branch = master)
+
+
+install:
+  - ci/install.sh
+
+script:
+  - ci/script.sh
+
+branches:
+  only:
+    - master
+    - staging
+    - trying
+
+notifications:
+  email:
+    on_success: never

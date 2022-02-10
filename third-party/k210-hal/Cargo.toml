@@ -1,0 +1,19 @@
+[package]
+name = "k210-hal"
+version = "0.2.0"
+authors = ["The RISC-V Team <risc-v@teams.rust-embedded.org>"]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Hardware Abstract Layer (HAL) support for K210, dual-core RV64GC SoC"
+repository = "https://github.com/riscv-rust/k210-hal"
+keywords = ["riscv", "k210", "hal"]
+license = "ISC"
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = ["riscv64gc-unknown-none-elf"]
+
+[dependencies]
+embedded-hal = "=1.0.0-alpha.1"
+nb = "0.1.1"
+k210-pac = { path = "../k210-pac" }
+bitflags = "1.2.1"

@@ -1,0 +1,13 @@
+[package]
+name = "virtio-drivers"
+version = "0.1.0"
+authors = ["Jiajie Chen <noc@jiegec.ac.cn>", "Runji Wang <wangrunji0408@163.com>", "Yuekai Jia <equation618@gmail.com>"]
+edition = "2018"
+description = "VirtIO guest drivers."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+volatile = "0.3"
+log = "0.4"
+bitflags = "1.3"
