@@ -1,0 +1,13 @@
+[workspace]
+
+members=[
+    "easy-fs",
+    "easy-fs-fuse",
+    "os",
+    "user",
+    "third-party/k210-hal",
+    "third-party/k210-pac",
+    "third-party/k210-soc",
+    "third-party/riscv",
+    "third-party/virtio-drivers",
+]
