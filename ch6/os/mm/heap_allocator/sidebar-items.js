@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["handle_alloc_error",""],["heap_test",""],["init_heap",""]],"static":[["HEAP_ALLOCATOR",""],["HEAP_SPACE",""]]});
