@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["CLOCK_FREQ",""],["MMIO",""],["VIRT_PLIC",""],["VIRT_UART",""]],"fn":[["device_init",""],["irq_handler",""]],"type":[["BlockDeviceImpl",""],["CharDeviceImpl",""]]});

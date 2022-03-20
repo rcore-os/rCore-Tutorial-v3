@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["translated_byte_buffer",""],["translated_ref",""],["translated_refmut",""],["translated_str","Load a string from other address spaces into kernel space without an end `\\0`."]],"struct":[["PTEFlags",""],["PageTable",""],["PageTableEntry",""],["UserBuffer",""],["UserBufferIterator",""]]});

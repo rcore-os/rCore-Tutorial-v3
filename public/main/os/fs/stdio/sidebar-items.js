@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Stdin",""],["Stdout",""]]});
