@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["SYSCALL_EXEC",""],["SYSCALL_EXIT",""],["SYSCALL_FORK",""],["SYSCALL_GETPID",""],["SYSCALL_GET_TIME",""],["SYSCALL_READ",""],["SYSCALL_WAITPID",""],["SYSCALL_WRITE",""],["SYSCALL_YIELD",""]],"fn":[["syscall",""]],"mod":[["fs",""],["process",""]]});
