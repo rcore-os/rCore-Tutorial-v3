@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["SYSCALL_EXIT",""],["SYSCALL_GET_TIME",""],["SYSCALL_WRITE",""],["SYSCALL_YIELD",""]],"fn":[["syscall","handle syscall exception with `syscall_id` and other arguments"]],"mod":[["fs",""],["process",""]]});
