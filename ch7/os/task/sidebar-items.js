@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["add_initproc",""],["check_signals_of_current",""],["current_add_signal",""],["exit_current_and_run_next",""],["suspend_current_and_run_next",""]],"mod":[["context",""],["manager",""],["pid",""],["processor",""],["signal",""],["switch",""],["task",""]],"struct":[["INITPROC",""]]});
