@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["MutexBlocking",""],["MutexBlockingInner",""],["MutexSpin",""]],"trait":[["Mutex",""]]});
