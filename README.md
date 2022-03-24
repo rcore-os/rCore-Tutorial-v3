@@ -35,7 +35,7 @@ Install some tools:
 
 ```sh
 $ rustup target add riscv64gc-unknown-none-elf
-$ cargo install cargo-binutils --vers =0.3.3
+$ cargo install cargo-binutils --vers=0.3.3
 $ rustup component add llvm-tools-preview
 $ rustup component add rust-src
 ```
