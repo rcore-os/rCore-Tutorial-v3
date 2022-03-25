@@ -48,7 +48,31 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The operating system and app also starts in this module. Kernel code starts</span>
+<span class="doccomment">//! executing from `entry.asm`, after which [`rust_main()`] is called to</span>
+<span class="doccomment">//! initialize various pieces of functionality [`clear_bss()`]. (See its source code for</span>
+<span class="doccomment">//! details.)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! We then call [`println!`] to display `Hello, world!`.</span>
+
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
+<span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
 
@@ -61,7 +85,8 @@
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 
-<span class="kw">fn</span> <span class="ident">clear_bss</span>() {
+<span class="doccomment">/// clear BSS segment</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_bss</span>() {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="kw">fn</span> <span class="ident">sbss</span>();
         <span class="kw">fn</span> <span class="ident">ebss</span>();
@@ -69,19 +94,20 @@
     (<span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>..<span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="ident">a</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>).<span class="ident">write_volatile</span>(<span class="number">0</span>) });
 }
 
+<span class="doccomment">/// the rust entry-point of os</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rust_main</span>() -&gt; <span class="op">!</span> {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">fn</span> <span class="ident">stext</span>();
-        <span class="kw">fn</span> <span class="ident">etext</span>();
-        <span class="kw">fn</span> <span class="ident">srodata</span>();
-        <span class="kw">fn</span> <span class="ident">erodata</span>();
-        <span class="kw">fn</span> <span class="ident">sdata</span>();
-        <span class="kw">fn</span> <span class="ident">edata</span>();
-        <span class="kw">fn</span> <span class="ident">sbss</span>();
-        <span class="kw">fn</span> <span class="ident">ebss</span>();
-        <span class="kw">fn</span> <span class="ident">boot_stack</span>();
-        <span class="kw">fn</span> <span class="ident">boot_stack_top</span>();
+        <span class="kw">fn</span> <span class="ident">stext</span>();               <span class="comment">// begin addr of text segment</span>
+        <span class="kw">fn</span> <span class="ident">etext</span>();               <span class="comment">// end addr of text segment</span>
+        <span class="kw">fn</span> <span class="ident">srodata</span>();             <span class="comment">// start addr of Read-Only data segment</span>
+        <span class="kw">fn</span> <span class="ident">erodata</span>();             <span class="comment">// end addr of Read-Only data ssegment</span>
+        <span class="kw">fn</span> <span class="ident">sdata</span>();               <span class="comment">// start addr of data segment</span>
+        <span class="kw">fn</span> <span class="ident">edata</span>();               <span class="comment">// end addr of data segment</span>
+        <span class="kw">fn</span> <span class="ident">sbss</span>();                <span class="comment">// start addr of BSS segment</span>
+        <span class="kw">fn</span> <span class="ident">ebss</span>();                <span class="comment">// end addr of BSS segment</span>
+        <span class="kw">fn</span> <span class="ident">boot_stack</span>();          <span class="comment">// stack bottom</span>
+        <span class="kw">fn</span> <span class="ident">boot_stack_top</span>();      <span class="comment">// stack top</span>
     }
     <span class="ident">clear_bss</span>();
     <span class="macro">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);
