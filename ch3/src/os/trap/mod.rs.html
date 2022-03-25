@@ -66,7 +66,35 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Trap handling functionality</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For rCore, we have a single trap entry point, namely `__alltraps`. At</span>
+<span class="doccomment">//! initialization in [`init()`], we set the `stvec` CSR to point to it.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! All traps go through `__alltraps`, which is defined in `trap.S`. The</span>
+<span class="doccomment">//! assembly language code does just enough work restore the kernel space</span>
+<span class="doccomment">//! context, ensuring that Rust code safely runs, and transfers control to</span>
+<span class="doccomment">//! [`trap_handler()`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! It then calls different functionality based on what exactly the exception</span>
+<span class="doccomment">//! was. For example, timer interrupts trigger task preemption, and syscalls go</span>
+<span class="doccomment">//! to [`syscall()`].</span>
+
+<span class="kw">mod</span> <span class="ident">context</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall::syscall</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};

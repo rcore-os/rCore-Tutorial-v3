@@ -92,7 +92,21 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::<span class="kw-2">*</span>;
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Loading user applications into memory</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For chapter 3, user applications are simply part of the data included in the</span>
+<span class="doccomment">//! kernel binary, so we only need to copy them to the space allocated for each</span>
+<span class="doccomment">//! app to load them. We also allocate fixed spaces for each task&#39;s</span>
+<span class="doccomment">//! [`KernelStack`] and [`UserStack`].</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap::TrapContext</span>;
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
 

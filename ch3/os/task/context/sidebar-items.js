@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["TaskContext",""]]});
+initSidebarItems({"struct":[["TaskContext","Task Context"]]});

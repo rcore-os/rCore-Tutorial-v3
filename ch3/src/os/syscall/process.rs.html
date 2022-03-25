@@ -21,7 +21,9 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
+<span id="21">21</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Process management syscalls</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::timer::get_time_ms</span>;
 
 <span class="doccomment">/// task exits and submit an exit code</span>

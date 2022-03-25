@@ -22,7 +22,11 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::CLOCK_FREQ</span>;
+<span id="22">22</span>
+<span id="23">23</span>
+</pre><pre class="rust"><code><span class="doccomment">//! RISC-V timer-related functionality</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::CLOCK_FREQ</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::set_timer</span>;
 <span class="kw">use</span> <span class="ident">riscv::register::time</span>;
 

@@ -15,7 +15,11 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
+<span id="15">15</span>
+<span id="16">16</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Constants used in rCore</span>
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_APP_NUM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">APP_BASE_ADDRESS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x80400000</span>;

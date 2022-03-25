@@ -26,29 +26,39 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">riscv::register::sstatus</span>::{<span class="self">self</span>, <span class="ident">Sstatus</span>, <span class="ident">SPP</span>};
-
+<span class="doccomment">/// Trap Context</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrapContext</span> {
+    <span class="doccomment">/// general regs[0..31]</span>
     <span class="kw">pub</span> <span class="ident">x</span>: [<span class="ident">usize</span>; <span class="number">32</span>],
+    <span class="doccomment">/// CSR sstatus      </span>
     <span class="kw">pub</span> <span class="ident">sstatus</span>: <span class="ident">Sstatus</span>,
+    <span class="doccomment">/// CSR sepc</span>
     <span class="kw">pub</span> <span class="ident">sepc</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TrapContext</span> {
+    <span class="doccomment">/// set stack pointer to x_2 reg (sp)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sp</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">x</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">sp</span>;
     }
+    <span class="doccomment">/// init app context</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app_init_context</span>(<span class="ident">entry</span>: <span class="ident">usize</span>, <span class="ident">sp</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sstatus</span> <span class="op">=</span> <span class="ident">sstatus::read</span>();
-        <span class="ident">sstatus</span>.<span class="ident">set_spp</span>(<span class="ident">SPP::User</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sstatus</span> <span class="op">=</span> <span class="ident">sstatus::read</span>(); <span class="comment">// CSR sstatus</span>
+        <span class="ident">sstatus</span>.<span class="ident">set_spp</span>(<span class="ident">SPP::User</span>); <span class="comment">//previous privilege mode: user mode</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">x</span>: [<span class="number">0</span>; <span class="number">32</span>],
             <span class="ident">sstatus</span>,
-            <span class="ident">sepc</span>: <span class="ident">entry</span>,
+            <span class="ident">sepc</span>: <span class="ident">entry</span>, <span class="comment">// entry point of app</span>
         };
-        <span class="ident">cx</span>.<span class="ident">set_sp</span>(<span class="ident">sp</span>);
-        <span class="ident">cx</span>
+        <span class="ident">cx</span>.<span class="ident">set_sp</span>(<span class="ident">sp</span>); <span class="comment">// app&#39;s user stack pointer</span>
+        <span class="ident">cx</span> <span class="comment">// return initial Trap Context of app</span>
     }
 }
 </code></pre></div>
