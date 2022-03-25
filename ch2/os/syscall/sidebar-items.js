@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["SYSCALL_EXIT",""],["SYSCALL_WRITE",""]],"fn":[["syscall","handle syscall exception with `syscall_id` and other arguments"]],"mod":[["fs",""],["process",""]]});
+initSidebarItems({"constant":[["SYSCALL_EXIT",""],["SYSCALL_WRITE",""]],"fn":[["syscall","handle syscall exception with `syscall_id` and other arguments"]],"mod":[["fs","File and filesystem-related syscalls"],["process","App management syscalls"]]});

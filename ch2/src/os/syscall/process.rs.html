@@ -8,7 +8,9 @@
 <span id="5">5</span>
 <span id="6">6</span>
 <span id="7">7</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::batch::run_next_app</span>;
+<span id="8">8</span>
+</pre><pre class="rust"><code><span class="doccomment">//! App management syscalls</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::batch::run_next_app</span>;
 
 <span class="doccomment">/// task exits and submit an exit code</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_exit</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) -&gt; <span class="op">!</span> {

@@ -143,7 +143,14 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+</pre><pre class="rust"><code><span class="doccomment">//! batch subsystem</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap::TrapContext</span>;
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
@@ -256,14 +263,17 @@
     };
 }
 
+<span class="doccomment">/// init batch subsystem</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() {
     <span class="ident">print_app_info</span>();
 }
 
+<span class="doccomment">/// print apps info</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_app_info</span>() {
     <span class="ident">APP_MANAGER</span>.<span class="ident">exclusive_access</span>().<span class="ident">print_app_info</span>();
 }
 
+<span class="doccomment">/// run next app</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_next_app</span>() -&gt; <span class="op">!</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">app_manager</span> <span class="op">=</span> <span class="ident">APP_MANAGER</span>.<span class="ident">exclusive_access</span>();
     <span class="kw">let</span> <span class="ident">current_app</span> <span class="op">=</span> <span class="ident">app_manager</span>.<span class="ident">get_current_app</span>();

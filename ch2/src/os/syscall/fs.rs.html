@@ -16,8 +16,14 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
-</pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">FD_STDOUT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+</pre><pre class="rust"><code><span class="doccomment">//! File and filesystem-related syscalls</span>
 
+<span class="kw">const</span> <span class="ident">FD_STDOUT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="doccomment">/// write buf of length `len`  to a file with `fd`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_write</span>(<span class="ident">fd</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">fd</span> {
         <span class="ident">FD_STDOUT</span> =&gt; {
