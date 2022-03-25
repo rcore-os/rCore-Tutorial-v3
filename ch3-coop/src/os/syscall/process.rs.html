@@ -15,7 +15,9 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
+<span id="15">15</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Process management syscalls</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
 
 <span class="doccomment">/// task exits and submit an exit code</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_exit</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) -&gt; <span class="op">!</span> {

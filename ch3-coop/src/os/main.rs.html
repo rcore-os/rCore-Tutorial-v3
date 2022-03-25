@@ -41,7 +41,47 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Various facilities of the kernels are implemented as submodules. The most</span>
+<span class="doccomment">//! important ones are:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - [`trap`]: Handles all cases of switching from userspace to the kernel</span>
+<span class="doccomment">//! - [`task`]: Task management</span>
+<span class="doccomment">//! - [`syscall`]: System call handling and implementation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The operating system also starts in this module. Kernel code starts</span>
+<span class="doccomment">//! executing from `entry.asm`, after which [`rust_main()`] is called to</span>
+<span class="doccomment">//! initialize various pieces of functionality. (See its source code for</span>
+<span class="doccomment">//! details.)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! We then call [`task::run_first_task()`] and for the first time go to</span>
+<span class="doccomment">//! userspace.</span>
+
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
+<span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
 
@@ -54,13 +94,14 @@
 <span class="kw">mod</span> <span class="ident">loader</span>;
 <span class="kw">mod</span> <span class="ident">sbi</span>;
 <span class="kw">mod</span> <span class="ident">sync</span>;
-<span class="kw">mod</span> <span class="ident">syscall</span>;
-<span class="kw">mod</span> <span class="ident">task</span>;
-<span class="kw">mod</span> <span class="ident">trap</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">syscall</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">task</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">trap</span>;
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;link_app.S&quot;</span>));
 
+<span class="doccomment">/// clear BSS segment</span>
 <span class="kw">fn</span> <span class="ident">clear_bss</span>() {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="kw">fn</span> <span class="ident">sbss</span>();
@@ -72,6 +113,7 @@
     }
 }
 
+<span class="doccomment">/// the rust entry-point of os</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rust_main</span>() -&gt; <span class="op">!</span> {
     <span class="ident">clear_bss</span>();

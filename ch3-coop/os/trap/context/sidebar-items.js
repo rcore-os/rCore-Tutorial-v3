@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["TrapContext",""]]});
+initSidebarItems({"struct":[["TrapContext","Trap Context"]]});

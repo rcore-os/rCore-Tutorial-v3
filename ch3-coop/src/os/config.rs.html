@@ -6,7 +6,11 @@
 <span id="3">3</span>
 <span id="4">4</span>
 <span id="5">5</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
+<span id="6">6</span>
+<span id="7">7</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Constants used in rCore</span>
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_APP_NUM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">APP_BASE_ADDRESS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x80400000</span>;

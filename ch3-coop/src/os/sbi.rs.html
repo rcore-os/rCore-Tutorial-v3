@@ -45,20 +45,22 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+<span id="45">45</span>
+</pre><pre class="rust"><code><span class="doccomment">//! SBI call wrappers</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
 
-<span class="kw">const</span> <span class="ident">SBI_SET_TIMER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 <span class="kw">const</span> <span class="ident">SBI_CONSOLE_PUTCHAR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">SBI_CONSOLE_GETCHAR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">SBI_CLEAR_IPI</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
-<span class="kw">const</span> <span class="ident">SBI_SEND_IPI</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">const</span> <span class="ident">SBI_REMOTE_FENCE_I</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
-<span class="kw">const</span> <span class="ident">SBI_REMOTE_SFENCE_VMA</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
-<span class="kw">const</span> <span class="ident">SBI_REMOTE_SFENCE_VMA_ASID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
 <span class="kw">const</span> <span class="ident">SBI_SHUTDOWN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="comment">// const SBI_SET_TIMER: usize = 0;</span>
+<span class="comment">// const SBI_CONSOLE_GETCHAR: usize = 2;</span>
+<span class="comment">// const SBI_CLEAR_IPI: usize = 3;</span>
+<span class="comment">// const SBI_SEND_IPI: usize = 4;</span>
+<span class="comment">// const SBI_REMOTE_FENCE_I: usize = 5;</span>
+<span class="comment">// const SBI_REMOTE_SFENCE_VMA: usize = 6;</span>
+<span class="comment">// const SBI_REMOTE_SFENCE_VMA_ASID: usize = 7;</span>
 
+<span class="doccomment">///  handle SBI call with `which` SBI_id and other arguments</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="kw">fn</span> <span class="ident">sbi_call</span>(<span class="ident">which</span>: <span class="ident">usize</span>, <span class="ident">arg0</span>: <span class="ident">usize</span>, <span class="ident">arg1</span>: <span class="ident">usize</span>, <span class="ident">arg2</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>;
@@ -80,9 +82,9 @@
 }
 
 <span class="doccomment">/// use sbi call to getchar from console (qemu uart handler)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">console_getchar</span>() -&gt; <span class="ident">usize</span> {
-    <span class="ident">sbi_call</span>(<span class="ident">SBI_CONSOLE_GETCHAR</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-}
+<span class="comment">// pub fn console_getchar() -&gt; usize {</span>
+<span class="comment">//     sbi_call(SBI_CONSOLE_GETCHAR, 0, 0, 0)</span>
+<span class="comment">// }</span>
 
 <span class="doccomment">/// use sbi call to shutdown the kernel</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {

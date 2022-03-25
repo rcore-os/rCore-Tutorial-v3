@@ -144,7 +144,46 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Task management implementation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Everything about task management, like starting and switching tasks is</span>
+<span class="doccomment">//! implemented here.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A single global instance of [`TaskManager`] called `TASK_MANAGER` controls</span>
+<span class="doccomment">//! all the tasks in the operating system.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Be careful when you see `__switch` ASM function in `switch.S`. Control flow around this function</span>
+<span class="doccomment">//! might not be what you expect.</span>
+
+<span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">switch</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::module_inception</span>)]</span>
@@ -159,6 +198,15 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context::TaskContext</span>;
 
+<span class="doccomment">/// The task manager, where all the tasks are managed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Functions implemented on `TaskManager` deals with all task state transitions</span>
+<span class="doccomment">/// and task context switching. For convenience, you can find wrappers around it</span>
+<span class="doccomment">/// in the module level.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Most of `TaskManager` are hidden behind the field `inner`, to defer</span>
+<span class="doccomment">/// borrowing checks to runtime. You can see examples on how to use `inner` in</span>
+<span class="doccomment">/// existing functions on `TaskManager`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskManager</span> {
     <span class="doccomment">/// total number of tasks</span>
     <span class="ident">num_app</span>: <span class="ident">usize</span>,
@@ -166,7 +214,8 @@
     <span class="ident">inner</span>: <span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">TaskManagerInner</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">struct</span> <span class="ident">TaskManagerInner</span> {
+<span class="doccomment">/// Inner of Task Manager</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskManagerInner</span> {
     <span class="doccomment">/// task list</span>
     <span class="ident">tasks</span>: [<span class="ident">TaskControlBlock</span>; <span class="ident">MAX_APP_NUM</span>],
     <span class="doccomment">/// id of current `Running` task</span>
@@ -174,6 +223,7 @@
 }
 
 <span class="macro">lazy_static!</span> {
+    <span class="doccomment">/// Global variable: TASK_MANAGER</span>
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TASK_MANAGER</span>: <span class="ident">TaskManager</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">num_app</span> <span class="op">=</span> <span class="ident">get_num_app</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tasks</span> <span class="op">=</span> [<span class="ident">TaskControlBlock</span> {
@@ -262,27 +312,33 @@
     }
 }
 
+<span class="doccomment">/// run first task</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_first_task</span>() {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">run_first_task</span>();
 }
 
+<span class="doccomment">/// rust next task</span>
 <span class="kw">fn</span> <span class="ident">run_next_task</span>() {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">run_next_task</span>();
 }
 
+<span class="doccomment">/// suspend current task</span>
 <span class="kw">fn</span> <span class="ident">mark_current_suspended</span>() {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">mark_current_suspended</span>();
 }
 
+<span class="doccomment">/// exit current task</span>
 <span class="kw">fn</span> <span class="ident">mark_current_exited</span>() {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">mark_current_exited</span>();
 }
 
+<span class="doccomment">/// suspend current task, then run next task</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suspend_current_and_run_next</span>() {
     <span class="ident">mark_current_suspended</span>();
     <span class="ident">run_next_task</span>();
 }
 
+<span class="doccomment">/// exit current task,  then run next task</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>() {
     <span class="ident">mark_current_exited</span>();
     <span class="ident">run_next_task</span>();
