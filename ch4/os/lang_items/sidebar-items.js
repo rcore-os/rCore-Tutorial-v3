@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["panic",""]]});
+initSidebarItems({"fn":[["panic","panic handler"]]});

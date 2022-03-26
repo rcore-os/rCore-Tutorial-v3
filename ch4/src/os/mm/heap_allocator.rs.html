@@ -46,19 +46,31 @@
 <span id="43">43</span>
 <span id="44">44</span>
 <span id="45">45</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::KERNEL_HEAP_SIZE</span>;
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The global allocator</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::KERNEL_HEAP_SIZE</span>;
 <span class="kw">use</span> <span class="ident">buddy_system_allocator::LockedHeap</span>;
 
 <span class="attribute">#[<span class="ident">global_allocator</span>]</span>
+<span class="doccomment">/// heap allocator instance</span>
 <span class="kw">static</span> <span class="ident">HEAP_ALLOCATOR</span>: <span class="ident">LockedHeap</span> <span class="op">=</span> <span class="ident">LockedHeap::empty</span>();
 
 <span class="attribute">#[<span class="ident">alloc_error_handler</span>]</span>
+<span class="doccomment">/// panic when heap allocation error occurs</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_alloc_error</span>(<span class="ident">layout</span>: <span class="ident">core::alloc::Layout</span>) -&gt; <span class="op">!</span> {
     <span class="macro">panic!</span>(<span class="string">&quot;Heap allocation error, layout = {:?}&quot;</span>, <span class="ident">layout</span>);
 }
 
+<span class="doccomment">/// heap space ([u8; KERNEL_HEAP_SIZE])</span>
 <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">HEAP_SPACE</span>: [<span class="ident">u8</span>; <span class="ident">KERNEL_HEAP_SIZE</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="ident">KERNEL_HEAP_SIZE</span>];
 
+<span class="doccomment">/// initiate heap allocator</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_heap</span>() {
     <span class="kw">unsafe</span> {
         <span class="ident">HEAP_ALLOCATOR</span>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["TaskStatus",""]],"struct":[["TaskControlBlock",""]]});
+initSidebarItems({"enum":[["TaskStatus","task status: UnInit, Ready, Running, Exited"]],"struct":[["TaskControlBlock","task control block structure"]]});

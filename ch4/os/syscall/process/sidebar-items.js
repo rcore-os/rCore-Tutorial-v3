@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["sys_exit",""],["sys_get_time",""],["sys_yield",""]]});
+initSidebarItems({"fn":[["sys_exit","task exits and submit an exit code"],["sys_get_time","get current time "],["sys_yield","current task gives up resources for other tasks"]]});

@@ -19,7 +19,13 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::CLOCK_FREQ</span>;
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+</pre><pre class="rust"><code><span class="doccomment">//! RISC-V timer-related functionality</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::CLOCK_FREQ</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::set_timer</span>;
 <span class="kw">use</span> <span class="ident">riscv::register::time</span>;
 
@@ -30,10 +36,12 @@
     <span class="ident">time::read</span>()
 }
 
+<span class="doccomment">/// get current time in microseconds</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_time_ms</span>() -&gt; <span class="ident">usize</span> {
     <span class="ident">time::read</span>() <span class="op">/</span> (<span class="ident">CLOCK_FREQ</span> <span class="op">/</span> <span class="ident">MSEC_PER_SEC</span>)
 }
 
+<span class="doccomment">/// set the next timer interrupt</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_next_trigger</span>() {
     <span class="ident">set_timer</span>(<span class="ident">get_time</span>() <span class="op">+</span> <span class="ident">CLOCK_FREQ</span> <span class="op">/</span> <span class="ident">TICKS_PER_SEC</span>);
 }

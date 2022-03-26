@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["up",""]]});
+initSidebarItems({"mod":[["up","Uniprocessor interior mutability primitives"]]});

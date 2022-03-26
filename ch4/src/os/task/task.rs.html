@@ -62,11 +62,16 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskContext</span>;
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types related to task management</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskContext</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">kernel_stack_position</span>, <span class="ident">TRAP_CONTEXT</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">MemorySet</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap</span>::{<span class="ident">trap_handler</span>, <span class="ident">TrapContext</span>};
 
+<span class="doccomment">/// task control block structure</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskControlBlock</span> {
     <span class="kw">pub</span> <span class="ident">task_status</span>: <span class="ident">TaskStatus</span>,
     <span class="kw">pub</span> <span class="ident">task_cx</span>: <span class="ident">TaskContext</span>,
@@ -118,6 +123,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="doccomment">/// task status: UnInit, Ready, Running, Exited</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TaskStatus</span> {
     <span class="ident">Ready</span>,
     <span class="ident">Running</span>,
