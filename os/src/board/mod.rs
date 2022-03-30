@@ -18,6 +18,7 @@ use crate::drivers::plic::{IntrTargetPriority, PLIC};
 
 pub fn device_init() {
     use riscv::register::sie;
+    kprintln!("[KERN] board::qemu::device_init() begin");
     let mut plic = unsafe { PLIC::new(VIRT_PLIC) };
     let hart_id: usize = 0;
     let supervisor = IntrTargetPriority::Supervisor;
@@ -31,6 +32,7 @@ pub fn device_init() {
     unsafe {
         sie::set_sext();
     }
+    kprintln!("[KERN] board::qemu::device_init() end");
 }
 
 pub fn irq_handler() {

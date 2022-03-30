@@ -31,10 +31,13 @@ lazy_static! {
 }
 
 pub fn add_task(task: Arc<TaskControlBlock>) {
+    //kprintln!("[KERN] task::manager::add_task() begin");
     TASK_MANAGER.exclusive_access().add(task);
+    //kprintln!("[KERN] task::manager::add_task() end");
 }
 
 pub fn fetch_task() -> Option<Arc<TaskControlBlock>> {
+    //kprintln!("[KERN] task::manager::fetch_task() begin");
     TASK_MANAGER.exclusive_access().fetch()
 }
 

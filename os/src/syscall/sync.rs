@@ -4,14 +4,17 @@ use crate::timer::{add_timer, get_time_ms};
 use alloc::sync::Arc;
 
 pub fn sys_sleep(ms: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_sleep begin");
     let expire_ms = get_time_ms() + ms;
     let task = current_task().unwrap();
     add_timer(expire_ms, task);
     block_current_and_run_next();
+    kprintln!("[KERN] syscall::sync::sys_sleep end");
     0
 }
 
 pub fn sys_mutex_create(blocking: bool) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_mutex_create begin");
     let process = current_process();
     let mutex: Option<Arc<dyn Mutex>> = if !blocking {
         Some(Arc::new(MutexSpin::new()))
@@ -35,6 +38,7 @@ pub fn sys_mutex_create(blocking: bool) -> isize {
 }
 
 pub fn sys_mutex_lock(mutex_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_mutex_lock begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let mutex = Arc::clone(process_inner.mutex_list[mutex_id].as_ref().unwrap());
@@ -45,6 +49,7 @@ pub fn sys_mutex_lock(mutex_id: usize) -> isize {
 }
 
 pub fn sys_mutex_unlock(mutex_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_mutex_unlock begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let mutex = Arc::clone(process_inner.mutex_list[mutex_id].as_ref().unwrap());
@@ -55,6 +60,7 @@ pub fn sys_mutex_unlock(mutex_id: usize) -> isize {
 }
 
 pub fn sys_semaphore_create(res_count: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_semaphore_create begin");
     let process = current_process();
     let mut process_inner = process.inner_exclusive_access();
     let id = if let Some(id) = process_inner
@@ -76,6 +82,7 @@ pub fn sys_semaphore_create(res_count: usize) -> isize {
 }
 
 pub fn sys_semaphore_up(sem_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_semaphore_up begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let sem = Arc::clone(process_inner.semaphore_list[sem_id].as_ref().unwrap());
@@ -85,6 +92,7 @@ pub fn sys_semaphore_up(sem_id: usize) -> isize {
 }
 
 pub fn sys_semaphore_down(sem_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_semaphore_down begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let sem = Arc::clone(process_inner.semaphore_list[sem_id].as_ref().unwrap());
@@ -94,6 +102,7 @@ pub fn sys_semaphore_down(sem_id: usize) -> isize {
 }
 
 pub fn sys_condvar_create(_arg: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_condvar_create begin");
     let process = current_process();
     let mut process_inner = process.inner_exclusive_access();
     let id = if let Some(id) = process_inner
@@ -115,6 +124,7 @@ pub fn sys_condvar_create(_arg: usize) -> isize {
 }
 
 pub fn sys_condvar_signal(condvar_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_condvar_signal begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let condvar = Arc::clone(process_inner.condvar_list[condvar_id].as_ref().unwrap());
@@ -124,6 +134,7 @@ pub fn sys_condvar_signal(condvar_id: usize) -> isize {
 }
 
 pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
+    kprintln!("[KERN] syscall::sync::sys_condvar_wait begin");
     let process = current_process();
     let process_inner = process.inner_exclusive_access();
     let condvar = Arc::clone(process_inner.condvar_list[condvar_id].as_ref().unwrap());

@@ -51,11 +51,11 @@ lazy_static! {
 }
 
 pub fn list_apps() {
-    println!("/**** APPS ****");
+    kprintln!("[KERN] fs::inode::list_apps()) begin");
     for app in ROOT_INODE.ls() {
         println!("{}", app);
     }
-    println!("**************/")
+    kprintln!("[KERN] fs::inode::list_apps()) end");
 }
 
 bitflags! {
@@ -83,6 +83,7 @@ impl OpenFlags {
 }
 
 pub fn open_file(name: &str, flags: OpenFlags) -> Option<Arc<OSInode>> {
+    kprintln!("[KERN] fs::inode::open_file() begin");
     let (readable, writable) = flags.read_write();
     if flags.contains(OpenFlags::CREATE) {
         if let Some(inode) = ROOT_INODE.find(name) {
@@ -113,6 +114,7 @@ impl File for OSInode {
         self.writable
     }
     fn read(&self, mut buf: UserBuffer) -> usize {
+        kprintln!("[KERN] fs::inode::read() begin");
         let mut inner = self.inner.exclusive_access();
         let mut total_read_size = 0usize;
         for slice in buf.buffers.iter_mut() {
@@ -123,9 +125,11 @@ impl File for OSInode {
             inner.offset += read_size;
             total_read_size += read_size;
         }
+        kprintln!("[KERN] fs::inode::read() end");
         total_read_size
     }
     fn write(&self, buf: UserBuffer) -> usize {
+        kprintln!("[KERN] fs::inode::write() begin");
         let mut inner = self.inner.exclusive_access();
         let mut total_write_size = 0usize;
         for slice in buf.buffers.iter() {
@@ -134,6 +138,7 @@ impl File for OSInode {
             inner.offset += write_size;
             total_write_size += write_size;
         }
+        kprintln!("[KERN] fs::inode::write() end");
         total_write_size
     }
 }

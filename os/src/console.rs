@@ -29,3 +29,33 @@ macro_rules! println {
         $crate::console::print(format_args!(concat!($fmt, "\n") $(, $($arg)+)?))
     }
 }
+
+use crate::sbi::console_putchar;
+struct Kstdout;
+
+impl Write for Kstdout {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        for c in s.chars() {
+            console_putchar(c as usize);
+        }
+        Ok(())
+    }
+}
+
+pub fn kprint(args: fmt::Arguments) {
+    Kstdout.write_fmt(args).unwrap();
+}
+
+#[macro_export]
+macro_rules! kprint {
+    ($fmt: literal $(, $($arg: tt)+)?) => {
+        $crate::console::kprint(format_args!($fmt $(, $($arg)+)?));
+    }
+}
+
+#[macro_export]
+macro_rules! kprintln {
+    ($fmt: literal $(, $($arg: tt)+)?) => {
+        $crate::console::kprint(format_args!(concat!($fmt, "\n") $(, $($arg)+)?));
+    }
+}

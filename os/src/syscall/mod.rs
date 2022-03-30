@@ -37,6 +37,12 @@ use sync::*;
 use thread::*;
 
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
+    if syscall_id !=SYSCALL_YIELD && 
+       syscall_id !=SYSCALL_WAITPID &&
+       !(syscall_id ==SYSCALL_READ && args[0] == 0) &&
+       !(syscall_id ==SYSCALL_WRITE && (args[0] == 1|| args[0] == 2)) {
+        kprintln!("[KERN] syscall::syscall(id: {}) begin", sys_id_str(syscall_id));
+    }
     match syscall_id {
         SYSCALL_DUP => sys_dup(args[0]),
         SYSCALL_OPEN => sys_open(args[0] as *const u8, args[1] as u32),
@@ -66,5 +72,38 @@ pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
         SYSCALL_CONDVAR_SIGNAL => sys_condvar_signal(args[0]),
         SYSCALL_CONDVAR_WAIT => sys_condvar_wait(args[0], args[1]),
         _ => panic!("Unsupported syscall_id: {}", syscall_id),
+    }
+}
+
+pub fn sys_id_str(syscall_id: usize) -> &'static str {
+    match syscall_id {
+        SYSCALL_DUP => "sys_dup",
+        SYSCALL_OPEN => "sys_open",
+        SYSCALL_CLOSE => "sys_close",
+        SYSCALL_PIPE => "sys_pipe",
+        SYSCALL_READ => "sys_read",
+        SYSCALL_WRITE => "sys_write",
+        SYSCALL_EXIT => "sys_exit",
+        SYSCALL_SLEEP => "sys_sleep",
+        SYSCALL_YIELD => "sys_yield",
+        SYSCALL_KILL => "sys_kill",
+        SYSCALL_GET_TIME => "sys_get_time",
+        SYSCALL_GETPID => "sys_getpid",
+        SYSCALL_FORK => "sys_fork",
+        SYSCALL_EXEC => "sys_exec",
+        SYSCALL_WAITPID => "sys_waitpid",
+        SYSCALL_THREAD_CREATE => "sys_thread_create",
+        SYSCALL_GETTID => "sys_gettid",
+        SYSCALL_WAITTID => "sys_waittid",
+        SYSCALL_MUTEX_CREATE => "sys_mutex_create",
+        SYSCALL_MUTEX_LOCK => "sys_mutex_lock",
+        SYSCALL_MUTEX_UNLOCK => "sys_mutex_unlock",
+        SYSCALL_SEMAPHORE_CREATE => "sys_semaphore_create",
+        SYSCALL_SEMAPHORE_UP => "sys_semaphore_up",
+        SYSCALL_SEMAPHORE_DOWN => "sys_semaphore_down",
+        SYSCALL_CONDVAR_CREATE => "sys_condvar_create",
+        SYSCALL_CONDVAR_SIGNAL => "sys_condvar_signal",
+        SYSCALL_CONDVAR_WAIT => "sys_condvar_wait",
+        _ => "Unsupported syscall_id",
     }
 }

@@ -1,7 +1,7 @@
-mod sdcard;
+// mod sdcard;
 mod virtio_blk;
 
-pub use sdcard::SDCardWrapper;
+// pub use sdcard::SDCardWrapper;
 pub use virtio_blk::VirtIOBlock;
 
 use crate::board::BlockDeviceImpl;

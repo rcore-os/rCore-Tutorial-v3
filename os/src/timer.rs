@@ -21,7 +21,9 @@ pub fn get_time_ms() -> usize {
 }
 
 pub fn set_next_trigger() {
+    //kprintln!("[KERN] timer::set_next_trigger() begin");
     set_timer(get_time() + CLOCK_FREQ / TICKS_PER_SEC);
+    //kprintln!("[KERN] timer::set_next_trigger() end");
 }
 
 pub struct TimerCondVar {

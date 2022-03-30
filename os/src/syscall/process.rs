@@ -10,6 +10,7 @@ use alloc::sync::Arc;
 use alloc::vec::Vec;
 
 pub fn sys_exit(exit_code: i32) -> ! {
+    kprintln!("[KERN] syscall::process::sys_exit begin");
     exit_current_and_run_next(exit_code);
     panic!("Unreachable in sys_exit!");
 }
@@ -20,14 +21,17 @@ pub fn sys_yield() -> isize {
 }
 
 pub fn sys_get_time() -> isize {
+    kprintln!("[KERN] syscall::process::sys_get_time begin");
     get_time_ms() as isize
 }
 
 pub fn sys_getpid() -> isize {
+    kprintln!("[KERN] syscall::process::sys_getpid begin");
     current_task().unwrap().process.upgrade().unwrap().getpid() as isize
 }
 
 pub fn sys_fork() -> isize {
+    kprintln!("[KERN] syscall::process::sys_fork begin");
     let current_process = current_process();
     let new_process = current_process.fork();
     let new_pid = new_process.getpid();
@@ -38,10 +42,12 @@ pub fn sys_fork() -> isize {
     // we do not have to move to next instruction since we have done it before
     // for child process, fork returns 0
     trap_cx.x[10] = 0;
+    kprintln!("[KERN] syscall::process::sys_fork end");
     new_pid as isize
 }
 
 pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
+    kprintln!("[KERN] syscall::process::sys_exec begin");
     let token = current_user_token();
     let path = translated_str(token, path);
     let mut args_vec: Vec<String> = Vec::new();
@@ -60,6 +66,7 @@ pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
         let process = current_process();
         let argc = args_vec.len();
         process.exec(all_data.as_slice(), args_vec);
+        kprintln!("[KERN] syscall::process::sys_exec end");
         // return argc because cx.x[10] will be covered with it later
         argc as isize
     } else {
@@ -70,6 +77,7 @@ pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
 /// If there is not a child process whose pid is same as given, return -1.
 /// Else if there is a child process but it is still running, return -2.
 pub fn sys_waitpid(pid: isize, exit_code_ptr: *mut i32) -> isize {
+    //kprintln!("[KERN] syscall::process::sys_waitpid begin");
     let process = current_process();
     // find a child process
 
@@ -104,6 +112,7 @@ pub fn sys_waitpid(pid: isize, exit_code_ptr: *mut i32) -> isize {
 }
 
 pub fn sys_kill(pid: usize, signal: u32) -> isize {
+    kprintln!("[KERN] syscall::process::sys_kill begin");
     if let Some(process) = pid2process(pid) {
         if let Some(flag) = SignalFlags::from_bits(signal) {
             process.inner_exclusive_access().signals |= flag;

@@ -49,10 +49,12 @@ impl TaskControlBlock {
         ustack_base: usize,
         alloc_user_res: bool,
     ) -> Self {
+        kprintln!("[KERN] TaskControlBlock::new() begin");
         let res = TaskUserRes::new(Arc::clone(&process), ustack_base, alloc_user_res);
         let trap_cx_ppn = res.trap_cx_ppn();
         let kstack = kstack_alloc();
         let kstack_top = kstack.get_top();
+        kprintln!("[KERN] TaskControlBlock::new() end");
         Self {
             process: Arc::downgrade(&process),
             kstack,

@@ -17,7 +17,9 @@ use riscv::register::{
 global_asm!(include_str!("trap.S"));
 
 pub fn init() {
+    kprintln!("[KERN] trap::init() begin");
     set_kernel_trap_entry();
+    kprintln!("[KERN] trap::init() end");
 }
 
 fn set_kernel_trap_entry() {
@@ -39,9 +41,11 @@ fn set_user_trap_entry() {
 }
 
 pub fn enable_timer_interrupt() {
+    kprintln!("[KERN] trap::enable_timer_interrupt() begin");
     unsafe {
         sie::set_stimer();
     }
+    kprintln!("[KERN] trap::enable_timer_interrupt() end");
 }
 
 fn enable_supervisor_interrupt() {

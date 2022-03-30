@@ -27,6 +27,7 @@ pub use task::{TaskControlBlock, TaskStatus};
 
 pub fn suspend_current_and_run_next() {
     // There must be an application running.
+    //kprintln!("[KERN] task::suspend_current_and_run_next() begin");
     let task = take_current_task().unwrap();
 
     // ---- access current TCB exclusively
@@ -40,14 +41,17 @@ pub fn suspend_current_and_run_next() {
     // push back to ready queue.
     add_task(task);
     // jump to scheduling cycle
+    //kprintln!("[KERN] task::suspend_current_and_run_next() end");
     schedule(task_cx_ptr);
 }
 
 /// This function must be followed by a schedule
 pub fn block_current_task() -> *mut TaskContext {
+    //kprintln!("[KERN] task::block_current_task() begin");
     let task = take_current_task().unwrap();
     let mut task_inner = task.inner_exclusive_access();
     task_inner.task_status = TaskStatus::Blocking;
+    //kprintln!("[KERN] task::block_current_task() end");
     &mut task_inner.task_cx as *mut TaskContext
 }
 
@@ -57,6 +61,7 @@ pub fn block_current_and_run_next() {
 }
 
 pub fn exit_current_and_run_next(exit_code: i32) {
+    kprintln!("[KERN] task::exit_current_and_run_next() begin");
     let task = take_current_task().unwrap();
     let mut task_inner = task.inner_exclusive_access();
     let process = task.process.upgrade().unwrap();
@@ -105,11 +110,13 @@ pub fn exit_current_and_run_next(exit_code: i32) {
     drop(process);
     // we do not have to save task context
     let mut _unused = TaskContext::zero_init();
+    kprintln!("[KERN] task::exit_current_and_run_next() end");
     schedule(&mut _unused as *mut _);
 }
 
 lazy_static! {
     pub static ref INITPROC: Arc<ProcessControlBlock> = {
+        kprintln!("[KERN] task::lazy_static!INITPROC begin");
         let inode = open_file("initproc", OpenFlags::RDONLY).unwrap();
         let v = inode.read_all();
         ProcessControlBlock::new(v.as_slice())
@@ -117,7 +124,9 @@ lazy_static! {
 }
 
 pub fn add_initproc() {
+    kprintln!("[KERN] task::add_initproc() begin");
     let _initproc = INITPROC.clone();
+    kprintln!("[KERN] task::add_initproc() end");
 }
 
 pub fn check_signals_of_current() -> Option<(i32, &'static str)> {

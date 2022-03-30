@@ -8,12 +8,12 @@ extern crate alloc;
 #[macro_use]
 extern crate bitflags;
 
-#[cfg(feature = "board_k210")]
-#[path = "boards/k210.rs"]
-mod board;
-#[cfg(not(any(feature = "board_k210")))]
-#[path = "boards/qemu.rs"]
-mod board;
+// #[cfg(feature = "board_k210")]
+// #[path = "boards/k210.rs"]
+// mod board;
+// #[cfg(not(any(feature = "board_k210")))]
+// #[path = "boards/qemu.rs"]
+
 
 #[macro_use]
 mod console;
@@ -28,6 +28,8 @@ mod syscall;
 mod task;
 mod timer;
 mod trap;
+mod board;
+// use board::*;
 
 core::arch::global_asm!(include_str!("entry.asm"));
 
@@ -36,10 +38,12 @@ fn clear_bss() {
         fn sbss();
         fn ebss();
     }
+    kprintln!("[KERN] clear_bss() begin");
     unsafe {
         core::slice::from_raw_parts_mut(sbss as usize as *mut u8, ebss as usize - sbss as usize)
             .fill(0);
     }
+    kprintln!("[KERN] clear_bss() end");
 }
 
 use lazy_static::*;
@@ -51,6 +55,7 @@ lazy_static! {
 
 #[no_mangle]
 pub fn rust_main() -> ! {
+    kprintln!("[KERN] rust_main() begin");
     clear_bss();
     mm::init();
     trap::init();
@@ -61,5 +66,5 @@ pub fn rust_main() -> ! {
     task::add_initproc();
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
     task::run_tasks();
-    panic!("Unreachable in rust_main!");
+    panic!("[KERN] Unreachable in rust_main!");
 }

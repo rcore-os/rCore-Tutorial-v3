@@ -6,6 +6,7 @@ use crate::{
 use alloc::sync::Arc;
 
 pub fn sys_thread_create(entry: usize, arg: usize) -> isize {
+    kprintln!("[KERN] syscall::thread::sys_thread_create begin");
     let task = current_task().unwrap();
     let process = task.process.upgrade().unwrap();
     // create a new thread
@@ -39,10 +40,12 @@ pub fn sys_thread_create(entry: usize, arg: usize) -> isize {
         trap_handler as usize,
     );
     (*new_task_trap_cx).x[10] = arg;
+    kprintln!("[KERN] syscall::thread::sys_thread_create end");
     new_task_tid as isize
 }
 
 pub fn sys_gettid() -> isize {
+    kprintln!("[KERN] syscall::thread::sys_gettid begin");
     current_task()
         .unwrap()
         .inner_exclusive_access()
@@ -56,6 +59,7 @@ pub fn sys_gettid() -> isize {
 /// thread has not exited yet, return -2
 /// otherwise, return thread's exit code
 pub fn sys_waittid(tid: usize) -> i32 {
+    kprintln!("[KERN] syscall::thread::sys_waittid begin");
     let task = current_task().unwrap();
     let process = task.process.upgrade().unwrap();
     let task_inner = task.inner_exclusive_access();

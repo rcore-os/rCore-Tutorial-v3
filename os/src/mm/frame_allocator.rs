@@ -48,7 +48,7 @@ impl StackFrameAllocator {
     pub fn init(&mut self, l: PhysPageNum, r: PhysPageNum) {
         self.current = l.0;
         self.end = r.0;
-        println!("last {} Physical Frames.", self.end - self.current);
+        println!("[KERN] last {} Physical Frames.", self.end - self.current);
     }
 }
 impl FrameAllocator for StackFrameAllocator {
@@ -73,7 +73,7 @@ impl FrameAllocator for StackFrameAllocator {
         let ppn = ppn.0;
         // validity check
         if ppn >= self.current || self.recycled.iter().any(|&v| v == ppn) {
-            panic!("Frame ppn={:#x} has not been allocated!", ppn);
+            panic!("[KERN] Frame ppn={:#x} has not been allocated!", ppn);
         }
         // recycle
         self.recycled.push(ppn);
@@ -91,10 +91,12 @@ pub fn init_frame_allocator() {
     extern "C" {
         fn ekernel();
     }
+    kprintln!("[KERN] mm::init_frame_allocator() begin");
     FRAME_ALLOCATOR.exclusive_access().init(
         PhysAddr::from(ekernel as usize).ceil(),
         PhysAddr::from(MEMORY_END).floor(),
     );
+    kprintln!("[KERN] mm::init_frame_allocator() end");
 }
 
 pub fn frame_alloc() -> Option<FrameTracker> {

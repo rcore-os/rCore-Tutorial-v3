@@ -88,18 +88,19 @@ impl MemorySet {
     }
     /// Without kernel stacks.
     pub fn new_kernel() -> Self {
+        kprintln!("[KERN] mm::memory_set::MemorySet::new_kernel() begin");
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
         // map kernel sections
-        println!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
-        println!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
-        println!(".data [{:#x}, {:#x})", sdata as usize, edata as usize);
+        println!("[KERN] .text [{:#x}, {:#x})", stext as usize, etext as usize);
+        println!("[KERN] .rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
+        println!("[KERN] .data [{:#x}, {:#x})", sdata as usize, edata as usize);
         println!(
-            ".bss [{:#x}, {:#x})",
+            "[KERN] .bss [{:#x}, {:#x})",
             sbss_with_stack as usize, ebss as usize
         );
-        println!("mapping .text section");
+        println!("[KERN] mapping .text section");
         memory_set.push(
             MapArea::new(
                 (stext as usize).into(),
@@ -109,7 +110,7 @@ impl MemorySet {
             ),
             None,
         );
-        println!("mapping .rodata section");
+        println!("[KERN] mapping .rodata section");
         memory_set.push(
             MapArea::new(
                 (srodata as usize).into(),
@@ -119,7 +120,7 @@ impl MemorySet {
             ),
             None,
         );
-        println!("mapping .data section");
+        println!("[KERN] mapping .data section");
         memory_set.push(
             MapArea::new(
                 (sdata as usize).into(),
@@ -129,7 +130,7 @@ impl MemorySet {
             ),
             None,
         );
-        println!("mapping .bss section");
+        println!("[KERN] mapping .bss section");
         memory_set.push(
             MapArea::new(
                 (sbss_with_stack as usize).into(),
@@ -139,7 +140,7 @@ impl MemorySet {
             ),
             None,
         );
-        println!("mapping physical memory");
+        println!("[KERN] mapping physical memory");
         memory_set.push(
             MapArea::new(
                 (ekernel as usize).into(),
@@ -149,7 +150,7 @@ impl MemorySet {
             ),
             None,
         );
-        println!("mapping memory-mapped registers");
+        println!("[KERN] mapping memory-mapped registers");
         for pair in MMIO {
             memory_set.push(
                 MapArea::new(
@@ -161,11 +162,13 @@ impl MemorySet {
                 None,
             );
         }
+        kprintln!("[KERN] mm::memory_set::MemorySet::new_kernel() end");
         memory_set
     }
     /// Include sections in elf and trampoline,
     /// also returns user_sp_base and entry point.
     pub fn from_elf(elf_data: &[u8]) -> (Self, usize, usize) {
+        kprintln!("[KERN] mm::memory_set::MemorySet::from_elf() begin");
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
@@ -203,6 +206,7 @@ impl MemorySet {
         let max_end_va: VirtAddr = max_end_vpn.into();
         let mut user_stack_base: usize = max_end_va.into();
         user_stack_base += PAGE_SIZE;
+        kprintln!("[KERN] mm::memory_set::MemorySet::from_elf() end");
         (
             memory_set,
             user_stack_base,
@@ -210,6 +214,7 @@ impl MemorySet {
         )
     }
     pub fn from_existed_user(user_space: &MemorySet) -> MemorySet {
+        kprintln!("[KERN] mm::memory_set::MemorySet::from_existed_user() begin");
         let mut memory_set = Self::new_bare();
         // map trampoline
         memory_set.map_trampoline();
@@ -226,14 +231,17 @@ impl MemorySet {
                     .copy_from_slice(src_ppn.get_bytes_array());
             }
         }
+        kprintln!("[KERN] mm::memory_set::MemorySet::from_existed_user() end");
         memory_set
     }
     pub fn activate(&self) {
+        kprintln!("[KERN] mm::memory_set::MemorySet::activate() begin");
         let satp = self.page_table.token();
         unsafe {
             satp::write(satp);
             asm!("sfence.vma");
         }
+        kprintln!("[KERN] mm::memory_set::MemorySet::activate() begin");
     }
     pub fn translate(&self, vpn: VirtPageNum) -> Option<PageTableEntry> {
         self.page_table.translate(vpn)
@@ -258,8 +266,10 @@ impl MapArea {
         map_type: MapType,
         map_perm: MapPermission,
     ) -> Self {
+        kprintln!("[KERN] mm::memory_set::MapArea::new() begin");
         let start_vpn: VirtPageNum = start_va.floor();
         let end_vpn: VirtPageNum = end_va.ceil();
+        kprintln!("[KERN] mm::memory_set::MapArea::new(start_vpn: {:?}, end_vpn: {:?}) end", start_vpn, end_vpn);
         Self {
             vpn_range: VPNRange::new(start_vpn, end_vpn),
             data_frames: BTreeMap::new(),
@@ -297,18 +307,23 @@ impl MapArea {
         page_table.unmap(vpn);
     }
     pub fn map(&mut self, page_table: &mut PageTable) {
+        kprintln!("[KERN] mm::memory_set::MapArea::map() begin");
         for vpn in self.vpn_range {
             self.map_one(page_table, vpn);
         }
+        kprintln!("[KERN] mm::memory_set::MapArea::map() end");
     }
     pub fn unmap(&mut self, page_table: &mut PageTable) {
+        kprintln!("[KERN] mm::memory_set::MapArea::unmap() begin");
         for vpn in self.vpn_range {
             self.unmap_one(page_table, vpn);
         }
+        kprintln!("[KERN] mm::memory_set::MapArea::unmap() end");
     }
     /// data: start-aligned but maybe with shorter length
     /// assume that all frames were cleared before
     pub fn copy_data(&mut self, page_table: &mut PageTable, data: &[u8]) {
+        kprintln!("[KERN] mm::memory_set::MapArea::copy_data() begin");
         assert_eq!(self.map_type, MapType::Framed);
         let mut start: usize = 0;
         let mut current_vpn = self.vpn_range.get_start();
@@ -327,6 +342,7 @@ impl MapArea {
             }
             current_vpn.step();
         }
+        kprintln!("[KERN] mm::memory_set::MapArea::copy_data() end");
     }
 }
 

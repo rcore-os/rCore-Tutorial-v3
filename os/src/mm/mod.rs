@@ -16,7 +16,9 @@ pub use page_table::{
 };
 
 pub fn init() {
+    kprintln!("[KERN] mm::init() begin");
     heap_allocator::init_heap();
     frame_allocator::init_frame_allocator();
     KERNEL_SPACE.exclusive_access().activate();
+    kprintln!("[KERN] mm::init() end");
 }

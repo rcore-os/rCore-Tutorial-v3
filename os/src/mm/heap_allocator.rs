@@ -6,17 +6,19 @@ static HEAP_ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 #[alloc_error_handler]
 pub fn handle_alloc_error(layout: core::alloc::Layout) -> ! {
-    panic!("Heap allocation error, layout = {:?}", layout);
+    panic!("[KERN] Heap allocation error, layout = {:?}", layout);
 }
 
 static mut HEAP_SPACE: [u8; KERNEL_HEAP_SIZE] = [0; KERNEL_HEAP_SIZE];
 
 pub fn init_heap() {
+    kprintln!("[KERN] mm::init_heap() begin");
     unsafe {
         HEAP_ALLOCATOR
             .lock()
             .init(HEAP_SPACE.as_ptr() as usize, KERNEL_HEAP_SIZE);
     }
+    kprintln!("[KERN] mm::init_heap() end");
 }
 
 #[allow(unused)]

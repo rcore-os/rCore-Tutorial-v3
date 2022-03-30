@@ -34,6 +34,7 @@ lazy_static! {
 }
 
 pub fn run_tasks() {
+    kprintln!("[KERN] task::processor::run_tasks() begin");
     loop {
         let mut processor = PROCESSOR.exclusive_access();
         if let Some(task) = fetch_task() {
