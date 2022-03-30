@@ -5,7 +5,7 @@ use crate::sync::UPIntrFreeCell;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bitflags::*;
-use easy_fs::{EasyFileSystem, Inode};
+use super::easy_fs::{EasyFileSystem, Inode};
 use lazy_static::*;
 
 pub struct OSInode {

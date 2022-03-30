@@ -17,9 +17,9 @@ virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers" }
 # k210-pac = { git = "https://github.com/wyfcyx/k210-pac" }
 # k210-hal = { git = "https://github.com/wyfcyx/k210-hal" }
 # k210-soc = { git = "https://github.com/wyfcyx/k210-soc" }
-easy-fs = { path = "../easy-fs" }
+# easy-fs = { path = "../easy-fs" }
 #log = "0.4"
-
+spin = "0.7.0"
 # [features]
 # board_qemu = []
 # board_k210 = []
