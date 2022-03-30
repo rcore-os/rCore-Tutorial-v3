@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["inode",""],["pipe",""],["stdio",""]],"trait":[["File",""]]});
+initSidebarItems({"mod":[["easy_fs",""],["inode",""],["pipe",""],["stdio",""]],"trait":[["File",""]]});

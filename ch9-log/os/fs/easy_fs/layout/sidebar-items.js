@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["DIRECT_BOUND",""],["DIRENT_SZ",""],["EFS_MAGIC",""],["INDIRECT1_BOUND",""],["INDIRECT2_BOUND",""],["INODE_DIRECT_COUNT",""],["INODE_INDIRECT1_COUNT",""],["INODE_INDIRECT2_COUNT",""],["NAME_LENGTH_LIMIT",""]],"enum":[["DiskInodeType",""]],"struct":[["DirEntry",""],["DiskInode",""],["SuperBlock",""]],"type":[["DataBlock",""],["IndirectBlock",""]]});

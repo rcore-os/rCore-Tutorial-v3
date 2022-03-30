@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["BLOCK_CACHE_SIZE",""]],"fn":[["block_cache_sync_all",""],["get_block_cache",""]],"struct":[["BLOCK_CACHE_MANAGER",""],["BlockCache",""],["BlockCacheManager",""]]});

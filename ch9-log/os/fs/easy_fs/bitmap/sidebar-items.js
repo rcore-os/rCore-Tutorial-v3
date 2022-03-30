@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["BLOCK_BITS",""]],"fn":[["decomposition","Return (block_pos, bits64_pos, inner_pos)"]],"struct":[["Bitmap",""]],"type":[["BitmapBlock",""]]});
