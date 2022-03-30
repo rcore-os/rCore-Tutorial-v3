@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["kprint",""],["print",""]],"struct":[["Kstdout",""],["Stdout",""]]});
