@@ -32,7 +32,7 @@ impl Inode {
     }
 
     fn read_disk_inode<V>(&self, f: impl FnOnce(&DiskInode) -> V) -> V {
-        kprintln!("[KERN EASYFS] vfs::Inode::read_disk_inode() begin");
+        //kprintln!("[KERN EASYFS] vfs::Inode::read_disk_inode() begin");
         get_block_cache(self.block_id, Arc::clone(&self.block_device))
             .lock()
             .read(self.block_offset, f)
@@ -85,6 +85,7 @@ impl Inode {
         disk_inode: &mut DiskInode,
         fs: &mut MutexGuard<EasyFileSystem>,
     ) {
+        kprintln!("[KERN EASYFS] vfs::Inode::increase_size() begin");
         if new_size < disk_inode.size {
             return;
         }
@@ -165,7 +166,7 @@ impl Inode {
     }
 
     pub fn read_at(&self, offset: usize, buf: &mut [u8]) -> usize {
-        kprintln!("[KERN EASYFS] vfs::Inode::read_at() begin");
+        //kprintln!("[KERN EASYFS] vfs::Inode::read_at() begin");
         let _fs = self.fs.lock();
         self.read_disk_inode(|disk_inode| disk_inode.read_at(offset, buf, &self.block_device))
     }

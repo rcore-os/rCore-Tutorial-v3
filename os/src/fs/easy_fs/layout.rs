@@ -44,6 +44,7 @@ impl SuperBlock {
         data_bitmap_blocks: u32,
         data_area_blocks: u32,
     ) {
+        kprintln!("[KERN EASYFS] layout::SuperBlock::initialize() begin");
         *self = Self {
             magic: EFS_MAGIC,
             total_blocks,
@@ -79,6 +80,7 @@ pub struct DiskInode {
 impl DiskInode {
     /// indirect1 and indirect2 block are allocated only when they are needed.
     pub fn initialize(&mut self, type_: DiskInodeType) {
+        kprintln!("[KERN EASYFS] layout::DiskInode::initialize() begin");
         self.size = 0;
         self.direct.iter_mut().for_each(|v| *v = 0);
         self.indirect1 = 0;
@@ -121,6 +123,7 @@ impl DiskInode {
         Self::total_blocks(new_size) - Self::total_blocks(self.size)
     }
     pub fn get_block_id(&self, inner_id: u32, block_device: &Arc<dyn BlockDevice>) -> u32 {
+        //kprintln!("[KERN EASYFS] layout::DiskInode::get_block_id() begin");
         let inner_id = inner_id as usize;
         if inner_id < INODE_DIRECT_COUNT {
             self.direct[inner_id]
@@ -150,6 +153,7 @@ impl DiskInode {
         new_blocks: Vec<u32>,
         block_device: &Arc<dyn BlockDevice>,
     ) {
+        kprintln!("[KERN EASYFS] layout::DiskInode::increase_size() begin");
         let mut current_blocks = self.data_blocks();
         self.size = new_size;
         let mut total_blocks = self.data_blocks();
@@ -221,7 +225,7 @@ impl DiskInode {
     ///
     /// We will clear the block contents to zero later.
     pub fn clear_size(&mut self, block_device: &Arc<dyn BlockDevice>) -> Vec<u32> {
-        kprintln!("[KERN EASYFS] layout::EasyFileSystem::create() begin");
+        kprintln!("[KERN EASYFS] layout::DiskInode::clear_size() begin");
         let mut v: Vec<u32> = Vec::new();
         let mut data_blocks = self.data_blocks() as usize;
         self.size = 0;
@@ -290,6 +294,7 @@ impl DiskInode {
                 }
             });
         self.indirect2 = 0;
+        kprintln!("[KERN EASYFS] layout::DiskInode::clear_size() end");
         v
     }
     pub fn read_at(
@@ -298,6 +303,7 @@ impl DiskInode {
         buf: &mut [u8],
         block_device: &Arc<dyn BlockDevice>,
     ) -> usize {
+        //kprintln!("[KERN EASYFS] layout::DiskInode::read_at() begin");
         let mut start = offset;
         let end = (offset + buf.len()).min(self.size as usize);
         if start >= end {
@@ -338,6 +344,7 @@ impl DiskInode {
         buf: &[u8],
         block_device: &Arc<dyn BlockDevice>,
     ) -> usize {
+        kprintln!("[KERN EASYFS] layout::DiskInode::write_at() begin");
         let mut start = offset;
         let end = (offset + buf.len()).min(self.size as usize);
         assert!(start <= end);
@@ -387,6 +394,7 @@ impl DirEntry {
         }
     }
     pub fn new(name: &str, inode_number: u32) -> Self {
+        kprintln!("[KERN EASYFS] layout::DirEntry::new() begin");
         let mut bytes = [0u8; NAME_LENGTH_LIMIT + 1];
         bytes[..name.len()].copy_from_slice(name.as_bytes());
         Self {

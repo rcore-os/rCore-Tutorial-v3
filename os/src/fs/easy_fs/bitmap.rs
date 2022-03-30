@@ -19,6 +19,7 @@ fn decomposition(mut bit: usize) -> (usize, usize, usize) {
 
 impl Bitmap {
     pub fn new(start_block_id: usize, blocks: usize) -> Self {
+        kprintln!("[KERN EASYFS] bitmap::Bitmap::new() begin");
         Self {
             start_block_id,
             blocks,
@@ -26,6 +27,7 @@ impl Bitmap {
     }
 
     pub fn alloc(&self, block_device: &Arc<dyn BlockDevice>) -> Option<usize> {
+        kprintln!("[KERN EASYFS] bitmap::Bitmap::alloc() begin");
         for block_id in 0..self.blocks {
             let pos = get_block_cache(
                 block_id + self.start_block_id as usize,
@@ -54,6 +56,7 @@ impl Bitmap {
     }
 
     pub fn dealloc(&self, block_device: &Arc<dyn BlockDevice>, bit: usize) {
+        kprintln!("[KERN EASYFS] bitmap::Bitmap::dealloc() begin");
         let (block_pos, bits64_pos, inner_pos) = decomposition(bit);
         get_block_cache(block_pos + self.start_block_id, Arc::clone(block_device))
             .lock()

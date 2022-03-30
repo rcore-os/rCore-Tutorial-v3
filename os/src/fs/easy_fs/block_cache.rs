@@ -14,6 +14,7 @@ pub struct BlockCache {
 impl BlockCache {
     /// Load a new BlockCache from disk.
     pub fn new(block_id: usize, block_device: Arc<dyn BlockDevice>) -> Self {
+        //kprintln!("[KERN EASYFS] block_cache::BlockCache::new() begin");
         let mut cache = [0u8; BLOCK_SZ];
         block_device.read_block(block_id, &mut cache);
         Self {
@@ -79,6 +80,7 @@ pub struct BlockCacheManager {
 
 impl BlockCacheManager {
     pub fn new() -> Self {
+        kprintln!("[KERN EASYFS] block_cache::BlockCacheManager::new() begin");
         Self {
             queue: VecDeque::new(),
         }
@@ -89,6 +91,7 @@ impl BlockCacheManager {
         block_id: usize,
         block_device: Arc<dyn BlockDevice>,
     ) -> Arc<Mutex<BlockCache>> {
+        //kprintln!("[KERN EASYFS] block_cache::BlockCacheManager::get_block_cache() begin");
         if let Some(pair) = self.queue.iter().find(|pair| pair.0 == block_id) {
             Arc::clone(&pair.1)
         } else {
@@ -126,12 +129,14 @@ pub fn get_block_cache(
     block_id: usize,
     block_device: Arc<dyn BlockDevice>,
 ) -> Arc<Mutex<BlockCache>> {
+    //kprintln!("[KERN EASYFS] block_cache::get_block_cache() begin");
     BLOCK_CACHE_MANAGER
         .lock()
         .get_block_cache(block_id, block_device)
 }
 
 pub fn block_cache_sync_all() {
+    kprintln!("[KERN EASYFS] block_cache::block_cache_sync_all() begin");
     let manager = BLOCK_CACHE_MANAGER.lock();
     for (_, cache) in manager.queue.iter() {
         cache.lock().sync();
