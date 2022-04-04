@@ -157,7 +157,7 @@ impl TaskUserRes {
         let process = self.process.upgrade().unwrap();
         let mut process_inner = process.inner_exclusive_access();
         // alloc user stack
-        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack");
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack for TCB");
         let ustack_bottom = ustack_bottom_from_tid(self.ustack_base, self.tid);
         let ustack_top = ustack_bottom + USER_STACK_SIZE;
         process_inner.memory_set.insert_framed_area(
@@ -166,7 +166,7 @@ impl TaskUserRes {
             MapPermission::R | MapPermission::W | MapPermission::U,
         );
         // alloc trap_cx
-        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx");
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx for TCB");
         let trap_cx_bottom = trap_cx_bottom_from_tid(self.tid);
         let trap_cx_top = trap_cx_bottom + PAGE_SIZE;
         process_inner.memory_set.insert_framed_area(

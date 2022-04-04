@@ -52,6 +52,7 @@ impl TaskControlBlock {
         kprintln!("[KERN] TaskControlBlock::new() begin");
         let res = TaskUserRes::new(Arc::clone(&process), ustack_base, alloc_user_res);
         let trap_cx_ppn = res.trap_cx_ppn();
+        kprintln!("[KERN] TaskControlBlock::new(): alloc kernel stack for TCB");
         let kstack = kstack_alloc();
         let kstack_top = kstack.get_top();
         kprintln!("[KERN] TaskControlBlock::new() end");

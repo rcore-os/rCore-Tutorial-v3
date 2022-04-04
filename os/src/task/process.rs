@@ -134,9 +134,10 @@ impl ProcessControlBlock {
         let mut process_inner = process.inner_exclusive_access();
         process_inner.tasks.push(Some(Arc::clone(&task)));
         drop(process_inner);
+        kprintln!("[KERN] task::process::new(): insert <pid, PCB> in PID2PCB BTreeMap");
         insert_into_pid2process(process.getpid(), Arc::clone(&process));
         // add main thread to scheduler
-        kprintln!("[KERN] task::process::new(): add_task(task): add main thread to tscheduler");
+        kprintln!("[KERN] task::process::new(): add_task(task): add main thread to scheduler");
         add_task(task);
         kprintln!("[KERN] task::process::new() end");
         process
@@ -203,10 +204,13 @@ impl ProcessControlBlock {
         let mut parent = self.inner_exclusive_access();
         assert_eq!(parent.thread_count(), 1);
         // clone parent's memory_set completely including trampoline/ustacks/trap_cxs
+        kprintln!("[KERN] task::process::fork(): clone parent's memory_set for child");
         let memory_set = MemorySet::from_existed_user(&parent.memory_set);
         // alloc a pid
+        kprintln!("[KERN] task::process::fork(): alloc a new pid for child");
         let pid = pid_alloc();
         // copy fd table
+        kprintln!("[KERN] task::process::fork(): copy fd table for child");
         let mut new_fd_table: Vec<Option<Arc<dyn File + Send + Sync>>> = Vec::new();
         for fd in parent.fd_table.iter() {
             if let Some(file) = fd {
@@ -216,6 +220,7 @@ impl ProcessControlBlock {
             }
         }
         // create child process pcb
+        kprintln!("[KERN] task::process::fork(): new child PCB with new pid, memory_set, fd_table, ...");
         let child = Arc::new(Self {
             pid,
             inner: unsafe {
@@ -236,8 +241,10 @@ impl ProcessControlBlock {
             },
         });
         // add child
+        kprintln!("[KERN] task::process::fork(): add child link in parent' children Vec");
         parent.children.push(Arc::clone(&child));
         // create main thread of child process
+        kprintln!("[KERN] task::process::fork(): TaskControlBlock::new(): create main thread of child process");
         let task = Arc::new(TaskControlBlock::new(
             Arc::clone(&child),
             parent
@@ -252,16 +259,20 @@ impl ProcessControlBlock {
             false,
         ));
         // attach task to child process
+        kprintln!("[KERN] task::process::fork(): attach child TCB to child PCB");
         let mut child_inner = child.inner_exclusive_access();
         child_inner.tasks.push(Some(Arc::clone(&task)));
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
+        kprintln!("[KERN] task::process::fork(): modify child's kstack_top in trap_cx of child");
         let task_inner = task.inner_exclusive_access();
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);
+        kprintln!("[KERN] task::process::fork(): insert <child pid, child PCB> in PID2PCB BTreeMap");
         insert_into_pid2process(child.getpid(), Arc::clone(&child));
         // add this thread to scheduler
+        kprintln!("[KERN] task::process::fork(): add_task(child task): add child thread to scheduler");
         add_task(task);
         kprintln!("[KERN] task::process::fork() end");
         child
