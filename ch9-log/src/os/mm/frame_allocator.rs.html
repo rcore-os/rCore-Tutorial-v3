@@ -132,6 +132,8 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -162,7 +164,9 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FrameTracker</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] mm::frame_allocator::Drop&lt;FrameTracker&gt;::drop begin&quot;</span>);
         <span class="ident">frame_dealloc</span>(<span class="self">self</span>.<span class="ident">ppn</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] mm::frame_allocator::Drop&lt;FrameTracker&gt;::drop end&quot;</span>);
     }
 }
 

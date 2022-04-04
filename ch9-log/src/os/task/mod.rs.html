@@ -143,6 +143,18 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
@@ -212,24 +224,32 @@
     <span class="kw">let</span> <span class="ident">process</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">process</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">res</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">tid</span>;
     <span class="comment">// record exit code</span>
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): record exit code in task_inner&quot;</span>);
     <span class="ident">task_inner</span>.<span class="ident">exit_code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">exit_code</span>);
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): TaskUserRes =&gt;None&quot;</span>);
     <span class="ident">task_inner</span>.<span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="comment">// here we do not remove the thread since we are still using the kstack</span>
     <span class="comment">// it will be deallocated when sys_waittid is called</span>
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): drop task_inner&quot;</span>);
     <span class="ident">drop</span>(<span class="ident">task_inner</span>);
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): drop task&quot;</span>);
     <span class="ident">drop</span>(<span class="ident">task</span>);
     <span class="comment">// however, if this is the main thread of current process</span>
     <span class="comment">// the process should terminate at once</span>
     <span class="kw">if</span> <span class="ident">tid</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): it&#39;s main thread, process should terminate at once&quot;</span>);
         <span class="ident">remove_from_pid2process</span>(<span class="ident">process</span>.<span class="ident">getpid</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="comment">// mark this process as a zombie process</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): mark this process as a zombie process&quot;</span>);
         <span class="ident">process_inner</span>.<span class="ident">is_zombie</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="comment">// record exit code of main process</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): record exit code in process_inner&quot;</span>);
         <span class="ident">process_inner</span>.<span class="ident">exit_code</span> <span class="op">=</span> <span class="ident">exit_code</span>;
 
         {
             <span class="comment">// move all child processes under init process</span>
+            <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): move all child processes under INITPROC&quot;</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">initproc_inner</span> <span class="op">=</span> <span class="ident">INITPROC</span>.<span class="ident">inner_exclusive_access</span>();
             <span class="kw">for</span> <span class="ident">child</span> <span class="kw">in</span> <span class="ident">process_inner</span>.<span class="ident">children</span>.<span class="ident">iter</span>() {
                 <span class="ident">child</span>.<span class="ident">inner_exclusive_access</span>().<span class="ident">parent</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">INITPROC</span>));
@@ -240,22 +260,26 @@
         <span class="comment">// deallocate user res (including tid/trap_cx/ustack) of all threads</span>
         <span class="comment">// it has to be done before we dealloc the whole memory_set</span>
         <span class="comment">// otherwise they will be deallocated twice</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): deallocate user res (tid/trap_cx/ustack) of all threads&quot;</span>);
         <span class="kw">for</span> <span class="ident">task</span> <span class="kw">in</span> <span class="ident">process_inner</span>.<span class="ident">tasks</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">is_some</span>()) {
             <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
             <span class="ident">task_inner</span>.<span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         }
-
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): clear children Vector in process_inner&quot;</span>);
         <span class="ident">process_inner</span>.<span class="ident">children</span>.<span class="ident">clear</span>();
         <span class="comment">// deallocate other data in user space i.e. program code/data section</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): deallocate code/data in user space&quot;</span>);
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">recycle_data_pages</span>();
         <span class="comment">// drop file descriptors</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): drop file descriptors&quot;</span>);
         <span class="ident">process_inner</span>.<span class="ident">fd_table</span>.<span class="ident">clear</span>();
     }
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next(): drop process&quot;</span>);
     <span class="ident">drop</span>(<span class="ident">process</span>);
     <span class="comment">// we do not have to save task context</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_unused</span> <span class="op">=</span> <span class="ident">TaskContext::zero_init</span>();
-    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next() end&quot;</span>);
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::exit_current_and_run_next() end, sched next task&quot;</span>);
     <span class="ident">schedule</span>(<span class="kw-2">&amp;mut</span> <span class="ident">_unused</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
 }
 
