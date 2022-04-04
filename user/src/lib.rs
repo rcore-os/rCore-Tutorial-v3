@@ -117,13 +117,16 @@ pub fn wait(exit_code: &mut i32) -> isize {
 }
 
 pub fn waitpid(pid: usize, exit_code: &mut i32) -> isize {
+    println!("[USER] lib::waitpid() begin");
     loop {
         match sys_waitpid(pid as isize, exit_code as *mut _) {
             -2 => {
                 yield_();
             }
             // -1 or a real pid
-            exit_pid => return exit_pid,
+            exit_pid => {
+                println!("[USER] lib::waitpid() end: exit_pid {}", exit_pid);
+                return exit_pid; }
         }
     }
 }

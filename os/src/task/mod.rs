@@ -67,24 +67,32 @@ pub fn exit_current_and_run_next(exit_code: i32) {
     let process = task.process.upgrade().unwrap();
     let tid = task_inner.res.as_ref().unwrap().tid;
     // record exit code
+    kprintln!("[KERN] task::exit_current_and_run_next(): record exit code in task_inner");
     task_inner.exit_code = Some(exit_code);
+    kprintln!("[KERN] task::exit_current_and_run_next(): TaskUserRes =>None");
     task_inner.res = None;
     // here we do not remove the thread since we are still using the kstack
     // it will be deallocated when sys_waittid is called
+    kprintln!("[KERN] task::exit_current_and_run_next(): drop task_inner");
     drop(task_inner);
+    kprintln!("[KERN] task::exit_current_and_run_next(): drop task");
     drop(task);
     // however, if this is the main thread of current process
     // the process should terminate at once
     if tid == 0 {
+        kprintln!("[KERN] task::exit_current_and_run_next(): it's main thread, process should terminate at once");
         remove_from_pid2process(process.getpid());
         let mut process_inner = process.inner_exclusive_access();
         // mark this process as a zombie process
+        kprintln!("[KERN] task::exit_current_and_run_next(): mark this process as a zombie process");
         process_inner.is_zombie = true;
         // record exit code of main process
+        kprintln!("[KERN] task::exit_current_and_run_next(): record exit code in process_inner");
         process_inner.exit_code = exit_code;
 
         {
             // move all child processes under init process
+            kprintln!("[KERN] task::exit_current_and_run_next(): move all child processes under INITPROC");
             let mut initproc_inner = INITPROC.inner_exclusive_access();
             for child in process_inner.children.iter() {
                 child.inner_exclusive_access().parent = Some(Arc::downgrade(&INITPROC));
@@ -95,22 +103,26 @@ pub fn exit_current_and_run_next(exit_code: i32) {
         // deallocate user res (including tid/trap_cx/ustack) of all threads
         // it has to be done before we dealloc the whole memory_set
         // otherwise they will be deallocated twice
+        kprintln!("[KERN] task::exit_current_and_run_next(): deallocate user res (tid/trap_cx/ustack) of all threads");
         for task in process_inner.tasks.iter().filter(|t| t.is_some()) {
             let task = task.as_ref().unwrap();
             let mut task_inner = task.inner_exclusive_access();
             task_inner.res = None;
         }
-
+        kprintln!("[KERN] task::exit_current_and_run_next(): clear children Vector in process_inner");
         process_inner.children.clear();
         // deallocate other data in user space i.e. program code/data section
+        kprintln!("[KERN] task::exit_current_and_run_next(): deallocate code/data in user space");
         process_inner.memory_set.recycle_data_pages();
         // drop file descriptors
+        kprintln!("[KERN] task::exit_current_and_run_next(): drop file descriptors");
         process_inner.fd_table.clear();
     }
+    kprintln!("[KERN] task::exit_current_and_run_next(): drop process");
     drop(process);
     // we do not have to save task context
     let mut _unused = TaskContext::zero_init();
-    kprintln!("[KERN] task::exit_current_and_run_next() end");
+    kprintln!("[KERN] task::exit_current_and_run_next() end, sched next task");
     schedule(&mut _unused as *mut _);
 }
 

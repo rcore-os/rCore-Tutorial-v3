@@ -72,14 +72,14 @@ impl ProcessControlBlock {
     }
 
     pub fn new(elf_data: &[u8]) -> Arc<Self> {
-        // memory_set with elf program headers/trampoline/trap context/user stack
-        kprintln!("[KERN] task::process::new() begin");
-        kprintln!("[KERN] task::process::new(): build MemorySet, set user_stack_base, set entry_point");
+        // memory_set with elf program headers/trampoline/user stack_base addr/entry_point
+        kprintln!("[KERN] task::process::PCB::new() begin");
+        kprintln!("[KERN] task::process::PCB::new(): build MemorySet, set trampoline, user_stack_base, entry_point...");
         let (memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
         // allocate a pid
-        kprintln!("[KERN] task::process::new(): allocate a pid");
+        kprintln!("[KERN] task::process::PCB::new(): allocate a pid");
         let pid_handle = pid_alloc();
-        kprintln!("[KERN] task::process::new(): new ProcessControlBlockInner");
+        kprintln!("[KERN] task::process::PCB::new(): new ProcessControlBlockInner");
         let process = Arc::new(Self {
             pid: pid_handle,
             inner: unsafe {
@@ -107,15 +107,15 @@ impl ProcessControlBlock {
             },
         });
         // create a main thread, we should allocate ustack and trap_cx here
-        kprintln!("[KERN] task::process::new(): create a main thread begin");
-        kprintln!("[KERN] task::process::new(): create a main thread: new TCB(alloc kstack, utack & trap_cx...) ");
+        kprintln!("[KERN] task::process::PCB::new(): create a main thread... start");
+        kprintln!("[KERN] task::process::PCB::new(): create a main thread: new TCB(alloc kstack, utack & trap_cx...) ");
         let task = Arc::new(TaskControlBlock::new(
             Arc::clone(&process),
             ustack_base,
             true,
         ));
         // prepare trap_cx of main thread
-        kprintln!("[KERN] task::process::new(): create a main thread: set trap_cx(entry_point, ustack_top, k_satp, k_sp, trap_handler) ");
+        kprintln!("[KERN] task::process::PCB::new(): create a main thread: set trap_cx(entry_point, ustack_top, k_satp, k_sp, trap_handler) ");
         let task_inner = task.inner_exclusive_access();
         let trap_cx = task_inner.get_trap_cx();
         let ustack_top = task_inner.res.as_ref().unwrap().ustack_top();
@@ -128,38 +128,43 @@ impl ProcessControlBlock {
             kstack_top,
             trap_handler as usize,
         );
-        kprintln!("[KERN] task::process::new(): create a main thread end");
+        kprintln!("[KERN] task::process::PCB::new(): create a main thread... done");
         // add main thread to the process
-        kprintln!("[KERN] task::process::new(): add main thread to the process");
+        kprintln!("[KERN] task::process::PCB::new(): add main thread to the process");
         let mut process_inner = process.inner_exclusive_access();
         process_inner.tasks.push(Some(Arc::clone(&task)));
         drop(process_inner);
-        kprintln!("[KERN] task::process::new(): insert <pid, PCB> in PID2PCB BTreeMap");
+        kprintln!("[KERN] task::process::PCB::new(): insert <pid, PCB> in PID2PCB BTreeMap");
         insert_into_pid2process(process.getpid(), Arc::clone(&process));
         // add main thread to scheduler
-        kprintln!("[KERN] task::process::new(): add_task(task): add main thread to scheduler");
+        kprintln!("[KERN] task::process::PCB::new(): add_task(task): add main thread to scheduler");
         add_task(task);
-        kprintln!("[KERN] task::process::new() end");
+        kprintln!("[KERN] task::process::PCB::new() end");
         process
     }
 
     /// Only support processes with a single thread.
     pub fn exec(self: &Arc<Self>, elf_data: &[u8], args: Vec<String>) {
+        kprintln!("[KERN] task::process::PCB::exec() begin");
         assert_eq!(self.inner_exclusive_access().thread_count(), 1);
-        // memory_set with elf program headers/trampoline/trap context/user stack
-        kprintln!("[KERN] task::process::exec() begin");
+        // memory_set with elf program headers/trampoline/user_stack_base addr/entry_point
+        kprintln!("[KERN] task::process::PCB::exec(): build MemorySet,  trampoline, user_stack_base, entry_point...");
         let (memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
         let new_token = memory_set.token();
         // substitute memory_set
+        kprintln!("[KERN] task::process::PCB::exec():  substitute memory_set, ustack_base");
         self.inner_exclusive_access().memory_set = memory_set;
         // then we alloc user resource for main thread again
         // since memory_set has been changed
         let task = self.inner_exclusive_access().get_task(0);
         let mut task_inner = task.inner_exclusive_access();
         task_inner.res.as_mut().unwrap().ustack_base = ustack_base;
+        kprintln!("[KERN] task::process::PCB::exec():  alloc user resource for this thread");
         task_inner.res.as_mut().unwrap().alloc_user_res();
+        kprintln!("[KERN] task::process::PCB::exec():  set  trap_cx_ppn for this thread");
         task_inner.trap_cx_ppn = task_inner.res.as_mut().unwrap().trap_cx_ppn();
         // push arguments on user stack
+        kprintln!("[KERN] task::process::PCB::exec():  push arguments on user stack for this thread");
         let mut user_sp = task_inner.res.as_mut().unwrap().ustack_top();
         user_sp -= (args.len() + 1) * core::mem::size_of::<usize>();
         let argv_base = user_sp;
@@ -185,6 +190,7 @@ impl ProcessControlBlock {
         // make the user_sp aligned to 8B for k210 platform
         user_sp -= user_sp % core::mem::size_of::<usize>();
         // initialize trap_cx
+        kprintln!("[KERN] task::process::PCB::exec():  set trap_cx(entry_point, ustack_top, k_satp, k_sp, trap_handler, argc=x[10], argv=x[11])");
         let mut trap_cx = TrapContext::app_init_context(
             entry_point,
             user_sp,
@@ -195,22 +201,22 @@ impl ProcessControlBlock {
         trap_cx.x[10] = args.len();
         trap_cx.x[11] = argv_base;
         *task_inner.get_trap_cx() = trap_cx;
-        kprintln!("[KERN] task::process::exec() end");
+        kprintln!("[KERN] task::process::PCB::exec() end");
     }
 
     /// Only support processes with a single thread.
     pub fn fork(self: &Arc<Self>) -> Arc<Self> {
-        kprintln!("[KERN] task::process::fork() begin");
+        kprintln!("[KERN] task::process::PCB::fork() begin");
         let mut parent = self.inner_exclusive_access();
         assert_eq!(parent.thread_count(), 1);
         // clone parent's memory_set completely including trampoline/ustacks/trap_cxs
-        kprintln!("[KERN] task::process::fork(): clone parent's memory_set for child");
+        kprintln!("[KERN] task::process::PCB::fork(): clone parent's memory_set for child");
         let memory_set = MemorySet::from_existed_user(&parent.memory_set);
         // alloc a pid
-        kprintln!("[KERN] task::process::fork(): alloc a new pid for child");
+        kprintln!("[KERN] task::process::PCB::fork(): alloc a new pid for child");
         let pid = pid_alloc();
         // copy fd table
-        kprintln!("[KERN] task::process::fork(): copy fd table for child");
+        kprintln!("[KERN] task::process::PCB::fork(): copy fd table for child");
         let mut new_fd_table: Vec<Option<Arc<dyn File + Send + Sync>>> = Vec::new();
         for fd in parent.fd_table.iter() {
             if let Some(file) = fd {
@@ -220,7 +226,7 @@ impl ProcessControlBlock {
             }
         }
         // create child process pcb
-        kprintln!("[KERN] task::process::fork(): new child PCB with new pid, memory_set, fd_table, ...");
+        kprintln!("[KERN] task::process::PCB::fork(): new child PCB with new pid, memory_set, fd_table, ...");
         let child = Arc::new(Self {
             pid,
             inner: unsafe {
@@ -241,10 +247,10 @@ impl ProcessControlBlock {
             },
         });
         // add child
-        kprintln!("[KERN] task::process::fork(): add child link in parent' children Vec");
+        kprintln!("[KERN] task::process::PCB::fork(): add child link in parent' children Vec");
         parent.children.push(Arc::clone(&child));
         // create main thread of child process
-        kprintln!("[KERN] task::process::fork(): TaskControlBlock::new(): create main thread of child process");
+        kprintln!("[KERN] task::process::PCB::fork(): TaskControlBlock::new(): create main thread of child process");
         let task = Arc::new(TaskControlBlock::new(
             Arc::clone(&child),
             parent
@@ -259,22 +265,22 @@ impl ProcessControlBlock {
             false,
         ));
         // attach task to child process
-        kprintln!("[KERN] task::process::fork(): attach child TCB to child PCB");
+        kprintln!("[KERN] task::process::PCB::fork(): attach child TCB to child PCB");
         let mut child_inner = child.inner_exclusive_access();
         child_inner.tasks.push(Some(Arc::clone(&task)));
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
-        kprintln!("[KERN] task::process::fork(): modify child's kstack_top in trap_cx of child");
+        kprintln!("[KERN] task::process::PCB::fork(): modify child's kstack_top in trap_cx of child");
         let task_inner = task.inner_exclusive_access();
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);
-        kprintln!("[KERN] task::process::fork(): insert <child pid, child PCB> in PID2PCB BTreeMap");
+        kprintln!("[KERN] task::process::PCB::fork(): insert <child pid, child PCB> in PID2PCB BTreeMap");
         insert_into_pid2process(child.getpid(), Arc::clone(&child));
         // add this thread to scheduler
-        kprintln!("[KERN] task::process::fork(): add_task(child task): add child thread to scheduler");
+        kprintln!("[KERN] task::process::PCB::fork(): add_task(child task): add child thread to scheduler");
         add_task(task);
-        kprintln!("[KERN] task::process::fork() end");
+        kprintln!("[KERN] task::process::PCB::fork() end");
         child
     }
 

@@ -28,7 +28,9 @@ impl Debug for FrameTracker {
 
 impl Drop for FrameTracker {
     fn drop(&mut self) {
+        kprintln!("[KERN] mm::frame_allocator::Drop<FrameTracker>::drop begin");
         frame_dealloc(self.ppn);
+        kprintln!("[KERN] mm::frame_allocator::Drop<FrameTracker>::drop end");
     }
 }
 

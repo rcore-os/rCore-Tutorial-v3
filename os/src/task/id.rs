@@ -61,7 +61,9 @@ pub fn pid_alloc() -> PidHandle {
 
 impl Drop for PidHandle {
     fn drop(&mut self) {
+        kprintln!("[KERN] task::id::Drop<PidHandle>::drop begin");
         PID_ALLOCATOR.exclusive_access().dealloc(self.0);
+        kprintln!("[KERN] task::id::Drop<PidHandle>::drop end");
     }
 }
 
@@ -91,11 +93,13 @@ pub fn kstack_alloc() -> KernelStack {
 
 impl Drop for KernelStack {
     fn drop(&mut self) {
+        kprintln!("[KERN] task::id::Drop<KernelStack>::drop begin");
         let (kernel_stack_bottom, _) = kernel_stack_position(self.0);
         let kernel_stack_bottom_va: VirtAddr = kernel_stack_bottom.into();
         KERNEL_SPACE
             .exclusive_access()
             .remove_area_with_start_vpn(kernel_stack_bottom_va.into());
+        kprintln!("[KERN] task::id::Drop<KernelStack>::drop end");    
     }
 }
 
@@ -240,7 +244,9 @@ impl TaskUserRes {
 
 impl Drop for TaskUserRes {
     fn drop(&mut self) {
+        kprintln!("[KERN] task::id::Drop<TaskUserRes>::drop begin");
         self.dealloc_tid();
         self.dealloc_user_res();
+        kprintln!("[KERN] task::id::Drop<TaskUserRes>::drop end");
     }
 }
