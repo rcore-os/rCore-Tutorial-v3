@@ -18,6 +18,9 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ns16550a</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ns16550a::NS16550a</span>;
@@ -33,7 +36,10 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">UART</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CharDeviceImpl</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">CharDeviceImpl::new</span>());
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">UART</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CharDeviceImpl</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] drivers::chardev::lazy_static!UART begin&quot;</span>);
+        <span class="ident">Arc::new</span>(<span class="ident">CharDeviceImpl::new</span>())
+    };
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (9ad5d82f8 2022-01-18)" ></div>

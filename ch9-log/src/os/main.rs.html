@@ -71,6 +71,9 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
@@ -123,7 +126,10 @@
 <span class="kw">use</span> <span class="ident">sync::UPIntrFreeCell</span>;
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEV_NON_BLOCKING_ACCESS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="bool-val">false</span>) };
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEV_NON_BLOCKING_ACCESS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] main::lazy_static!DEV_NON_BLOCKING_ACCESS begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="bool-val">false</span>) }
+    };
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>

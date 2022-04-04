@@ -130,6 +130,8 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -215,8 +217,10 @@
 <span class="kw">type</span> <span class="ident">FrameAllocatorImpl</span> <span class="op">=</span> <span class="ident">StackFrameAllocator</span>;
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FRAME_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">FrameAllocatorImpl</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">FrameAllocatorImpl::new</span>()) };
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FRAME_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">FrameAllocatorImpl</span><span class="op">&gt;</span> <span class="op">=</span>{
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] mm::frame_allocator::lazy_static!FRAME_ALLOCATOR begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">FrameAllocatorImpl::new</span>()) }
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_frame_allocator</span>() {

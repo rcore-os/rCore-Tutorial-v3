@@ -31,6 +31,9 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><pre class="rust"><code><span class="comment">// mod sdcard;</span>
 <span class="kw">mod</span> <span class="ident">virtio_blk</span>;
 
@@ -43,7 +46,10 @@
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BLOCK_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">BlockDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">BlockDeviceImpl::new</span>());
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BLOCK_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">BlockDevice</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] drivers::block::lazy_static!BLOCK_DEVICE begin&quot;</span>);
+        <span class="ident">Arc::new</span>(<span class="ident">BlockDeviceImpl::new</span>())
+    };
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>

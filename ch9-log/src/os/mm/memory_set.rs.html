@@ -387,6 +387,8 @@
 <span id="384">384</span>
 <span id="385">385</span>
 <span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>, <span class="ident">PageTableEntry</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
@@ -414,8 +416,10 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KERNEL_SPACE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">MemorySet</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="ident">Arc::new</span>(<span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">MemorySet::new_kernel</span>()) });
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KERNEL_SPACE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">MemorySet</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>{
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] mm::memory_set::lazy_static!KERNEL_SPACE begin&quot;</span>);
+        <span class="ident">Arc::new</span>(<span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">MemorySet::new_kernel</span>()) })
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kernel_token</span>() -&gt; <span class="ident">usize</span> {

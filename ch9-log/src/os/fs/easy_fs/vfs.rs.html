@@ -233,7 +233,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">read_disk_inode</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">DiskInode</span>) -&gt; <span class="ident">V</span>) -&gt; <span class="ident">V</span> {
-        <span class="comment">//kprintln!(&quot;[KERN EASYFS] vfs::Inode::read_disk_inode() begin&quot;);</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN EASYFS] vfs::Inode::read_disk_inode() begin&quot;</span>);
         <span class="ident">get_block_cache</span>(<span class="self">self</span>.<span class="ident">block_id</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">block_device</span>))
             .<span class="ident">lock</span>()
             .<span class="ident">read</span>(<span class="self">self</span>.<span class="ident">block_offset</span>, <span class="ident">f</span>)
@@ -367,7 +367,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="comment">//kprintln!(&quot;[KERN EASYFS] vfs::Inode::read_at() begin&quot;);</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN EASYFS] vfs::Inode::read_at() begin&quot;</span>);
         <span class="kw">let</span> <span class="ident">_fs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fs</span>.<span class="ident">lock</span>();
         <span class="self">self</span>.<span class="ident">read_disk_inode</span>(<span class="op">|</span><span class="ident">disk_inode</span><span class="op">|</span> <span class="ident">disk_inode</span>.<span class="ident">read_at</span>(<span class="ident">offset</span>, <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">block_device</span>))
     }

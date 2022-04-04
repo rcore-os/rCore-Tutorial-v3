@@ -76,6 +76,8 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::CLOCK_FREQ</span>;
@@ -130,8 +132,10 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIMERS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">TimerCondVar</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">BinaryHeap</span>::<span class="op">&lt;</span><span class="ident">TimerCondVar</span><span class="op">&gt;</span><span class="ident">::new</span>()) };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIMERS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">TimerCondVar</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>{
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] timer::lazy_static!TIMERS begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">BinaryHeap</span>::<span class="op">&lt;</span><span class="ident">TimerCondVar</span><span class="op">&gt;</span><span class="ident">::new</span>()) }
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_timer</span>(<span class="ident">expire_ms</span>: <span class="ident">usize</span>, <span class="ident">task</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span>) {

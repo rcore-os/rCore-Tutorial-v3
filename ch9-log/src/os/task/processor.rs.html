@@ -105,6 +105,9 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::__switch</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">fetch_task</span>, <span class="ident">TaskStatus</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ProcessControlBlock</span>, <span class="ident">TaskContext</span>, <span class="ident">TaskControlBlock</span>};
@@ -137,7 +140,10 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PROCESSOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Processor</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Processor::new</span>()) };
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PROCESSOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Processor</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::processor::lazy_static!PROCESSOR begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Processor::new</span>()) }
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_tasks</span>() {

@@ -224,6 +224,29 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ProcessControlBlock</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">KERNEL_STACK_SIZE</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT_BASE</span>, <span class="ident">USER_STACK_SIZE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
@@ -266,10 +289,17 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PID_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">RecycleAllocator</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">RecycleAllocator::new</span>()) };
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KSTACK_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">RecycleAllocator</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">RecycleAllocator::new</span>()) };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PID_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">RecycleAllocator</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::lazy_static!PID_ALLOCATOR begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">RecycleAllocator::new</span>()) }
+    };
+}
+
+<span class="macro">lazy_static!</span> {
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KSTACK_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">RecycleAllocator</span><span class="op">&gt;</span> <span class="op">=</span>{
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::lazy_static!KSTACK_ALLOCATOR begin&quot;</span>);
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">RecycleAllocator::new</span>()) }
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PidHandle</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
@@ -286,14 +316,17 @@
 
 <span class="doccomment">/// Return (bottom, top) of a kernel stack in kernel space.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kernel_stack_position</span>(<span class="ident">kstack_id</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::kernel_stack_position() begin&quot;</span>);
     <span class="kw">let</span> <span class="ident">top</span> <span class="op">=</span> <span class="ident">TRAMPOLINE</span> <span class="op">-</span> <span class="ident">kstack_id</span> <span class="op">*</span> (<span class="ident">KERNEL_STACK_SIZE</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>);
     <span class="kw">let</span> <span class="ident">bottom</span> <span class="op">=</span> <span class="ident">top</span> <span class="op">-</span> <span class="ident">KERNEL_STACK_SIZE</span>;
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::kernel_stack_position() end&quot;</span>);
     (<span class="ident">bottom</span>, <span class="ident">top</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KernelStack</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kstack_alloc</span>() -&gt; <span class="ident">KernelStack</span> {
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::kstack_alloc() begin&quot;</span>);
     <span class="kw">let</span> <span class="ident">kstack_id</span> <span class="op">=</span> <span class="ident">KSTACK_ALLOCATOR</span>.<span class="ident">exclusive_access</span>().<span class="ident">alloc</span>();
     <span class="kw">let</span> (<span class="ident">kstack_bottom</span>, <span class="ident">kstack_top</span>) <span class="op">=</span> <span class="ident">kernel_stack_position</span>(<span class="ident">kstack_id</span>);
     <span class="ident">KERNEL_SPACE</span>.<span class="ident">exclusive_access</span>().<span class="ident">insert_framed_area</span>(
@@ -301,6 +334,7 @@
         <span class="ident">kstack_top</span>.<span class="ident">into</span>(),
         <span class="ident">MapPermission::R</span> <span class="op">|</span> <span class="ident">MapPermission::W</span>,
     );
+    <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::kstack_alloc() end&quot;</span>);
     <span class="ident">KernelStack</span>(<span class="ident">kstack_id</span>)
 }
 
@@ -353,6 +387,7 @@
         <span class="ident">ustack_base</span>: <span class="ident">usize</span>,
         <span class="ident">alloc_user_res</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="self">Self</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::new() begin&quot;</span>);
         <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>().<span class="ident">alloc_tid</span>();
         <span class="kw">let</span> <span class="ident">task_user_res</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">tid</span>,
@@ -362,13 +397,16 @@
         <span class="kw">if</span> <span class="ident">alloc_user_res</span> {
             <span class="ident">task_user_res</span>.<span class="ident">alloc_user_res</span>();
         }
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::new() end&quot;</span>);
         <span class="ident">task_user_res</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alloc_user_res</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res() begin&quot;</span>);
         <span class="kw">let</span> <span class="ident">process</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">process</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="comment">// alloc user stack</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack&quot;</span>);
         <span class="kw">let</span> <span class="ident">ustack_bottom</span> <span class="op">=</span> <span class="ident">ustack_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">ustack_base</span>, <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">ustack_top</span> <span class="op">=</span> <span class="ident">ustack_bottom</span> <span class="op">+</span> <span class="ident">USER_STACK_SIZE</span>;
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">insert_framed_area</span>(
@@ -377,6 +415,7 @@
             <span class="ident">MapPermission::R</span> <span class="op">|</span> <span class="ident">MapPermission::W</span> <span class="op">|</span> <span class="ident">MapPermission::U</span>,
         );
         <span class="comment">// alloc trap_cx</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx&quot;</span>);
         <span class="kw">let</span> <span class="ident">trap_cx_bottom</span> <span class="op">=</span> <span class="ident">trap_cx_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">trap_cx_top</span> <span class="op">=</span> <span class="ident">trap_cx_bottom</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>;
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">insert_framed_area</span>(
@@ -384,22 +423,29 @@
             <span class="ident">trap_cx_top</span>.<span class="ident">into</span>(),
             <span class="ident">MapPermission::R</span> <span class="op">|</span> <span class="ident">MapPermission::W</span>,
         );
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res() end&quot;</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">dealloc_user_res</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::dealloc_user_res() begin&quot;</span>);
         <span class="comment">// dealloc tid</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc tid&quot;</span>);
         <span class="kw">let</span> <span class="ident">process</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">process</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="comment">// dealloc ustack manually</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc ustack manually&quot;</span>);
         <span class="kw">let</span> <span class="ident">ustack_bottom_va</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> <span class="ident">ustack_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">ustack_base</span>, <span class="self">self</span>.<span class="ident">tid</span>).<span class="ident">into</span>();
         <span class="ident">process_inner</span>
             .<span class="ident">memory_set</span>
             .<span class="ident">remove_area_with_start_vpn</span>(<span class="ident">ustack_bottom_va</span>.<span class="ident">into</span>());
         <span class="comment">// dealloc trap_cx manually</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc trap_cx  manually&quot;</span>);
         <span class="kw">let</span> <span class="ident">trap_cx_bottom_va</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> <span class="ident">trap_cx_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">tid</span>).<span class="ident">into</span>();
         <span class="ident">process_inner</span>
             .<span class="ident">memory_set</span>
             .<span class="ident">remove_area_with_start_vpn</span>(<span class="ident">trap_cx_bottom_va</span>.<span class="ident">into</span>());
+        
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::dealloc_user_res() end&quot;</span>);    
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>

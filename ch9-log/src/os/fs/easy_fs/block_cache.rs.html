@@ -145,6 +145,8 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BlockDevice</span>, <span class="ident">BLOCK_SZ</span>};
 <span class="kw">use</span> <span class="ident">alloc::collections::VecDeque</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
@@ -268,8 +270,10 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BLOCK_CACHE_MANAGER</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">BlockCacheManager</span><span class="op">&gt;</span> <span class="op">=</span>
-        <span class="ident">Mutex::new</span>(<span class="ident">BlockCacheManager::new</span>());
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BLOCK_CACHE_MANAGER</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">BlockCacheManager</span><span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN EASYFS] block_cache::lazy_static!BLOCK_CACHE_MANAGER begin&quot;</span>);
+        <span class="ident">Mutex::new</span>(<span class="ident">BlockCacheManager::new</span>())
+    };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_block_cache</span>(
