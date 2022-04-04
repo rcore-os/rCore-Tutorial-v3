@@ -121,8 +121,10 @@ impl BlockCacheManager {
 }
 
 lazy_static! {
-    pub static ref BLOCK_CACHE_MANAGER: Mutex<BlockCacheManager> =
-        Mutex::new(BlockCacheManager::new());
+    pub static ref BLOCK_CACHE_MANAGER: Mutex<BlockCacheManager> = {
+        kprintln!("[KERN EASYFS] block_cache::lazy_static!BLOCK_CACHE_MANAGER begin");
+        Mutex::new(BlockCacheManager::new())
+    };
 }
 
 pub fn get_block_cache(

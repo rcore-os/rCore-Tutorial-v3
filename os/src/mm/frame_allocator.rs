@@ -83,8 +83,10 @@ impl FrameAllocator for StackFrameAllocator {
 type FrameAllocatorImpl = StackFrameAllocator;
 
 lazy_static! {
-    pub static ref FRAME_ALLOCATOR: UPIntrFreeCell<FrameAllocatorImpl> =
-        unsafe { UPIntrFreeCell::new(FrameAllocatorImpl::new()) };
+    pub static ref FRAME_ALLOCATOR: UPIntrFreeCell<FrameAllocatorImpl> ={
+        kprintln!("[KERN] mm::frame_allocator::lazy_static!FRAME_ALLOCATOR begin");
+        unsafe { UPIntrFreeCell::new(FrameAllocatorImpl::new()) }
+    };
 }
 
 pub fn init_frame_allocator() {

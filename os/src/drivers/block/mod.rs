@@ -10,7 +10,10 @@ use crate::fs::easy_fs::BlockDevice;
 use lazy_static::*;
 
 lazy_static! {
-    pub static ref BLOCK_DEVICE: Arc<dyn BlockDevice> = Arc::new(BlockDeviceImpl::new());
+    pub static ref BLOCK_DEVICE: Arc<dyn BlockDevice> = {
+        kprintln!("[KERN] drivers::block::lazy_static!BLOCK_DEVICE begin");
+        Arc::new(BlockDeviceImpl::new())
+    };
 }
 
 #[allow(unused)]

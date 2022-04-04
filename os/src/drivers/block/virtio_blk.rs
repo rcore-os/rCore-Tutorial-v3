@@ -20,7 +20,10 @@ pub struct VirtIOBlock {
 }
 
 lazy_static! {
-    static ref QUEUE_FRAMES: UPIntrFreeCell<Vec<FrameTracker>> = unsafe { UPIntrFreeCell::new(Vec::new()) };
+    static ref QUEUE_FRAMES: UPIntrFreeCell<Vec<FrameTracker>> = {
+        kprintln!("[KERN] drivers::block::virtio_blk::lazy_static!QUEUE_FRAMES begin");
+        unsafe { UPIntrFreeCell::new(Vec::new()) }
+    };
 }
 
 impl BlockDevice for VirtIOBlock {

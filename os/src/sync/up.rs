@@ -57,6 +57,7 @@ pub struct IntrMaskingInfo {
 
 lazy_static! {
     static ref INTR_MASKING_INFO: UPSafeCellRaw<IntrMaskingInfo> = unsafe {
+        kprintln!("[KERN] sync::up::lazy_static!INTR_MASKING_INFO begin");
         UPSafeCellRaw::new(IntrMaskingInfo::new()) 
     };
 }

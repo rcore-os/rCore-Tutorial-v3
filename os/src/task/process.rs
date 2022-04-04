@@ -74,9 +74,12 @@ impl ProcessControlBlock {
     pub fn new(elf_data: &[u8]) -> Arc<Self> {
         // memory_set with elf program headers/trampoline/trap context/user stack
         kprintln!("[KERN] task::process::new() begin");
+        kprintln!("[KERN] task::process::new(): build MemorySet, set user_stack_base, set entry_point");
         let (memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
         // allocate a pid
+        kprintln!("[KERN] task::process::new(): allocate a pid");
         let pid_handle = pid_alloc();
+        kprintln!("[KERN] task::process::new(): new ProcessControlBlockInner");
         let process = Arc::new(Self {
             pid: pid_handle,
             inner: unsafe {
@@ -104,12 +107,15 @@ impl ProcessControlBlock {
             },
         });
         // create a main thread, we should allocate ustack and trap_cx here
+        kprintln!("[KERN] task::process::new(): create a main thread begin");
+        kprintln!("[KERN] task::process::new(): create a main thread: new TCB(alloc kstack, utack & trap_cx...) ");
         let task = Arc::new(TaskControlBlock::new(
             Arc::clone(&process),
             ustack_base,
             true,
         ));
         // prepare trap_cx of main thread
+        kprintln!("[KERN] task::process::new(): create a main thread: set trap_cx(entry_point, ustack_top, k_satp, k_sp, trap_handler) ");
         let task_inner = task.inner_exclusive_access();
         let trap_cx = task_inner.get_trap_cx();
         let ustack_top = task_inner.res.as_ref().unwrap().ustack_top();
@@ -122,12 +128,15 @@ impl ProcessControlBlock {
             kstack_top,
             trap_handler as usize,
         );
+        kprintln!("[KERN] task::process::new(): create a main thread end");
         // add main thread to the process
+        kprintln!("[KERN] task::process::new(): add main thread to the process");
         let mut process_inner = process.inner_exclusive_access();
         process_inner.tasks.push(Some(Arc::clone(&task)));
         drop(process_inner);
         insert_into_pid2process(process.getpid(), Arc::clone(&process));
         // add main thread to scheduler
+        kprintln!("[KERN] task::process::new(): add_task(task): add main thread to tscheduler");
         add_task(task);
         kprintln!("[KERN] task::process::new() end");
         process

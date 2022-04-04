@@ -50,7 +50,10 @@ use lazy_static::*;
 use sync::UPIntrFreeCell;
 
 lazy_static! {
-    pub static ref DEV_NON_BLOCKING_ACCESS: UPIntrFreeCell<bool> = unsafe { UPIntrFreeCell::new(false) };
+    pub static ref DEV_NON_BLOCKING_ACCESS: UPIntrFreeCell<bool> = {
+        kprintln!("[KERN] main::lazy_static!DEV_NON_BLOCKING_ACCESS begin");
+        unsafe { UPIntrFreeCell::new(false) }
+    };
 }
 
 #[no_mangle]

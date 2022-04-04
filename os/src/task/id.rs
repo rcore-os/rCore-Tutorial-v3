@@ -40,10 +40,17 @@ impl RecycleAllocator {
 }
 
 lazy_static! {
-    static ref PID_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> =
-        unsafe { UPIntrFreeCell::new(RecycleAllocator::new()) };
-    static ref KSTACK_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> =
-        unsafe { UPIntrFreeCell::new(RecycleAllocator::new()) };
+    static ref PID_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> = {
+        kprintln!("[KERN] task::id::lazy_static!PID_ALLOCATOR begin");
+        unsafe { UPIntrFreeCell::new(RecycleAllocator::new()) }
+    };
+}
+
+lazy_static! {
+    static ref KSTACK_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> ={
+        kprintln!("[KERN] task::id::lazy_static!KSTACK_ALLOCATOR begin");
+        unsafe { UPIntrFreeCell::new(RecycleAllocator::new()) }
+    };
 }
 
 pub struct PidHandle(pub usize);
@@ -60,14 +67,17 @@ impl Drop for PidHandle {
 
 /// Return (bottom, top) of a kernel stack in kernel space.
 pub fn kernel_stack_position(kstack_id: usize) -> (usize, usize) {
+    kprintln!("[KERN] task::id::kernel_stack_position() begin");
     let top = TRAMPOLINE - kstack_id * (KERNEL_STACK_SIZE + PAGE_SIZE);
     let bottom = top - KERNEL_STACK_SIZE;
+    kprintln!("[KERN] task::id::kernel_stack_position() end");
     (bottom, top)
 }
 
 pub struct KernelStack(pub usize);
 
 pub fn kstack_alloc() -> KernelStack {
+    kprintln!("[KERN] task::id::kstack_alloc() begin");
     let kstack_id = KSTACK_ALLOCATOR.exclusive_access().alloc();
     let (kstack_bottom, kstack_top) = kernel_stack_position(kstack_id);
     KERNEL_SPACE.exclusive_access().insert_framed_area(
@@ -75,6 +85,7 @@ pub fn kstack_alloc() -> KernelStack {
         kstack_top.into(),
         MapPermission::R | MapPermission::W,
     );
+    kprintln!("[KERN] task::id::kstack_alloc() end");
     KernelStack(kstack_id)
 }
 
@@ -127,6 +138,7 @@ impl TaskUserRes {
         ustack_base: usize,
         alloc_user_res: bool,
     ) -> Self {
+        kprintln!("[KERN] task::id::TaskUserRes::new() begin");
         let tid = process.inner_exclusive_access().alloc_tid();
         let task_user_res = Self {
             tid,
@@ -136,13 +148,16 @@ impl TaskUserRes {
         if alloc_user_res {
             task_user_res.alloc_user_res();
         }
+        kprintln!("[KERN] task::id::TaskUserRes::new() end");
         task_user_res
     }
 
     pub fn alloc_user_res(&self) {
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res() begin");
         let process = self.process.upgrade().unwrap();
         let mut process_inner = process.inner_exclusive_access();
         // alloc user stack
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack");
         let ustack_bottom = ustack_bottom_from_tid(self.ustack_base, self.tid);
         let ustack_top = ustack_bottom + USER_STACK_SIZE;
         process_inner.memory_set.insert_framed_area(
@@ -151,6 +166,7 @@ impl TaskUserRes {
             MapPermission::R | MapPermission::W | MapPermission::U,
         );
         // alloc trap_cx
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx");
         let trap_cx_bottom = trap_cx_bottom_from_tid(self.tid);
         let trap_cx_top = trap_cx_bottom + PAGE_SIZE;
         process_inner.memory_set.insert_framed_area(
@@ -158,22 +174,29 @@ impl TaskUserRes {
             trap_cx_top.into(),
             MapPermission::R | MapPermission::W,
         );
+        kprintln!("[KERN] task::id::TaskUserRes::alloc_user_res() end");
     }
 
     fn dealloc_user_res(&self) {
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res() begin");
         // dealloc tid
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc tid");
         let process = self.process.upgrade().unwrap();
         let mut process_inner = process.inner_exclusive_access();
         // dealloc ustack manually
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc ustack manually");
         let ustack_bottom_va: VirtAddr = ustack_bottom_from_tid(self.ustack_base, self.tid).into();
         process_inner
             .memory_set
             .remove_area_with_start_vpn(ustack_bottom_va.into());
         // dealloc trap_cx manually
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res():  dealloc trap_cx  manually");
         let trap_cx_bottom_va: VirtAddr = trap_cx_bottom_from_tid(self.tid).into();
         process_inner
             .memory_set
             .remove_area_with_start_vpn(trap_cx_bottom_va.into());
+        
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res() end");    
     }
 
     #[allow(unused)]

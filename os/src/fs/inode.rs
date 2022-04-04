@@ -21,6 +21,7 @@ pub struct OSInodeInner {
 
 impl OSInode {
     pub fn new(readable: bool, writable: bool, inode: Arc<Inode>) -> Self {
+        kprintln!("[KERN] fs::inode::OSInode::new() begin");
         Self {
             readable,
             writable,
@@ -28,6 +29,7 @@ impl OSInode {
         }
     }
     pub fn read_all(&self) -> Vec<u8> {
+        kprintln!("[KERN] fs::inode::OSInode::read_all() begin");
         let mut inner = self.inner.exclusive_access();
         let mut buffer = [0u8; 512];
         let mut v: Vec<u8> = Vec::new();
@@ -45,6 +47,7 @@ impl OSInode {
 
 lazy_static! {
     pub static ref ROOT_INODE: Arc<Inode> = {
+        kprintln!("[KERN] fs::inode::lazy_static!ROOT_INODE begin");
         let efs = EasyFileSystem::open(BLOCK_DEVICE.clone());
         Arc::new(EasyFileSystem::root_inode(&efs))
     };
@@ -114,7 +117,7 @@ impl File for OSInode {
         self.writable
     }
     fn read(&self, mut buf: UserBuffer) -> usize {
-        kprintln!("[KERN] fs::inode::read() begin");
+        kprintln!("[KERN] fs::inode::OSInode<FIle>::read() begin");
         let mut inner = self.inner.exclusive_access();
         let mut total_read_size = 0usize;
         for slice in buf.buffers.iter_mut() {
@@ -125,11 +128,11 @@ impl File for OSInode {
             inner.offset += read_size;
             total_read_size += read_size;
         }
-        kprintln!("[KERN] fs::inode::read() end");
+        kprintln!("[KERN] fs::inode::OSInode<FIle>::read() end");
         total_read_size
     }
     fn write(&self, buf: UserBuffer) -> usize {
-        kprintln!("[KERN] fs::inode::write() begin");
+        kprintln!("[KERN] fs::inode::OSInode<FIle>::write() begin");
         let mut inner = self.inner.exclusive_access();
         let mut total_write_size = 0usize;
         for slice in buf.buffers.iter() {
@@ -138,7 +141,7 @@ impl File for OSInode {
             inner.offset += write_size;
             total_write_size += write_size;
         }
-        kprintln!("[KERN] fs::inode::write() end");
+        kprintln!("[KERN] fs::inode::OSInode<FIle>::write() end");
         total_write_size
     }
 }

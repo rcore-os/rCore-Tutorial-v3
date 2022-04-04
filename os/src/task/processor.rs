@@ -30,7 +30,10 @@ impl Processor {
 }
 
 lazy_static! {
-    pub static ref PROCESSOR: UPIntrFreeCell<Processor> = unsafe { UPIntrFreeCell::new(Processor::new()) };
+    pub static ref PROCESSOR: UPIntrFreeCell<Processor> = {
+        kprintln!("[KERN] task::processor::lazy_static!PROCESSOR begin");
+        unsafe { UPIntrFreeCell::new(Processor::new()) }
+    };
 }
 
 pub fn run_tasks() {

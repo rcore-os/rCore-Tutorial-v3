@@ -25,8 +25,10 @@ extern "C" {
 }
 
 lazy_static! {
-    pub static ref KERNEL_SPACE: Arc<UPIntrFreeCell<MemorySet>> =
-        Arc::new(unsafe { UPIntrFreeCell::new(MemorySet::new_kernel()) });
+    pub static ref KERNEL_SPACE: Arc<UPIntrFreeCell<MemorySet>> ={
+        kprintln!("[KERN] mm::memory_set::lazy_static!KERNEL_SPACE begin");
+        Arc::new(unsafe { UPIntrFreeCell::new(MemorySet::new_kernel()) })
+    };
 }
 
 pub fn kernel_token() -> usize {

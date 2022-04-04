@@ -13,5 +13,8 @@ pub trait CharDevice {
 }
 
 lazy_static! {
-    pub static ref UART: Arc<CharDeviceImpl> = Arc::new(CharDeviceImpl::new());
+    pub static ref UART: Arc<CharDeviceImpl> = {
+        kprintln!("[KERN] drivers::chardev::lazy_static!UART begin");
+        Arc::new(CharDeviceImpl::new())
+    };
 }

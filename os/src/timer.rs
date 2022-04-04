@@ -52,8 +52,10 @@ impl Ord for TimerCondVar {
 }
 
 lazy_static! {
-    static ref TIMERS: UPIntrFreeCell<BinaryHeap<TimerCondVar>> =
-        unsafe { UPIntrFreeCell::new(BinaryHeap::<TimerCondVar>::new()) };
+    static ref TIMERS: UPIntrFreeCell<BinaryHeap<TimerCondVar>> ={
+        kprintln!("[KERN] timer::lazy_static!TIMERS begin");
+        unsafe { UPIntrFreeCell::new(BinaryHeap::<TimerCondVar>::new()) }
+    };
 }
 
 pub fn add_timer(expire_ms: usize, task: Arc<TaskControlBlock>) {
