@@ -274,6 +274,17 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::id::RecycleAllocator</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::manager::insert_into_pid2process</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskControlBlock</span>;
@@ -410,9 +421,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="ident">process_inner</span>.<span class="ident">tasks</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">task</span>)));
         <span class="ident">drop</span>(<span class="ident">process_inner</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::new(): insert &lt;pid, PCB&gt; in PID2PCB BTreeMap&quot;</span>);
         <span class="ident">insert_into_pid2process</span>(<span class="ident">process</span>.<span class="ident">getpid</span>(), <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">process</span>));
         <span class="comment">// add main thread to scheduler</span>
-        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::new(): add_task(task): add main thread to tscheduler&quot;</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::new(): add_task(task): add main thread to scheduler&quot;</span>);
         <span class="ident">add_task</span>(<span class="ident">task</span>);
         <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::new() end&quot;</span>);
         <span class="ident">process</span>
@@ -479,10 +491,13 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">parent</span>.<span class="ident">thread_count</span>(), <span class="number">1</span>);
         <span class="comment">// clone parent&#39;s memory_set completely including trampoline/ustacks/trap_cxs</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): clone parent&#39;s memory_set for child&quot;</span>);
         <span class="kw">let</span> <span class="ident">memory_set</span> <span class="op">=</span> <span class="ident">MemorySet::from_existed_user</span>(<span class="kw-2">&amp;</span><span class="ident">parent</span>.<span class="ident">memory_set</span>);
         <span class="comment">// alloc a pid</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): alloc a new pid for child&quot;</span>);
         <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">pid_alloc</span>();
         <span class="comment">// copy fd table</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): copy fd table for child&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_fd_table</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">File</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">for</span> <span class="ident">fd</span> <span class="kw">in</span> <span class="ident">parent</span>.<span class="ident">fd_table</span>.<span class="ident">iter</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file</span>) <span class="op">=</span> <span class="ident">fd</span> {
@@ -492,6 +507,7 @@
             }
         }
         <span class="comment">// create child process pcb</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): new child PCB with new pid, memory_set, fd_table, ...&quot;</span>);
         <span class="kw">let</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="self">Self</span> {
             <span class="ident">pid</span>,
             <span class="ident">inner</span>: <span class="kw">unsafe</span> {
@@ -512,8 +528,10 @@
             },
         });
         <span class="comment">// add child</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): add child link in parent&#39; children Vec&quot;</span>);
         <span class="ident">parent</span>.<span class="ident">children</span>.<span class="ident">push</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>));
         <span class="comment">// create main thread of child process</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): TaskControlBlock::new(): create main thread of child process&quot;</span>);
         <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">TaskControlBlock::new</span>(
             <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>),
             <span class="ident">parent</span>
@@ -528,16 +546,20 @@
             <span class="bool-val">false</span>,
         ));
         <span class="comment">// attach task to child process</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): attach child TCB to child PCB&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child_inner</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="ident">child_inner</span>.<span class="ident">tasks</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">task</span>)));
         <span class="ident">drop</span>(<span class="ident">child_inner</span>);
         <span class="comment">// modify kstack_top in trap_cx of this thread</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): modify child&#39;s kstack_top in trap_cx of child&quot;</span>);
         <span class="kw">let</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="kw">let</span> <span class="ident">trap_cx</span> <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">get_trap_cx</span>();
         <span class="ident">trap_cx</span>.<span class="ident">kernel_sp</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">kstack</span>.<span class="ident">get_top</span>();
         <span class="ident">drop</span>(<span class="ident">task_inner</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): insert &lt;child pid, child PCB&gt; in PID2PCB BTreeMap&quot;</span>);
         <span class="ident">insert_into_pid2process</span>(<span class="ident">child</span>.<span class="ident">getpid</span>(), <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>));
         <span class="comment">// add this thread to scheduler</span>
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork(): add_task(child task): add child thread to scheduler&quot;</span>);
         <span class="ident">add_task</span>(<span class="ident">task</span>);
         <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::process::fork() end&quot;</span>);
         <span class="ident">child</span>

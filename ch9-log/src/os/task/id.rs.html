@@ -406,7 +406,7 @@
         <span class="kw">let</span> <span class="ident">process</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">process</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="comment">// alloc user stack</span>
-        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack&quot;</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc user stack for TCB&quot;</span>);
         <span class="kw">let</span> <span class="ident">ustack_bottom</span> <span class="op">=</span> <span class="ident">ustack_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">ustack_base</span>, <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">ustack_top</span> <span class="op">=</span> <span class="ident">ustack_bottom</span> <span class="op">+</span> <span class="ident">USER_STACK_SIZE</span>;
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">insert_framed_area</span>(
@@ -415,7 +415,7 @@
             <span class="ident">MapPermission::R</span> <span class="op">|</span> <span class="ident">MapPermission::W</span> <span class="op">|</span> <span class="ident">MapPermission::U</span>,
         );
         <span class="comment">// alloc trap_cx</span>
-        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx&quot;</span>);
+        <span class="macro">kprintln!</span>(<span class="string">&quot;[KERN] task::id::TaskUserRes::alloc_user_res(): alloc trap_cx for TCB&quot;</span>);
         <span class="kw">let</span> <span class="ident">trap_cx_bottom</span> <span class="op">=</span> <span class="ident">trap_cx_bottom_from_tid</span>(<span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">trap_cx_top</span> <span class="op">=</span> <span class="ident">trap_cx_bottom</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>;
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">insert_framed_area</span>(
