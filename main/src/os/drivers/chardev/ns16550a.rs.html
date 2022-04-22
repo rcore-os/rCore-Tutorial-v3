@@ -193,7 +193,7 @@
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// InterruptEnableRegister</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IER</span>: <span class="ident">u8</span> {
-        <span class="kw">const</span> <span class="ident">RX_AVALIABLE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">RX_AVAILABLE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="kw">const</span> <span class="ident">TX_EMPTY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
     }
 
@@ -276,7 +276,7 @@
         <span class="ident">mcr</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MCR::REQUEST_TO_SEND</span>;
         <span class="ident">mcr</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MCR::AUX_OUTPUT2</span>;
         <span class="ident">read_end</span>.<span class="ident">mcr</span>.<span class="ident">write</span>(<span class="ident">mcr</span>);
-        <span class="kw">let</span> <span class="ident">ier</span> <span class="op">=</span> <span class="ident">IER::RX_AVALIABLE</span>;
+        <span class="kw">let</span> <span class="ident">ier</span> <span class="op">=</span> <span class="ident">IER::RX_AVAILABLE</span>;
         <span class="ident">read_end</span>.<span class="ident">ier</span>.<span class="ident">write</span>(<span class="ident">ier</span>);
     }
 
