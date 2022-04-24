@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["add_task",""],["fetch_task",""],["pid2task",""],["remove_from_pid2task",""]],"struct":[["PID2TCB",""],["TASK_MANAGER",""],["TaskManager",""]]});
