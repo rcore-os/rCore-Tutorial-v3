@@ -121,7 +121,39 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Trap handling functionality</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For rCore, we have a single trap entry point, namely `__alltraps`. At</span>
+<span class="doccomment">//! initialization in [`init()`], we set the `stvec` CSR to point to it.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! All traps go through `__alltraps`, which is defined in `trap.S`. The</span>
+<span class="doccomment">//! assembly language code does just enough work restore the kernel space</span>
+<span class="doccomment">//! context, ensuring that Rust code safely runs, and transfers control to</span>
+<span class="doccomment">//! [`trap_handler()`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! It then calls different functionality based on what exactly the exception</span>
+<span class="doccomment">//! was. For example, timer interrupts trigger task preemption, and syscalls go</span>
+<span class="doccomment">//! to [`syscall()`].</span>
+<span class="kw">mod</span> <span class="ident">context</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall::syscall</span>;
@@ -137,7 +169,7 @@
 };
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;trap.S&quot;</span>));
-
+<span class="doccomment">/// initialize CSR `stvec` as the entry of `__alltraps`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() {
     <span class="ident">set_kernel_trap_entry</span>();
 }
@@ -153,7 +185,7 @@
         <span class="ident">stvec::write</span>(<span class="ident">TRAMPOLINE</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">TrapMode::Direct</span>);
     }
 }
-
+<span class="doccomment">/// enable timer interrupt in sie CSR</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_timer_interrupt</span>() {
     <span class="kw">unsafe</span> {
         <span class="ident">sie::set_stimer</span>();
@@ -161,6 +193,7 @@
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="doccomment">/// handle an interrupt, exception, or system call from user space</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_handler</span>() -&gt; <span class="op">!</span> {
     <span class="ident">set_kernel_trap_entry</span>();
     <span class="kw">let</span> <span class="ident">scause</span> <span class="op">=</span> <span class="ident">scause::read</span>();
@@ -212,6 +245,9 @@
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="doccomment">/// set the new addr of __restore asm function in TRAMPOLINE page,</span>
+<span class="doccomment">/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,</span>
+<span class="doccomment">/// finally, jump to new addr of __restore asm function </span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_return</span>() -&gt; <span class="op">!</span> {
     <span class="ident">set_user_trap_entry</span>();
     <span class="kw">let</span> <span class="ident">trap_cx_ptr</span> <span class="op">=</span> <span class="ident">TRAP_CONTEXT</span>;
@@ -234,6 +270,8 @@
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="doccomment">/// Unimplement: traps/interrupts/exceptions from kernel mode</span>
+<span class="doccomment">/// Todo: Chapter 9: I/O device </span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_from_kernel</span>() -&gt; <span class="op">!</span> {
     <span class="macro">panic!</span>(<span class="string">&quot;a trap {:?} from kernel!&quot;</span>, <span class="ident">scause::read</span>().<span class="ident">cause</span>());
 }

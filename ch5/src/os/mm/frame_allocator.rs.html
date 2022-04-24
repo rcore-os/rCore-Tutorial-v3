@@ -130,18 +130,30 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation of [`FrameAllocator`] which </span>
+<span class="doccomment">//! controls all the frames in the operating system.</span>
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
 
+<span class="doccomment">/// manage a frame which has the same lifecycle as the tracker</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FrameTracker</span> {
+    <span class="doccomment">///</span>
     <span class="kw">pub</span> <span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">FrameTracker</span> {
+    <span class="doccomment">///Create an empty `FrameTracker`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// page cleaning</span>
         <span class="kw">let</span> <span class="ident">bytes_array</span> <span class="op">=</span> <span class="ident">ppn</span>.<span class="ident">get_bytes_array</span>();
@@ -169,7 +181,7 @@
     <span class="kw">fn</span> <span class="ident">alloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysPageNum</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>);
 }
-
+<span class="doccomment">/// an implementation for frame allocator</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StackFrameAllocator</span> {
     <span class="ident">current</span>: <span class="ident">usize</span>,
     <span class="ident">end</span>: <span class="ident">usize</span>,
@@ -215,10 +227,11 @@
 <span class="kw">type</span> <span class="ident">FrameAllocatorImpl</span> <span class="op">=</span> <span class="ident">StackFrameAllocator</span>;
 
 <span class="macro">lazy_static!</span> {
+    <span class="doccomment">/// frame allocator instance through lazy_static!</span>
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FRAME_ALLOCATOR</span>: <span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">FrameAllocatorImpl</span><span class="op">&gt;</span> <span class="op">=</span>
         <span class="kw">unsafe</span> { <span class="ident">UPSafeCell::new</span>(<span class="ident">FrameAllocatorImpl::new</span>()) };
 }
-
+<span class="doccomment">/// initiate the frame allocator using `ekernel` and `MEMORY_END`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_frame_allocator</span>() {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="kw">fn</span> <span class="ident">ekernel</span>();
@@ -228,19 +241,20 @@
         <span class="ident">PhysAddr::from</span>(<span class="ident">MEMORY_END</span>).<span class="ident">floor</span>(),
     );
 }
-
+<span class="doccomment">/// allocate a frame</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">frame_alloc</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span> {
     <span class="ident">FRAME_ALLOCATOR</span>
         .<span class="ident">exclusive_access</span>()
         .<span class="ident">alloc</span>()
         .<span class="ident">map</span>(<span class="ident">FrameTracker::new</span>)
 }
-
+<span class="doccomment">/// deallocate a frame</span>
 <span class="kw">fn</span> <span class="ident">frame_dealloc</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>) {
     <span class="ident">FRAME_ALLOCATOR</span>.<span class="ident">exclusive_access</span>().<span class="ident">dealloc</span>(<span class="ident">ppn</span>);
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+<span class="doccomment">/// a simple test for frame allocator</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">frame_allocator_test</span>() {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">5</span> {

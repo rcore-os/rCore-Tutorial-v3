@@ -41,22 +41,42 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">riscv::register::sstatus</span>::{<span class="self">self</span>, <span class="ident">Sstatus</span>, <span class="ident">SPP</span>};
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation of [`TrapContext`]</span>
+<span class="kw">use</span> <span class="ident">riscv::register::sstatus</span>::{<span class="self">self</span>, <span class="ident">Sstatus</span>, <span class="ident">SPP</span>};
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">///trap context structure containing sstatus, sepc and registers</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrapContext</span> {
+    <span class="doccomment">/// general regs[0..31]</span>
     <span class="kw">pub</span> <span class="ident">x</span>: [<span class="ident">usize</span>; <span class="number">32</span>],
+    <span class="doccomment">/// CSR sstatus      </span>
     <span class="kw">pub</span> <span class="ident">sstatus</span>: <span class="ident">Sstatus</span>,
+    <span class="doccomment">/// CSR sepc</span>
     <span class="kw">pub</span> <span class="ident">sepc</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Addr of Page Table</span>
     <span class="kw">pub</span> <span class="ident">kernel_satp</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// kernel stack</span>
     <span class="kw">pub</span> <span class="ident">kernel_sp</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Addr of trap_handler function</span>
     <span class="kw">pub</span> <span class="ident">trap_handler</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TrapContext</span> {
+    <span class="doccomment">///set stack pointer to x_2 reg (sp)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sp</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">x</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">sp</span>;
     }
+    <span class="doccomment">///init app context</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app_init_context</span>(
         <span class="ident">entry</span>: <span class="ident">usize</span>,
         <span class="ident">sp</span>: <span class="ident">usize</span>,

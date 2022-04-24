@@ -32,7 +32,9 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::cell</span>::{<span class="ident">RefCell</span>, <span class="ident">RefMut</span>};
+<span id="30">30</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Uniprocessor interior mutability primitives</span>
+<span class="kw">use</span> <span class="ident">core::cell</span>::{<span class="ident">RefCell</span>, <span class="ident">RefMut</span>};
 
 <span class="doccomment">/// Wrap a static data structure inside it so that we are</span>
 <span class="doccomment">/// able to access it without any `unsafe`.</span>
@@ -56,7 +58,7 @@
             <span class="ident">inner</span>: <span class="ident">RefCell::new</span>(<span class="ident">value</span>),
         }
     }
-    <span class="doccomment">/// Panic if the data has been borrowed.</span>
+    <span class="doccomment">/// Exclusive access inner data in UPSafeCell. Panic if the data has been borrowed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exclusive_access</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">borrow_mut</span>()
     }

@@ -22,7 +22,21 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">address</span>;
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Memory management implementation</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! SV39 page-based virtual-memory architecture for RV64 systems, and</span>
+<span class="doccomment">//! everything about memory management, like frame allocator, page table,</span>
+<span class="doccomment">//! map area and memory set, is implemented here.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Every task or process has a memory_set to control its virtual memory.</span>
+<span class="kw">mod</span> <span class="ident">address</span>;
 <span class="kw">mod</span> <span class="ident">frame_allocator</span>;
 <span class="kw">mod</span> <span class="ident">heap_allocator</span>;
 <span class="kw">mod</span> <span class="ident">memory_set</span>;
@@ -35,7 +49,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">memory_set</span>::{<span class="ident">MapPermission</span>, <span class="ident">MemorySet</span>, <span class="ident">KERNEL_SPACE</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">page_table</span>::{<span class="ident">translated_byte_buffer</span>, <span class="ident">translated_refmut</span>, <span class="ident">translated_str</span>, <span class="ident">PageTableEntry</span>};
 <span class="kw">use</span> <span class="ident">page_table</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>};
-
+<span class="doccomment">/// initiate heap allocator, frame allocator and kernel space</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() {
     <span class="ident">heap_allocator::init_heap</span>();
     <span class="ident">frame_allocator::init_frame_allocator</span>();

@@ -11,7 +11,9 @@
 <span id="6">6</span>
 <span id="7">7</span>
 <span id="8">8</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskContext</span>;
+<span id="9">9</span>
+</pre><pre class="rust"><code><span class="doccomment">//!Wrap `switch.S` as a function</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskContext</span>;
 <span class="kw">use</span> <span class="ident">core::arch::global_asm</span>;
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;switch.S&quot;</span>));
