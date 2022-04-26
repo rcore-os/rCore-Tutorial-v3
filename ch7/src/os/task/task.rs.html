@@ -224,7 +224,30 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskContext</span>;
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">TaskContext</span>, <span class="ident">SignalActions</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>, <span class="ident">SignalFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::TRAP_CONTEXT</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">File</span>, <span class="ident">Stdin</span>, <span class="ident">Stdout</span>};
@@ -256,6 +279,16 @@
     <span class="kw">pub</span> <span class="ident">exit_code</span>: <span class="ident">i32</span>,
     <span class="kw">pub</span> <span class="ident">fd_table</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">File</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">signals</span>: <span class="ident">SignalFlags</span>,
+    <span class="kw">pub</span> <span class="ident">signal_mask</span>: <span class="ident">SignalFlags</span>,
+    <span class="comment">// the signal which is being handling</span>
+    <span class="kw">pub</span> <span class="ident">handling_sig</span>: <span class="ident">isize</span>,
+    <span class="comment">// Signal actions</span>
+    <span class="kw">pub</span> <span class="ident">signal_actions</span>: <span class="ident">SignalActions</span>,
+    <span class="comment">// if the task is killed</span>
+    <span class="kw">pub</span> <span class="ident">killed</span>: <span class="ident">bool</span>,
+    <span class="comment">// if the task is frozen by a signal</span>
+    <span class="kw">pub</span> <span class="ident">frozen</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">trap_ctx_backup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TrapContext</span><span class="op">&gt;</span>
 }
 
 <span class="kw">impl</span> <span class="ident">TaskControlBlockInner</span> {
@@ -318,6 +351,12 @@
                         <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Stdout</span>)),
                     ],
                     <span class="ident">signals</span>: <span class="ident">SignalFlags::empty</span>(),
+                    <span class="ident">signal_mask</span>: <span class="ident">SignalFlags::empty</span>(),
+                    <span class="ident">handling_sig</span>: <span class="op">-</span><span class="number">1</span>,
+                    <span class="ident">signal_actions</span>: <span class="ident">SignalActions::default</span>(),
+                    <span class="ident">killed</span>: <span class="bool-val">false</span>,
+                    <span class="ident">frozen</span>: <span class="bool-val">false</span>,
+                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>
                 })
             },
         };
@@ -420,6 +459,13 @@
                     <span class="ident">exit_code</span>: <span class="number">0</span>,
                     <span class="ident">fd_table</span>: <span class="ident">new_fd_table</span>,
                     <span class="ident">signals</span>: <span class="ident">SignalFlags::empty</span>(),
+                    <span class="comment">// inherit the signal_mask and signal_action</span>
+                    <span class="ident">signal_mask</span>: <span class="ident">parent_inner</span>.<span class="ident">signal_mask</span>,
+                    <span class="ident">handling_sig</span>: <span class="op">-</span><span class="number">1</span>,
+                    <span class="ident">signal_actions</span>: <span class="ident">parent_inner</span>.<span class="ident">signal_actions</span>.<span class="ident">clone</span>(),
+                    <span class="ident">killed</span>: <span class="bool-val">false</span>,
+                    <span class="ident">frozen</span>: <span class="bool-val">false</span>,
+                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>
                 })
             },
         });

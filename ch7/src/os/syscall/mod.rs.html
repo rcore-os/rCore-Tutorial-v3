@@ -43,6 +43,14 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_DUP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">24</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
@@ -52,6 +60,9 @@
 <span class="kw">const</span> <span class="ident">SYSCALL_EXIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">93</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_YIELD</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">124</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_KILL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">129</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_SIGACTION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">134</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_SIGPROCMASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">135</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_SIGRETURN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">139</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_GET_TIME</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">169</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_GETPID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">172</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_FORK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">220</span>;
@@ -64,6 +75,8 @@
 <span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::SignalAction</span>;
+
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syscall</span>(<span class="ident">syscall_id</span>: <span class="ident">usize</span>, <span class="ident">args</span>: [<span class="ident">usize</span>; <span class="number">3</span>]) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">syscall_id</span> {
         <span class="ident">SYSCALL_DUP</span> =&gt; <span class="ident">sys_dup</span>(<span class="ident">args</span>[<span class="number">0</span>]),
@@ -74,7 +87,10 @@
         <span class="ident">SYSCALL_WRITE</span> =&gt; <span class="ident">sys_write</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">args</span>[<span class="number">2</span>]),
         <span class="ident">SYSCALL_EXIT</span> =&gt; <span class="ident">sys_exit</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">i32</span>),
         <span class="ident">SYSCALL_YIELD</span> =&gt; <span class="ident">sys_yield</span>(),
-        <span class="ident">SYSCALL_KILL</span> =&gt; <span class="ident">sys_kill</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>),
+        <span class="ident">SYSCALL_KILL</span> =&gt; <span class="ident">sys_kill</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">i32</span>),
+        <span class="ident">SYSCALL_SIGACTION</span> =&gt; <span class="ident">sys_sigaction</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">SignalAction</span>, <span class="ident">args</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">SignalAction</span>),
+        <span class="ident">SYSCALL_SIGPROCMASK</span> =&gt; <span class="ident">sys_sigprocmask</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u32</span>),
+        <span class="ident">SYSCALL_SIGRETURN</span> =&gt; <span class="ident">sys_sigretrun</span>(),
         <span class="ident">SYSCALL_GET_TIME</span> =&gt; <span class="ident">sys_get_time</span>(),
         <span class="ident">SYSCALL_GETPID</span> =&gt; <span class="ident">sys_getpid</span>(),
         <span class="ident">SYSCALL_FORK</span> =&gt; <span class="ident">sys_fork</span>(),

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SignalFlags",""]]});
+initSidebarItems({"constant":[["MAX_SIG",""]],"struct":[["SignalFlags",""]]});

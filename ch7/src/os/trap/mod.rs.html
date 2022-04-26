@@ -128,13 +128,16 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall::syscall</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{
-    <span class="ident">check_signals_of_current</span>, <span class="ident">current_add_signal</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>,
-    <span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalFlags</span>,
+    <span class="ident">check_signals_error_of_current</span>, <span class="ident">current_add_signal</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>,
+    <span class="ident">exit_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalFlags</span>, <span class="ident">handle_signals</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::timer::set_next_trigger</span>;
 <span class="kw">use</span> <span class="ident">core::arch</span>::{<span class="ident">asm</span>, <span class="ident">global_asm</span>};
@@ -215,8 +218,11 @@
             );
         }
     }
-    <span class="comment">// check signals</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">errno</span>, <span class="ident">msg</span>)) <span class="op">=</span> <span class="ident">check_signals_of_current</span>() {
+    <span class="comment">// handle signals (handle the sent signal)</span>
+    <span class="ident">handle_signals</span>();
+
+    <span class="comment">// check error signals (if error then exit)</span>
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">errno</span>, <span class="ident">msg</span>)) <span class="op">=</span> <span class="ident">check_signals_error_of_current</span>() {
         <span class="macro">println!</span>(<span class="string">&quot;[kernel] {}&quot;</span>, <span class="ident">msg</span>);
         <span class="ident">exit_current_and_run_next</span>(<span class="ident">errno</span>);
     }

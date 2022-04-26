@@ -32,15 +32,75 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags</span>::<span class="kw-2">*</span>;
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_SIG</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">31</span>;
 
 <span class="macro">bitflags!</span> {
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignalFlags</span>: <span class="ident">u32</span> {
-        <span class="kw">const</span> <span class="ident">SIGINT</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="kw">const</span> <span class="ident">SIGILL</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="kw">const</span> <span class="ident">SIGABRT</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="kw">const</span> <span class="ident">SIGFPE</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="kw">const</span> <span class="ident">SIGSEGV</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="kw">const</span> <span class="ident">SIGDEF</span> <span class="op">=</span> <span class="number">1</span>; <span class="comment">// Default signal handling</span>
+        <span class="kw">const</span> <span class="ident">SIGHUP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">SIGINT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="kw">const</span> <span class="ident">SIGQUIT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="kw">const</span> <span class="ident">SIGILL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
+        <span class="kw">const</span> <span class="ident">SIGTRAP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="kw">const</span> <span class="ident">SIGABRT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">SIGBUS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="kw">const</span> <span class="ident">SIGFPE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="kw">const</span> <span class="ident">SIGKILL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="kw">const</span> <span class="ident">SIGUSR1</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class="ident">SIGSEGV</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="kw">const</span> <span class="ident">SIGUSR2</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="kw">const</span> <span class="ident">SIGPIPE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="kw">const</span> <span class="ident">SIGALRM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="kw">const</span> <span class="ident">SIGTERM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+        <span class="kw">const</span> <span class="ident">SIGSTKFLT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+        <span class="kw">const</span> <span class="ident">SIGCHLD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
+        <span class="kw">const</span> <span class="ident">SIGCONT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
+        <span class="kw">const</span> <span class="ident">SIGSTOP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
+        <span class="kw">const</span> <span class="ident">SIGTSTP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
+        <span class="kw">const</span> <span class="ident">SIGTTIN</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
+        <span class="kw">const</span> <span class="ident">SIGTTOU</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;
+        <span class="kw">const</span> <span class="ident">SIGURG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">23</span>;
+        <span class="kw">const</span> <span class="ident">SIGXCPU</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
+        <span class="kw">const</span> <span class="ident">SIGXFSZ</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">25</span>;
+        <span class="kw">const</span> <span class="ident">SIGVTALRM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">26</span>;
+        <span class="kw">const</span> <span class="ident">SIGPROF</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>;
+        <span class="kw">const</span> <span class="ident">SIGWINCH</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">28</span>;
+        <span class="kw">const</span> <span class="ident">SIGIO</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>;
+        <span class="kw">const</span> <span class="ident">SIGPWR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
+        <span class="kw">const</span> <span class="ident">SIGSYS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
     }
 }
 
@@ -54,6 +114,8 @@
             <span class="prelude-val">Some</span>((<span class="op">-</span><span class="number">6</span>, <span class="string">&quot;Aborted, SIGABRT=6&quot;</span>))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SIGFPE</span>) {
             <span class="prelude-val">Some</span>((<span class="op">-</span><span class="number">8</span>, <span class="string">&quot;Erroneous Arithmetic Operation, SIGFPE=8&quot;</span>))
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SIGKILL</span>) {
+            <span class="prelude-val">Some</span>((<span class="op">-</span><span class="number">9</span>, <span class="string">&quot;Killed, SIGKILL=9&quot;</span>))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SIGSEGV</span>) {
             <span class="prelude-val">Some</span>((<span class="op">-</span><span class="number">11</span>, <span class="string">&quot;Segmentation Fault, SIGSEGV=11&quot;</span>))
         } <span class="kw">else</span> {
