@@ -2,11 +2,13 @@
 #![feature(linkage)]
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
+#![feature(naked_functions)]
 
 #[macro_use]
 pub mod console;
 mod lang_items;
 mod syscall;
+mod coroutine;
 
 extern crate alloc;
 #[macro_use]
@@ -15,6 +17,10 @@ extern crate bitflags;
 use alloc::vec::Vec;
 use buddy_system_allocator::LockedHeap;
 use syscall::*;
+
+pub use coroutine::stackful_coroutine_test;
+pub use coroutine::stackless_coroutine_test;
+
 
 const USER_HEAP_SIZE: usize = 32768;
 
