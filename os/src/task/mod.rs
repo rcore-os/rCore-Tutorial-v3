@@ -5,6 +5,7 @@ mod process;
 mod processor;
 mod signal;
 mod switch;
+pub mod stackless_coroutine;
 #[allow(clippy::module_inception)]
 mod task;
 
@@ -24,6 +25,9 @@ pub use processor::{
 };
 pub use signal::SignalFlags;
 pub use task::{TaskControlBlock, TaskStatus};
+
+pub use stackless_coroutine::kernel_stackless_coroutine_test;
+
 
 pub fn suspend_current_and_run_next() {
     // There must be an application running.
