@@ -379,6 +379,15 @@
 <span id="374">374</span>
 <span id="375">375</span>
 <span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>, <span class="ident">PageTableEntry</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
@@ -623,8 +632,17 @@
         <span class="comment">//*self = Self::new_bare();</span>
         <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">clear</span>();
     }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kernel_copy</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">areas</span> <span class="op">=</span> <span class="ident">KERNEL_SPACE</span>.<span class="ident">exclusive_access</span>().<span class="ident">areas</span>.<span class="ident">clone</span>();
+        <span class="self">Self</span> {
+            <span class="ident">page_table</span>: <span class="ident">PageTable::from_token</span>(<span class="ident">kernel_token</span>()),
+            <span class="ident">areas</span>: <span class="ident">areas</span>,
+        }
+    }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MapArea</span> {
     <span class="ident">vpn_range</span>: <span class="ident">VPNRange</span>,
     <span class="ident">data_frames</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">VirtPageNum</span>, <span class="ident">FrameTracker</span><span class="op">&gt;</span>,

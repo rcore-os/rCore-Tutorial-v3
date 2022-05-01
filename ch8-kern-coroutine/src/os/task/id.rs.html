@@ -226,9 +226,50 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ProcessControlBlock</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">KERNEL_STACK_SIZE</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT_BASE</span>, <span class="ident">USER_STACK_SIZE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>, <span class="ident">PhysAddr</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc</span>::{
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
@@ -298,6 +339,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kstack_alloc</span>() -&gt; <span class="ident">KernelStack</span> {
     <span class="kw">let</span> <span class="ident">kstack_id</span> <span class="op">=</span> <span class="ident">KSTACK_ALLOCATOR</span>.<span class="ident">exclusive_access</span>().<span class="ident">alloc</span>();
     <span class="kw">let</span> (<span class="ident">kstack_bottom</span>, <span class="ident">kstack_top</span>) <span class="op">=</span> <span class="ident">kernel_stack_position</span>(<span class="ident">kstack_id</span>);
+    <span class="comment">//println!(&quot;kstack_alloc  kstack_bottom: {:#x?}, kstack_top: {:#x?}&quot;, kstack_bottom, kstack_top);</span>
     <span class="ident">KERNEL_SPACE</span>.<span class="ident">exclusive_access</span>().<span class="ident">insert_framed_area</span>(
         <span class="ident">kstack_bottom</span>.<span class="ident">into</span>(),
         <span class="ident">kstack_top</span>.<span class="ident">into</span>(),
@@ -310,6 +352,8 @@
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> (<span class="ident">kernel_stack_bottom</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">kernel_stack_position</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">kernel_stack_bottom_va</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> <span class="ident">kernel_stack_bottom</span>.<span class="ident">into</span>();
+        <span class="comment">// let kernel_stack_bottom_pa: PhysAddr = kernel_stack_bottom.into();</span>
+        <span class="comment">// println!(&quot;kstack_drop  kstack_bottom: va: {:#x?}, pa: {:#x?}&quot;, kernel_stack_bottom_va, kernel_stack_bottom_pa);</span>
         <span class="ident">KERNEL_SPACE</span>
             .<span class="ident">exclusive_access</span>()
             .<span class="ident">remove_area_with_start_vpn</span>(<span class="ident">kernel_stack_bottom_va</span>.<span class="ident">into</span>());
@@ -449,6 +493,43 @@
         <span class="self">self</span>.<span class="ident">dealloc_user_res</span>();
     }
 }
-</code></pre></div>
+
+<span class="kw">use</span> <span class="ident">alloc::alloc</span>::{<span class="ident">alloc</span>, <span class="ident">dealloc</span>, <span class="ident">Layout</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KStack</span>(<span class="ident">usize</span>);
+
+<span class="kw">const</span> <span class="ident">STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x8000</span>;
+
+<span class="kw">impl</span> <span class="ident">KStack</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">KStack</span> {
+        <span class="kw">let</span> <span class="ident">bottom</span> <span class="op">=</span>
+            <span class="kw">unsafe</span> {
+                <span class="ident">alloc</span>(<span class="ident">Layout::from_size_align</span>(<span class="ident">STACK_SIZE</span>, <span class="ident">STACK_SIZE</span>).<span class="ident">unwrap</span>())
+            } <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="ident">KStack</span>(<span class="ident">bottom</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">top</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">STACK_SIZE</span>
+    }
+}
+<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>};
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">KStack</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;KStack:{:#x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">KStack</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="ident">dealloc</span>(
+                <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="ident">Layout::from_size_align</span>(<span class="ident">STACK_SIZE</span>, <span class="ident">STACK_SIZE</span>).<span class="ident">unwrap</span>()
+            );
+        }
+    }
+}</code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>

@@ -28,13 +28,14 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap::trap_return</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskContext</span> {
-    <span class="ident">ra</span>: <span class="ident">usize</span>,
-    <span class="ident">sp</span>: <span class="ident">usize</span>,
-    <span class="ident">s</span>: [<span class="ident">usize</span>; <span class="number">12</span>],
+    <span class="kw">pub</span> <span class="ident">ra</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">sp</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">s</span>: [<span class="ident">usize</span>; <span class="number">12</span>],
 }
 
 <span class="kw">impl</span> <span class="ident">TaskContext</span> {
@@ -45,6 +46,7 @@
             <span class="ident">s</span>: [<span class="number">0</span>; <span class="number">12</span>],
         }
     }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">goto_trap_return</span>(<span class="ident">kstack_ptr</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ra</span>: <span class="ident">trap_return</span> <span class="kw">as</span> <span class="ident">usize</span>,

@@ -64,6 +64,7 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
@@ -121,6 +122,7 @@
     <span class="ident">timer::set_next_trigger</span>();
     <span class="ident">task::stackless_coroutine::kernel_stackless_coroutine_test</span>();
     <span class="ident">fs::list_apps</span>();
+    <span class="ident">task::kernel_stackful_coroutine_test</span>();
     <span class="ident">task::add_initproc</span>();
     <span class="ident">task::run_tasks</span>();
     <span class="macro">panic!</span>(<span class="string">&quot;Unreachable in rust_main!&quot;</span>);
