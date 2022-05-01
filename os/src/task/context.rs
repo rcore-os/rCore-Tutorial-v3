@@ -2,9 +2,9 @@ use crate::trap::trap_return;
 
 #[repr(C)]
 pub struct TaskContext {
-    ra: usize,
-    sp: usize,
-    s: [usize; 12],
+    pub ra: usize,
+    pub sp: usize,
+    pub s: [usize; 12],
 }
 
 impl TaskContext {
@@ -15,6 +15,15 @@ impl TaskContext {
             s: [0; 12],
         }
     }
+
+    pub fn kthread_init() -> Self {
+        Self {
+            ra: 0xAAAAAAAA,
+            sp: 0xBBBBBBBB,
+            s: [0xCCCCCCCC; 12],
+        }
+    }
+
     pub fn goto_trap_return(kstack_ptr: usize) -> Self {
         Self {
             ra: trap_return as usize,

@@ -256,4 +256,30 @@ impl ProcessControlBlock {
     pub fn getpid(&self) -> usize {
         self.pid.0
     }
+    
+    pub fn kernel_process() -> Arc<Self>{
+        let memory_set = MemorySet::kernel_copy();
+        let process = Arc::new(
+            ProcessControlBlock {
+                pid: super::pid_alloc(),
+                inner: unsafe {
+                    UPSafeCell::new(
+                        ProcessControlBlockInner {
+                        is_zombie: false,
+                        memory_set: memory_set,
+                        parent: None,
+                        children: Vec::new(),
+                        exit_code: 0,
+                        fd_table: Vec::new(),
+                        signals: SignalFlags::empty(),
+                        tasks: Vec::new(),
+                        task_res_allocator: RecycleAllocator::new(),
+                        mutex_list: Vec::new(),
+                        semaphore_list: Vec::new(),
+                        condvar_list: Vec::new(),
+                    })
+               },
+        });
+        process
+    }
 }

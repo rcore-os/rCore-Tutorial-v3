@@ -242,8 +242,17 @@ impl MemorySet {
         //*self = Self::new_bare();
         self.areas.clear();
     }
+
+    pub fn kernel_copy() -> Self {
+        let areas = KERNEL_SPACE.exclusive_access().areas.clone();
+        Self {
+            page_table: PageTable::from_token(kernel_token()),
+            areas: areas,
+        }
+    }
 }
 
+#[derive(Clone)]
 pub struct MapArea {
     vpn_range: VPNRange,
     data_frames: BTreeMap<VirtPageNum, FrameTracker>,

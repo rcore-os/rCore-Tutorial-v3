@@ -221,3 +221,41 @@ impl Drop for TaskUserRes {
         self.dealloc_user_res();
     }
 }
+
+use alloc::alloc::{alloc, dealloc, Layout};
+
+#[derive(Clone)]
+pub struct KStack(usize);
+
+const STACK_SIZE: usize = 0x8000;
+
+impl KStack {
+    pub fn new() -> KStack {
+        let bottom =
+            unsafe {
+                alloc(Layout::from_size_align(STACK_SIZE, STACK_SIZE).unwrap())
+            } as usize;
+        KStack(bottom)
+    }
+
+    pub fn top(&self) -> usize {
+        self.0 + STACK_SIZE
+    }
+}
+use core::fmt::{self, Debug, Formatter};
+impl Debug for KStack {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.write_fmt(format_args!("KStack:{:#x}", self.0))
+    }
+}
+
+impl Drop for KStack {
+    fn drop(&mut self) {
+        unsafe {
+            dealloc(
+                self.0 as _,
+                Layout::from_size_align(STACK_SIZE, STACK_SIZE).unwrap()
+            );
+        }
+    }
+}

@@ -23,6 +23,11 @@ impl TaskControlBlock {
         let inner = process.inner_exclusive_access();
         inner.memory_set.token()
     }
+
+    // pub fn get_kernel_stack(&self) -> usize {
+    //     self.kstack
+    // }
+
 }
 
 pub struct TaskControlBlockInner {
@@ -68,6 +73,41 @@ impl TaskControlBlock {
             },
         }
     }
+
+    pub fn create_kthread(f: fn()) -> Self{
+        use crate::mm::{KERNEL_SPACE, PhysPageNum, VirtAddr, PhysAddr};
+        let process = ProcessControlBlock::kernel_process();
+        let process = Arc::downgrade(&process);
+        
+        let kstack = kstack_alloc();
+        let kernelstack = crate::task::id::KStack::new();
+        let kstack_top = kernelstack.top();
+
+        let mut context = TaskContext::kthread_init();
+        let context_addr = &context as *const TaskContext as usize;
+        let pa = PhysAddr::from(context_addr);
+        let context_ppn = pa.floor();
+        
+        context.ra = f as usize;
+        context.sp = kstack_top;
+
+        println!("context ppn :{:#x?}", context_ppn);
+
+        Self {
+            process,
+            kstack,
+            inner: unsafe {
+                UPSafeCell::new(TaskControlBlockInner {
+                    res: None,
+                    trap_cx_ppn: context_ppn,
+                    task_cx: context,
+                    task_status: TaskStatus::Ready,
+                    exit_code: None,
+                })
+            },
+        }
+    }
+
 }
 
 #[derive(Copy, Clone, PartialEq)]

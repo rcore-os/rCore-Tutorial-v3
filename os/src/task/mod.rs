@@ -131,3 +131,82 @@ pub fn current_add_signal(signal: SignalFlags) {
     let mut process_inner = process.inner_exclusive_access();
     process_inner.signals |= signal;
 }
+
+
+#[no_mangle]
+pub fn kthread_create(f: fn()) {
+
+    println!("kthread_create");
+    
+    //�����ں��߳�
+    let new_tcb = TaskControlBlock::create_kthread(f);
+    // let kernel_stack = new_tcb.get_kernel_stack();
+    let new_task = Arc::new(new_tcb);
+
+    //��������������,���û��̷߳���һ�����.
+    // println!("add task");
+    add_task(Arc::clone(&new_task));
+}
+
+#[no_mangle]
+pub fn kernel_stackful_coroutine_test() {
+    println!("kernel_stackful_coroutine_test");
+    kthread_create( ||
+        {
+            let id = 1;
+            println!("kernel thread {:?} STARTING", id);
+            for i in 0..10 {
+                println!("kernel thread: {} counter: {}", id, i);
+            }
+            println!("kernel thread {:?} FINISHED", id);
+            kthread_stop();
+        }
+    );
+    kthread_create( ||
+        {
+            let id = 2;
+            println!("kernel thread {:?} STARTING", 2);
+            for i in 0..10 {
+                println!("kernel thread: {} counter: {}", 2, i);
+                kthread_yield();
+            }
+            println!("kernel thread {:?} FINISHED", 2);
+            kthread_stop();
+        }
+    );
+    kthread_create( ||
+        {
+            let id = 3;
+            println!("kernel thread {:?} STARTING", 3);
+            for i in 0..10 {
+                println!("kernel thread: {} counter: {}", 3, i);
+                kthread_yield();
+            }
+            println!("kernel thread {:?} FINISHED", 3);
+            kthread_stop();
+        }
+    );
+}
+
+pub fn kthread_stop(){
+    do_exit();
+}
+#[no_mangle]
+pub fn do_exit(){
+    println!("kthread do exit");
+    exit_kthread_and_run_next(0);
+    panic!("Unreachable in sys_exit!");
+}
+
+pub fn kthread_yield(){
+    suspend_current_and_run_next();
+}
+
+
+#[no_mangle]
+pub fn exit_kthread_and_run_next(exit_code: i32) {
+    println!("exit_kthread_and_run_next");
+    // we do not have to save task context
+    let mut _unused = TaskContext::zero_init();
+    schedule(&mut _unused as *mut _);
+}
