@@ -138,12 +138,12 @@ pub fn kthread_create(f: fn()) {
 
     println!("kthread_create");
     
-    //�����ں��߳�
+    // create kernel thread
     let new_tcb = TaskControlBlock::create_kthread(f);
     // let kernel_stack = new_tcb.get_kernel_stack();
     let new_task = Arc::new(new_tcb);
 
-    //��������������,���û��̷߳���һ�����.
+    // add kernel thread into TASK_MANAGER
     // println!("add task");
     add_task(Arc::clone(&new_task));
 }

@@ -54,8 +54,8 @@ pub fn rust_main() -> ! {
     trap::enable_timer_interrupt();
     timer::set_next_trigger();
     task::stackless_coroutine::kernel_stackless_coroutine_test();
-    task::kernel_stackful_coroutine_test();
     fs::list_apps();
+    task::kernel_stackful_coroutine_test();
     task::add_initproc();
     task::run_tasks();
     panic!("Unreachable in rust_main!");

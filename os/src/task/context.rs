@@ -16,14 +16,6 @@ impl TaskContext {
         }
     }
 
-    pub fn kthread_init() -> Self {
-        Self {
-            ra: 0xAAAAAAAA,
-            sp: 0xBBBBBBBB,
-            s: [0xCCCCCCCC; 12],
-        }
-    }
-
     pub fn goto_trap_return(kstack_ptr: usize) -> Self {
         Self {
             ra: trap_return as usize,
