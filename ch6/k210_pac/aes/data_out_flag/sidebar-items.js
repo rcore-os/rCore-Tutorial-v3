@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DATA_OUT_FLAG_A","Data can be read from out_data when this flag is set"]],"struct":[["DATA_OUT_FLAG_W","Write proxy for field `data_out_flag`"]],"type":[["DATA_OUT_FLAG_R","Reader of field `data_out_flag`"],["R","Reader of register data_out_flag"],["W","Writer for register data_out_flag"]]});

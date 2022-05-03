@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register text_data"],["W","Writer for register text_data"]]});

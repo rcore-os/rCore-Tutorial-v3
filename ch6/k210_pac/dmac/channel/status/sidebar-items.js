@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CMPLTD_BLK_SIZE_W","Write proxy for field `cmpltd_blk_size`"]],"type":[["CMPLTD_BLK_SIZE_R","Reader of field `cmpltd_blk_size`"],["R","Reader of register status"],["W","Writer for register status"]]});

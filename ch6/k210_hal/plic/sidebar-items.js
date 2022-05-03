@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Priority","Priority of an interrupt"]],"trait":[["PlicExt","Extension trait for PLIC interrupt controller peripheral"]]});

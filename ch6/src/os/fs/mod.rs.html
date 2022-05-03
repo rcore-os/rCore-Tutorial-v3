@@ -17,15 +17,25 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">inode</span>;
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+</pre><pre class="rust"><code><span class="doccomment">//! File system in os</span>
+<span class="kw">mod</span> <span class="ident">inode</span>;
 <span class="kw">mod</span> <span class="ident">stdio</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
-
+<span class="doccomment">/// File trait </span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">File</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+    <span class="doccomment">/// If readable</span>
     <span class="kw">fn</span> <span class="ident">readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// If writable</span>
     <span class="kw">fn</span> <span class="ident">writable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Read file to `UserBuffer`</span>
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">UserBuffer</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Write `UserBuffer` to file</span>
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">UserBuffer</span>) -&gt; <span class="ident">usize</span>;
 }
 

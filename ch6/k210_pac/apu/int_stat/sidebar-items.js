@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DIR_SEARCH_DATA_RDY_W","Write proxy for field `dir_search_data_rdy`"],["VOC_BUF_DATA_RDY_W","Write proxy for field `voc_buf_data_rdy`"]],"type":[["DIR_SEARCH_DATA_RDY_R","Reader of field `dir_search_data_rdy`"],["R","Reader of register int_stat"],["VOC_BUF_DATA_RDY_R","Reader of field `voc_buf_data_rdy`"],["W","Writer for register int_stat"]]});

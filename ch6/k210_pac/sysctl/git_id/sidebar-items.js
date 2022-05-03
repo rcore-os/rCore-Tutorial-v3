@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register git_id"],["W","Writer for register git_id"]]});

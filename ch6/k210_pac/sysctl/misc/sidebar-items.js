@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DEBUG_SEL_W","Write proxy for field `debug_sel`"],["SPI_DVP_DATA_ENABLE_W","Write proxy for field `spi_dvp_data_enable`"]],"type":[["DEBUG_SEL_R","Reader of field `debug_sel`"],["R","Reader of register misc"],["SPI_DVP_DATA_ENABLE_R","Reader of field `spi_dvp_data_enable`"],["W","Writer for register misc"]]});

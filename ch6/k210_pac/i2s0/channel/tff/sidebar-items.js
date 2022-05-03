@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RTXCHFR_W","Write proxy for field `rtxchfr`"]],"type":[["R","Reader of register tff"],["RTXCHFR_A","Transmit channel FIFO reset"],["RTXCHFR_R","Reader of field `rtxchfr`"],["W","Writer for register tff"]]});

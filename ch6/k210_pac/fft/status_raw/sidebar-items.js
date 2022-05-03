@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FFT_DONE_W","Write proxy for field `fft_done`"],["FFT_WORK_W","Write proxy for field `fft_work`"]],"type":[["FFT_DONE_R","Reader of field `fft_done`"],["FFT_WORK_R","Reader of field `fft_work`"],["R","Reader of register status_raw"],["W","Writer for register status_raw"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DIV_W","Write proxy for field `div`"]],"type":[["DIV_R","Reader of field `div`"],["R","Reader of register div"],["W","Writer for register div"]]});

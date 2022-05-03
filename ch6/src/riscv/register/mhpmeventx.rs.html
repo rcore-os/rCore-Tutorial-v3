@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/riscv-ab2abd16c438337b/11d43cf/src/register/mhpmeventx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mhpmeventx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../riscv/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../riscv/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../riscv/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+</pre><pre class="rust"><code><span class="macro">macro_rules!</span> <span class="ident">reg</span> {
+    (
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csr</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>:<span class="ident">ident</span>
+    ) =&gt; {
+        <span class="doccomment">/// Machine performance-monitoring event selector</span>
+        <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csr</span> {
+            <span class="macro">read_csr_as_usize!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>);
+            <span class="macro">write_csr_as_usize!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>);
+        }
+    };
+}
+
+<span class="macro">reg!</span>(<span class="number">0x323</span>, <span class="ident">mhpmevent3</span>, <span class="ident">__read_mhpmevent3</span>, <span class="ident">__write_mhpmevent3</span>);
+<span class="macro">reg!</span>(<span class="number">0x324</span>, <span class="ident">mhpmevent4</span>, <span class="ident">__read_mhpmevent4</span>, <span class="ident">__write_mhpmevent4</span>);
+<span class="macro">reg!</span>(<span class="number">0x325</span>, <span class="ident">mhpmevent5</span>, <span class="ident">__read_mhpmevent5</span>, <span class="ident">__write_mhpmevent5</span>);
+<span class="macro">reg!</span>(<span class="number">0x326</span>, <span class="ident">mhpmevent6</span>, <span class="ident">__read_mhpmevent6</span>, <span class="ident">__write_mhpmevent6</span>);
+<span class="macro">reg!</span>(<span class="number">0x327</span>, <span class="ident">mhpmevent7</span>, <span class="ident">__read_mhpmevent7</span>, <span class="ident">__write_mhpmevent7</span>);
+<span class="macro">reg!</span>(<span class="number">0x328</span>, <span class="ident">mhpmevent8</span>, <span class="ident">__read_mhpmevent8</span>, <span class="ident">__write_mhpmevent8</span>);
+<span class="macro">reg!</span>(<span class="number">0x329</span>, <span class="ident">mhpmevent9</span>, <span class="ident">__read_mhpmevent9</span>, <span class="ident">__write_mhpmevent9</span>);
+<span class="macro">reg!</span>(<span class="number">0x32A</span>, <span class="ident">mhpmevent10</span>, <span class="ident">__read_mhpmevent10</span>, <span class="ident">__write_mhpmevent10</span>);
+<span class="macro">reg!</span>(<span class="number">0x32B</span>, <span class="ident">mhpmevent11</span>, <span class="ident">__read_mhpmevent11</span>, <span class="ident">__write_mhpmevent11</span>);
+<span class="macro">reg!</span>(<span class="number">0x32C</span>, <span class="ident">mhpmevent12</span>, <span class="ident">__read_mhpmevent12</span>, <span class="ident">__write_mhpmevent12</span>);
+<span class="macro">reg!</span>(<span class="number">0x32D</span>, <span class="ident">mhpmevent13</span>, <span class="ident">__read_mhpmevent13</span>, <span class="ident">__write_mhpmevent13</span>);
+<span class="macro">reg!</span>(<span class="number">0x32E</span>, <span class="ident">mhpmevent14</span>, <span class="ident">__read_mhpmevent14</span>, <span class="ident">__write_mhpmevent14</span>);
+<span class="macro">reg!</span>(<span class="number">0x32F</span>, <span class="ident">mhpmevent15</span>, <span class="ident">__read_mhpmevent15</span>, <span class="ident">__write_mhpmevent15</span>);
+<span class="macro">reg!</span>(<span class="number">0x330</span>, <span class="ident">mhpmevent16</span>, <span class="ident">__read_mhpmevent16</span>, <span class="ident">__write_mhpmevent16</span>);
+<span class="macro">reg!</span>(<span class="number">0x331</span>, <span class="ident">mhpmevent17</span>, <span class="ident">__read_mhpmevent17</span>, <span class="ident">__write_mhpmevent17</span>);
+<span class="macro">reg!</span>(<span class="number">0x332</span>, <span class="ident">mhpmevent18</span>, <span class="ident">__read_mhpmevent18</span>, <span class="ident">__write_mhpmevent18</span>);
+<span class="macro">reg!</span>(<span class="number">0x333</span>, <span class="ident">mhpmevent19</span>, <span class="ident">__read_mhpmevent19</span>, <span class="ident">__write_mhpmevent19</span>);
+<span class="macro">reg!</span>(<span class="number">0x334</span>, <span class="ident">mhpmevent20</span>, <span class="ident">__read_mhpmevent20</span>, <span class="ident">__write_mhpmevent20</span>);
+<span class="macro">reg!</span>(<span class="number">0x335</span>, <span class="ident">mhpmevent21</span>, <span class="ident">__read_mhpmevent21</span>, <span class="ident">__write_mhpmevent21</span>);
+<span class="macro">reg!</span>(<span class="number">0x336</span>, <span class="ident">mhpmevent22</span>, <span class="ident">__read_mhpmevent22</span>, <span class="ident">__write_mhpmevent22</span>);
+<span class="macro">reg!</span>(<span class="number">0x337</span>, <span class="ident">mhpmevent23</span>, <span class="ident">__read_mhpmevent23</span>, <span class="ident">__write_mhpmevent23</span>);
+<span class="macro">reg!</span>(<span class="number">0x338</span>, <span class="ident">mhpmevent24</span>, <span class="ident">__read_mhpmevent24</span>, <span class="ident">__write_mhpmevent24</span>);
+<span class="macro">reg!</span>(<span class="number">0x339</span>, <span class="ident">mhpmevent25</span>, <span class="ident">__read_mhpmevent25</span>, <span class="ident">__write_mhpmevent25</span>);
+<span class="macro">reg!</span>(<span class="number">0x33A</span>, <span class="ident">mhpmevent26</span>, <span class="ident">__read_mhpmevent26</span>, <span class="ident">__write_mhpmevent26</span>);
+<span class="macro">reg!</span>(<span class="number">0x33B</span>, <span class="ident">mhpmevent27</span>, <span class="ident">__read_mhpmevent27</span>, <span class="ident">__write_mhpmevent27</span>);
+<span class="macro">reg!</span>(<span class="number">0x33C</span>, <span class="ident">mhpmevent28</span>, <span class="ident">__read_mhpmevent28</span>, <span class="ident">__write_mhpmevent28</span>);
+<span class="macro">reg!</span>(<span class="number">0x33D</span>, <span class="ident">mhpmevent29</span>, <span class="ident">__read_mhpmevent29</span>, <span class="ident">__write_mhpmevent29</span>);
+<span class="macro">reg!</span>(<span class="number">0x33E</span>, <span class="ident">mhpmevent30</span>, <span class="ident">__read_mhpmevent30</span>, <span class="ident">__write_mhpmevent30</span>);
+<span class="macro">reg!</span>(<span class="number">0x33F</span>, <span class="ident">mhpmevent31</span>, <span class="ident">__read_mhpmevent31</span>, <span class="ident">__write_mhpmevent31</span>);
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="riscv" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
+</body></html>

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["msip","Hart software interrupt register"],["mtime","Timer register"],["mtimecmp","Hart time comparator register"]],"struct":[["RegisterBlock","Register block"]],"type":[["MSIP","Hart software interrupt register"],["MTIME","Timer register"],["MTIMECMP","Hart time comparator register"]]});

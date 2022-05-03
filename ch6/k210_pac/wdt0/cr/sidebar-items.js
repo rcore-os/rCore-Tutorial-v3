@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["RMOD_A","rmod"]],"struct":[["ENABLE_W","Write proxy for field `enable`"],["RMOD_W","Write proxy for field `rmod`"],["RPL_W","Write proxy for field `rpl`"]],"type":[["ENABLE_R","Reader of field `enable`"],["R","Reader of register cr"],["RMOD_R","Reader of field `rmod`"],["RPL_R","Reader of field `rpl`"],["W","Writer for register cr"]]});

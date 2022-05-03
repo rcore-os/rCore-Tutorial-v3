@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["USER_TOP_MAX_W","Write proxy for field `user_top_max`"]],"type":[["R","Reader of register comp_param_5"],["USER_TOP_MAX_R","Reader of field `user_top_max`"],["W","Writer for register comp_param_5"]]});

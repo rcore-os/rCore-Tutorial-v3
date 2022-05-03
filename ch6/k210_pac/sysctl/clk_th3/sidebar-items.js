@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["I2S0_CLK_W","Write proxy for field `i2s0_clk`"],["I2S1_CLK_W","Write proxy for field `i2s1_clk`"]],"type":[["I2S0_CLK_R","Reader of field `i2s0_clk`"],["I2S1_CLK_R","Reader of field `i2s1_clk`"],["R","Reader of register clk_th3"],["W","Writer for register clk_th3"]]});

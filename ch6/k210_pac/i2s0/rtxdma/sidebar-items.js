@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register rtxdma"],["W","Writer for register rtxdma"]]});

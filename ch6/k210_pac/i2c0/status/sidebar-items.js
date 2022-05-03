@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["ACTIVITY_R","Reader of field `activity`"],["MST_ACTIVITY_R","Reader of field `mst_activity`"],["R","Reader of register status"],["RFF_R","Reader of field `rff`"],["RFNE_R","Reader of field `rfne`"],["SLV_ACTIVITY_R","Reader of field `slv_activity`"],["TFE_R","Reader of field `tfe`"],["TFNF_R","Reader of field `tfnf`"]]});

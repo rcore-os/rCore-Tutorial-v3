@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register g_addr"],["W","Writer for register g_addr"]]});

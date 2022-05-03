@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SOFT_RESET_W","Write proxy for field `soft_reset`"]],"type":[["R","Reader of register soft_reset"],["SOFT_RESET_R","Reader of field `soft_reset`"],["W","Writer for register soft_reset"]]});

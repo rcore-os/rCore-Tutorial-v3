@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register eoi"],["W","Writer for register eoi"]]});

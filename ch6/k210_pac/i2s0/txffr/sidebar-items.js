@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RXFFR_W","Write proxy for field `rxffr`"]],"type":[["R","Reader of register txffr"],["RXFFR_A","Transmitter FIFO reset"],["RXFFR_R","Reader of field `rxffr`"],["W","Writer for register txffr"]]});

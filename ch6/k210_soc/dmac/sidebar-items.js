@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["src_dst_select",""]],"struct":[["DMAC","DMAC peripheral abstraction "]],"trait":[["DMACExt","Extension trait for adding configure() to DMAC peripheral "]],"type":[["address_increment",""],["burst_length",""],["master_number",""],["transfer_width",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Channel","A marker trait to identify MCU pins that can be used as inputs to an ADC channel."],["OneShot","ADCs that sample on single channels per request, and do so at the time of the request."]]});

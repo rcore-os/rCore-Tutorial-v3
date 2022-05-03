@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["clear_eip","External Interrupt "],["clear_sip","Software Interrupt"],["clear_tip","Timer Interrupt"],["read","Reads the CSR"],["set_eip","External Interrupt "],["set_sip","Software Interrupt"],["set_tip","Timer Interrupt"]],"struct":[["Hideleg",""]]});

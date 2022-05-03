@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Stdin",""],["Stdout",""]]});
+initSidebarItems({"struct":[["Stdin","Standard input"],["Stdout","Standard output"]]});

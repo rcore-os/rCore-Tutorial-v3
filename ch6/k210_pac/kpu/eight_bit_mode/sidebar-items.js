@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EIGHT_BIT_MODE_W","Write proxy for field `eight_bit_mode`"]],"type":[["EIGHT_BIT_MODE_R","Reader of field `eight_bit_mode`"],["R","Reader of register eight_bit_mode"],["W","Writer for register eight_bit_mode"]]});

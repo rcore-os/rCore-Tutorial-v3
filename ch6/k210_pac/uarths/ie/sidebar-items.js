@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RXWM_W","Write proxy for field `rxwm`"],["TXWM_W","Write proxy for field `txwm`"]],"type":[["R","Reader of register ie"],["RXWM_R","Reader of field `rxwm`"],["TXWM_R","Reader of field `txwm`"],["W","Writer for register ie"]]});

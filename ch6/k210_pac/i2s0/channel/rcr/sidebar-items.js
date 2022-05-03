@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["WLEN_A","Desired data resolution of receiver"]],"struct":[["WLEN_W","Write proxy for field `wlen`"]],"type":[["R","Reader of register rcr"],["W","Writer for register rcr"],["WLEN_R","Reader of field `wlen`"]]});

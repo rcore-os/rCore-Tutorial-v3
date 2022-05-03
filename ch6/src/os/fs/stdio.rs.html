@@ -60,13 +60,15 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
+<span id="58">58</span>
+</pre><pre class="rust"><code><span class="doccomment">//!Stdin &amp; Stdout</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::console_getchar</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::suspend_current_and_run_next</span>;
-
+<span class="doccomment">///Standard input</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stdin</span>;
-
+<span class="doccomment">///Standard output</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stdout</span>;
 
 <span class="kw">impl</span> <span class="ident">File</span> <span class="kw">for</span> <span class="ident">Stdin</span> {

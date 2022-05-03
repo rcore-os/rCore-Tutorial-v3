@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Flag","Accrued Exception Flag"],["RoundingMode","Rounding Mode"]],"fn":[["clear_flag","Resets `fflags` field bit"],["clear_flags","Resets `fflags` field bits"],["read","Reads the CSR"],["set_rounding_mode","Writes the CSR"]],"struct":[["FCSR","Floating-point control and status register"],["Flags","Accrued Exception Flags"]]});

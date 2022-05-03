@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["RXCHFR_A","Receiver channel FIFO reset"]],"struct":[["RXCHFR_W","Write proxy for field `rxchfr`"]],"type":[["R","Reader of register rff"],["RXCHFR_R","Reader of field `rxchfr`"],["W","Writer for register rff"]]});

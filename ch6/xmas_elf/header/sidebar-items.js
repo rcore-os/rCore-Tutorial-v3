@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MAGIC",""]],"enum":[["Class",""],["Data",""],["HeaderPt2",""],["Machine",""],["OsAbi",""],["Type",""],["Version",""]],"fn":[["parse_header",""],["sanity_check",""]],"struct":[["Class_",""],["Data_",""],["Header",""],["HeaderPt1",""],["HeaderPt2_",""],["Machine_",""],["OsAbi_",""],["Type_",""],["Version_",""]]});

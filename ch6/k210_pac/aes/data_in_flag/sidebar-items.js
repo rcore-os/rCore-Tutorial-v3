@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DATA_IN_FLAG_A","Data can be written to text_data or aad_data when this flag is set"]],"struct":[["DATA_IN_FLAG_W","Write proxy for field `data_in_flag`"]],"type":[["DATA_IN_FLAG_R","Reader of field `data_in_flag`"],["R","Reader of register data_in_flag"],["W","Writer for register data_in_flag"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register pending[%s]"],["W","Writer for register pending[%s]"]]});

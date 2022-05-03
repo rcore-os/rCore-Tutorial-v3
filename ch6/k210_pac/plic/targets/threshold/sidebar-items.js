@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["PRIORITY_A","Value on reset: 0"]],"struct":[["PRIORITY_W","Write proxy for field `priority`"]],"type":[["PRIORITY_R","Reader of field `priority`"],["R","Reader of register threshold"],["W","Writer for register threshold"]]});

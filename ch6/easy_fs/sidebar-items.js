@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["BLOCK_SZ","Use a block size of 512 bytes"]],"struct":[["EasyFileSystem","An easy file system on block"],["Inode","Virtual filesystem layer over easy-fs"]],"trait":[["BlockDevice","Trait for block devices which reads and writes data in the unit of blocks"]]});

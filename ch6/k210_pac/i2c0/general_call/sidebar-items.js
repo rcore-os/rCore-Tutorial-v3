@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CALL_ENABLE_W","Write proxy for field `call_enable`"]],"type":[["CALL_ENABLE_R","Reader of field `call_enable`"],["R","Reader of register general_call"],["W","Writer for register general_call"]]});

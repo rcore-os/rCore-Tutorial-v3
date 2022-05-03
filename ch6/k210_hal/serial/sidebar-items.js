@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Rx","Serial receiver"],["Serial","Serial abstraction"],["Tx","Serial transmitter"]],"trait":[["SerialExt","Extension trait that constrains UART peripherals"]]});

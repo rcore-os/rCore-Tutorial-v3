@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register dlf"],["W","Writer for register dlf"]]});

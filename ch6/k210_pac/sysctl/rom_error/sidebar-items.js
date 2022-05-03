@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ROM_MUL_ERROR_W","Write proxy for field `rom_mul_error`"],["ROM_ONE_ERROR_W","Write proxy for field `rom_one_error`"]],"type":[["R","Reader of register rom_error"],["ROM_MUL_ERROR_R","Reader of field `rom_mul_error`"],["ROM_ONE_ERROR_R","Reader of field `rom_one_error`"],["W","Writer for register rom_error"]]});

@@ -1,0 +1,545 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Hardware Abstraction Layer (HAL) for embedded systems"><meta name="keywords" content="rust, rustlang, rust-lang, embedded_hal"><title>embedded_hal - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../embedded_hal/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../embedded_hal/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate embedded_hal</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 1.0.0-alpha.1</li><li><a id="all-types" href="all.html">All Items</a></li></div></ul><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section><div id="sidebar-vars" data-name="embedded_hal" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../embedded_hal/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">embedded_hal</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/embedded_hal/lib.rs.html#1-701">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A Hardware Abstraction Layer (HAL) for embedded systems</p>
+<p><strong>NOTE</strong> This HAL is still is active development. Expect the traits presented here to be
+tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
+release.</p>
+<h2 id="design-goals"><a href="#design-goals">Design goals</a></h2>
+<p>The HAL</p>
+<ul>
+<li>
+<p>Must <em>erase</em> device specific details. Neither register, register blocks or magic values should
+appear in the API.</p>
+</li>
+<li>
+<p>Must be generic <em>within</em> a device and <em>across</em> devices. The API to use a serial interface must
+be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
+device or the UART0 peripheral of another device.</p>
+</li>
+<li>
+<p>Where possible must <em>not</em> be tied to a specific asynchronous model. The API should be usable
+in blocking mode, with the <code>futures</code> model, with an async/await model or with a callback model.
+(cf. the <a href="https://crates.io/crates/nb"><code>nb</code></a> crate)</p>
+</li>
+<li>
+<p>Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
+want higher level abstraction should <em>prefer to use this HAL</em> rather than <em>re-implement</em>
+register manipulation code.</p>
+</li>
+<li>
+<p>Serve as a foundation for building an ecosystem of platform agnostic drivers. Here driver
+means a library crate that lets a target platform interface an external device like a digital
+sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
+a generic library on top of <code>embedded-hal</code> driver authors can support any number of target
+platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
+advantage for application developers is that by adopting <code>embedded-hal</code> they can unlock all
+these drivers for their platform.</p>
+</li>
+</ul>
+<h2 id="out-of-scope"><a href="#out-of-scope">Out of scope</a></h2>
+<ul>
+<li>Initialization and configuration stuff like “ensure this serial interface and that SPI
+interface are not using the same pins”. The HAL will focus on <em>doing I/O</em>.</li>
+</ul>
+<h2 id="reference-implementation"><a href="#reference-implementation">Reference implementation</a></h2>
+<p>The <a href="https://crates.io/crates/stm32f30x-hal/0.1.0"><code>stm32f30x-hal</code></a> crate contains a reference implementation of this HAL.</p>
+<h2 id="platform-agnostic-drivers"><a href="#platform-agnostic-drivers">Platform agnostic drivers</a></h2>
+<p>You can find platform agnostic drivers built on top of <code>embedded-hal</code> on crates.io by <a href="https://crates.io/keywords/embedded-hal">searching
+for the <em>embedded-hal</em> keyword</a>.</p>
+<p>If you are writing a platform agnostic driver yourself you are highly encouraged to <a href="https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata">add the
+embedded-hal keyword</a>
+to your crate before publishing it!</p>
+<h2 id="detailed-design"><a href="#detailed-design">Detailed design</a></h2><h3 id="traits"><a href="#traits">Traits</a></h3>
+<p>The HAL is specified as traits to allow generic programming. These traits make use of the
+<a href="https://crates.io/crates/nb"><code>nb</code></a> crate (<em>please go read that crate documentation before continuing</em>) to abstract over
+the asynchronous model and to also provide a blocking operation mode.</p>
+<p>Here’s how a HAL trait may look like:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="doccomment">/// A serial interface</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Serial</span> {
+    <span class="doccomment">/// Error type associated to this serial interface</span>
+    <span class="kw">type</span> <span class="ident">Error</span>;
+
+    <span class="doccomment">/// Reads a single byte</span>
+    <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Writes a single byte</span>
+    <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+}</code></pre></div>
+<p>The <code>nb::Result</code> enum is used to add a <a href="https://docs.rs/nb/0.1.0/nb/enum.Error.html"><code>WouldBlock</code></a> variant to the errors
+of the serial interface. As explained in the documentation of the <code>nb</code> crate this single API,
+when paired with the macros in the <code>nb</code> crate, can operate in a blocking manner, or in a
+non-blocking manner compatible with <code>futures</code> and with the <code>await!</code> operator.</p>
+<p>Some traits, like the one shown below, may expose possibly blocking APIs that can’t fail. In
+those cases <code>nb::Result&lt;_, Infallible&gt;</code> is used.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="kw">use</span> <span class="ident">::core::convert::Infallible</span>;
+
+<span class="doccomment">/// A count down timer</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CountDown</span> {
+    <span class="comment">// ..</span>
+
+    <span class="doccomment">/// &quot;waits&quot; until the count down is over</span>
+    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span>(), <span class="ident">Infallible</span><span class="op">&gt;</span>;
+}
+</code></pre></div>
+<h3 id="suggested-implementation"><a href="#suggested-implementation">Suggested implementation</a></h3>
+<p>The HAL traits should be implemented for device crates generated via <a href="https://crates.io/crates/svd2rust"><code>svd2rust</code></a> to maximize
+code reuse.</p>
+<p>Shown below is an implementation of some of the HAL traits for the [<code>stm32f30x</code>] crate. This
+single implementation will work for <em>any</em> microcontroller in the STM32F30x family.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// crate: stm32f3xx-hal</span>
+<span class="comment">// An implementation of the `embedded-hal` traits for STM32F3xx microcontrollers</span>
+
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">embedded_hal</span> <span class="kw">as</span> <span class="ident">hal</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="comment">// device crate</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">stm32f3</span>;
+
+<span class="kw">use</span> <span class="ident">stm32f3::stm32f303::USART1</span>;
+
+<span class="doccomment">/// A serial interface</span>
+<span class="comment">// NOTE generic over the USART peripheral</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Serial</span><span class="op">&lt;</span><span class="ident">USART</span><span class="op">&gt;</span> { <span class="ident">usart</span>: <span class="ident">USART</span> }
+
+<span class="comment">// convenience type alias</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Serial1</span> <span class="op">=</span> <span class="ident">Serial</span><span class="op">&lt;</span><span class="ident">USART1</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// Serial interface error</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="doccomment">/// Buffer overrun</span>
+    <span class="ident">Overrun</span>,
+    <span class="comment">// omitted: other error variants</span>
+}
+
+<span class="kw">impl</span> <span class="ident">hal::serial::Read</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Serial</span><span class="op">&lt;</span><span class="ident">USART1</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// read the status register</span>
+        <span class="kw">let</span> <span class="ident">isr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">usart</span>.<span class="ident">isr</span>.<span class="ident">read</span>();
+
+        <span class="kw">if</span> <span class="ident">isr</span>.<span class="ident">ore</span>().<span class="ident">bit_is_set</span>() {
+            <span class="comment">// Error: Buffer overrun</span>
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::Other</span>(<span class="ident">Error::Overrun</span>))
+        }
+        <span class="comment">// omitted: checks for other errors</span>
+        <span class="kw">else</span> <span class="kw">if</span> <span class="ident">isr</span>.<span class="ident">rxne</span>().<span class="ident">bit_is_set</span>() {
+            <span class="comment">// Data available: read the data register</span>
+            <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">usart</span>.<span class="ident">rdr</span>.<span class="ident">read</span>().<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">u8</span>)
+        } <span class="kw">else</span> {
+            <span class="comment">// No data available yet</span>
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::WouldBlock</span>)
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">hal::serial::Write</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Serial</span><span class="op">&lt;</span><span class="ident">USART1</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// Similar to the `try_read` implementation</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">try_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">nb::Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// Similar to the `try_read` implementation</span>
+    }
+}
+</code></pre></div>
+<h3 id="intended-usage"><a href="#intended-usage">Intended usage</a></h3>
+<p>Thanks to the <a href="https://crates.io/crates/nb"><code>nb</code></a> crate the HAL API can be used in a blocking manner,
+with <code>futures</code> or with the <code>await</code> operator using the <a href="https://docs.rs/nb/0.1.0/nb/macro.block.html"><code>block!</code></a>,
+<a href="https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate"><code>try_nb!</code></a> and <a href="https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate"><code>await!</code></a> macros respectively.</p>
+<h4 id="blocking-mode"><a href="#blocking-mode">Blocking mode</a></h4>
+<p>An example of sending a string over the serial interface in a blocking
+fashion:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">embedded_hal</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>(<span class="ident">block</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="kw">use</span> <span class="ident">stm32f30x_hal::Serial1</span>;
+<span class="kw">use</span> <span class="ident">embedded_hal::serial::Write</span>;
+
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serial</span>: <span class="ident">Serial1</span> <span class="op">=</span> {
+    <span class="comment">// ..</span>
+};
+
+<span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="string">b&quot;Hello, world!&quot;</span> {
+    <span class="comment">// NOTE `block!` blocks until `serial.try_write()` completes and returns</span>
+    <span class="comment">// `Result&lt;(), Error&gt;`</span>
+    <span class="macro">block!</span>(<span class="ident">serial</span>.<span class="ident">try_write</span>(<span class="kw-2">*</span><span class="ident">byte</span>)).<span class="ident">unwrap</span>();
+}
+</code></pre></div>
+<h4 id="futures"><a href="#futures"><code>futures</code></a></h4>
+<p>An example of running two tasks concurrently. First task: blink a LED every
+second. Second task: loop back data over the serial interface. The target
+must provide the <code>libstd</code> in order to be able to use <code>futures</code>, which is not
+the case for many embedded targets.</p>
+<div class="example-wrap"><pre class="language-not_run"><code>extern crate embedded_hal as hal;
+extern crate futures;
+
+#[macro_use(try_nb)]
+extern crate nb;
+
+use hal::prelude::*;
+use futures::{
+    future,
+    Async,
+    Future,
+};
+use futures::future::Loop;
+use stm32f30x_hal::{Led, Serial1, Timer6};
+use core::convert::Infallible;
+
+/// `futures` version of `CountDown.try_wait`
+///
+/// This returns a future that must be polled to completion
+fn wait&lt;T&gt;(mut timer: T) -&gt; impl Future&lt;Item = T, Error = Infallible&gt;
+where
+    T: hal::timer::CountDown,
+{
+    let mut timer = Some(timer);
+    future::poll_fn(move || {
+        try_nb!(timer.as_mut().unwrap().try_wait());
+
+        Ok(Async::Ready(timer.take().unwrap()))
+    })
+}
+
+/// `futures` version of `Serial.read`
+///
+/// This returns a future that must be polled to completion
+fn read&lt;S&gt;(mut serial: S) -&gt; impl Future&lt;Item = (S, u8), Error = S::Error&gt;
+where
+    S: hal::serial::Read&lt;u8&gt;,
+{
+    let mut serial = Some(serial);
+    future::poll_fn(move || {
+        let byte = try_nb!(serial.as_mut().unwrap().try_read());
+
+        Ok(Async::Ready((serial.take().unwrap(), byte)))
+    })
+}
+
+/// `futures` version of `Serial.write`
+///
+/// This returns a future that must be polled to completion
+fn write&lt;S&gt;(mut serial: S, byte: u8) -&gt; impl Future&lt;Item = S, Error = S::Error&gt;
+where
+    S: hal::serial::Write&lt;u8&gt;,
+{
+    let mut serial = Some(serial);
+    future::poll_fn(move || {
+        try_nb!(serial.as_mut().unwrap().try_write(byte));
+
+        Ok(Async::Ready(serial.take().unwrap()))
+    })
+}
+
+fn main() {
+    // HAL implementers
+    let timer: Timer6 = {
+        // ..
+    };
+    let serial: Serial1 = {
+        // ..
+    };
+    let led: Led = {
+        // ..
+    };
+
+    // Tasks
+    let mut blinky = future::loop_fn::&lt;_, (), _, _&gt;(
+        (led, timer, true),
+        |(mut led, mut timer, state)| {
+            wait(timer).map(move |timer| {
+                if state {
+                    led.on();
+                } else {
+                    led.off();
+                }
+
+                Loop::Continue((led, timer, !state))
+            })
+        });
+
+    let mut loopback = future::loop_fn::&lt;_, (), _, _&gt;(serial, |mut serial| {
+        read(serial).and_then(|(serial, byte)| {
+            write(serial, byte)
+        }).map(|serial| {
+            Loop::Continue(serial)
+        })
+    });
+
+    // Event loop
+    loop {
+        blinky.poll().unwrap(); // NOTE(unwrap) E = Infallible
+        loopback.poll().unwrap();
+    }
+}
+</code></pre></div><h4 id="await"><a href="#await"><code>await</code></a></h4>
+<p>Same example as above but using <code>await!</code> instead of <code>futures</code>
+(same remark concerning the availability of <code>libstd</code> on the
+target).</p>
+<div class="example-wrap"><pre class="language-not_run"><code>#![feature(generator_trait)]
+#![feature(generators)]
+
+extern crate embedded_hal as hal;
+
+#[macro_use(r#await)]
+extern crate nb;
+
+use core::ops::Generator;
+use core::pin::Pin;
+
+use hal::prelude::*;
+use stm32f30x_hal::{Led, Serial1, Timer6};
+
+fn main() {
+    // HAL implementers
+    let mut timer: Timer6 = {
+        // ..
+    };
+    let mut serial: Serial1 = {
+        // ..
+    };
+    let mut led: Led = {
+        // ..
+    };
+
+    // Tasks
+    let mut blinky = (move || {
+        let mut state = false;
+        loop {
+            // `await!` means &quot;suspend / yield here&quot; instead of &quot;block until
+            // completion&quot;
+            nb::r#await!(timer.try_wait()).unwrap(); // NOTE(unwrap) E = Infallible
+
+            state = !state;
+
+            if state {
+                led.on();
+            } else {
+                led.off();
+            }
+        }
+    });
+
+    let mut loopback = (move || {
+        loop {
+            let byte = nb::r#await!(serial.try_read()).unwrap();
+            nb::r#await!(serial.try_write(byte)).unwrap();
+        }
+    });
+
+    // Event loop
+    loop {
+        Pin::new(&amp;mut blinky).resume();
+        Pin::new(&amp;mut loopback).resume();
+    }
+}
+</code></pre></div><h3 id="generic-programming-and-higher-level-abstractions"><a href="#generic-programming-and-higher-level-abstractions">Generic programming and higher level abstractions</a></h3>
+<p>The core of the HAL has been kept minimal on purpose to encourage building <strong>generic</strong> higher
+level abstractions on top of it. Some higher level abstractions that pick an asynchronous model
+or that have blocking behavior and that are deemed useful to build other abstractions can be
+found in the <code>blocking</code> module and, in the future, in the <code>futures</code> and <code>async</code> modules.</p>
+<p>Some examples:</p>
+<p><strong>NOTE</strong> All the functions shown below could have been written as trait
+methods with default implementation to allow specialization, but they have
+been written as functions to keep things simple.</p>
+<ul>
+<li>Write a whole buffer to a serial device in blocking a fashion.</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">embedded_hal</span> <span class="kw">as</span> <span class="ident">hal</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>(<span class="ident">block</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="kw">use</span> <span class="ident">hal::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">fn</span> <span class="ident">write_all</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">serial</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">S::Error</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">S</span>: <span class="ident">hal::serial::Write</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>
+{
+    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> <span class="kw">in</span> <span class="ident">buffer</span> {
+        <span class="macro">block!</span>(<span class="ident">serial</span>.<span class="ident">try_write</span>(<span class="ident">byte</span>))<span class="question-mark">?</span>;
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}
+</code></pre></div>
+<ul>
+<li>Blocking serial read with timeout</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">embedded_hal</span> <span class="kw">as</span> <span class="ident">hal</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="kw">use</span> <span class="ident">hal::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">SE</span>, <span class="ident">TE</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Serial interface error</span>
+    <span class="ident">Serial</span>(<span class="ident">SE</span>),
+    <span class="doccomment">/// Timeout error</span>
+    <span class="ident">TimedOut</span>(<span class="ident">TE</span>),
+}
+
+<span class="kw">fn</span> <span class="ident">read_with_timeout</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="ident">serial</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>,
+    <span class="ident">timer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
+    <span class="ident">timeout</span>: <span class="ident">T::Time</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">S::Error</span>, <span class="ident">T::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">hal::timer::CountDown</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">hal::serial::Read</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+{
+    <span class="ident">timer</span>.<span class="ident">try_start</span>(<span class="ident">timeout</span>).<span class="ident">map_err</span>(<span class="ident">Error::TimedOut</span>)<span class="question-mark">?</span>;
+
+    <span class="kw">loop</span> {
+        <span class="kw">match</span> <span class="ident">serial</span>.<span class="ident">try_read</span>() {
+            <span class="comment">// raise error</span>
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::Other</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Serial</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::WouldBlock</span>) =&gt; {
+                <span class="comment">// no data available yet, check the timer below</span>
+            },
+            <span class="prelude-val">Ok</span>(<span class="ident">byte</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">byte</span>),
+        }
+
+        <span class="kw">match</span> <span class="ident">timer</span>.<span class="ident">try_wait</span>() {
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::Other</span>(<span class="ident">e</span>)) =&gt; {
+                <span class="comment">// The error type specified by `timer.try_wait()` is `!`, which</span>
+                <span class="comment">// means no error can actually occur. The Rust compiler</span>
+                <span class="comment">// still forces us to provide this match arm, though.</span>
+                <span class="macro">unreachable!</span>()
+            },
+            <span class="comment">// no timeout yet, try again</span>
+            <span class="prelude-val">Err</span>(<span class="ident">nb::Error::WouldBlock</span>) =&gt; <span class="kw">continue</span>,
+            <span class="prelude-val">Ok</span>(()) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TimedOut</span>(())),
+        }
+    }
+}
+</code></pre></div>
+<ul>
+<li>Asynchronous SPI transfer</li>
+</ul>
+<div class="example-wrap"><pre class="language-not_run"><code>#![feature(conservative_impl_trait)]
+#![feature(generators)]
+#![feature(generator_trait)]
+
+extern crate embedded_hal as hal;
+#[macro_use(r#await)]
+extern crate nb;
+
+use core::ops::Generator;
+
+/// Transfers a byte buffer of size N
+///
+/// Returns the same byte buffer but filled with the data received from the
+/// slave device
+fn transfer&lt;S, B&gt;(
+    mut spi: S,
+    mut buffer: [u8; 16], // NOTE this should be generic over the size of the array
+) -&gt; impl Generator&lt;Return = Result&lt;(S, [u8; 16]), S::Error&gt;, Yield = ()&gt;
+where
+    S: hal::spi::FullDuplex&lt;u8&gt;,
+{
+    move || {
+        let n = buffer.len();
+        for i in 0..n {
+            nb::r#await!(spi.try_send(buffer[i]))?;
+            buffer[i] = nb::r#await!(spi.try_read())?;
+        }
+
+        Ok((spi, buffer))
+    }
+}
+</code></pre></div>
+<ul>
+<li>Buffered serial interface with periodic flushing in interrupt handler</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">embedded_hal</span> <span class="kw">as</span> <span class="ident">hal</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nb</span>;
+
+<span class="kw">use</span> <span class="ident">hal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">::core::convert::Infallible</span>;
+
+<span class="kw">fn</span> <span class="ident">flush</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">serial</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>, <span class="ident">cb</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CircularBuffer</span>)
+<span class="kw">where</span>
+    <span class="ident">S</span>: <span class="ident">hal::serial::Write</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Infallible</span><span class="op">&gt;</span>,
+{
+    <span class="kw">loop</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">byte</span>) <span class="op">=</span> <span class="ident">cb</span>.<span class="ident">peek</span>() {
+            <span class="kw">match</span> <span class="ident">serial</span>.<span class="ident">try_write</span>(<span class="kw-2">*</span><span class="ident">byte</span>) {
+                <span class="prelude-val">Err</span>(<span class="ident">nb::Error::Other</span>(<span class="kw">_</span>)) =&gt; <span class="macro">unreachable!</span>(),
+                <span class="prelude-val">Err</span>(<span class="ident">nb::Error::WouldBlock</span>) =&gt; <span class="kw">return</span>,
+                <span class="prelude-val">Ok</span>(()) =&gt; {}, <span class="comment">// keep flushing data</span>
+            }
+        }
+
+        <span class="ident">cb</span>.<span class="ident">pop</span>();
+    }
+}
+
+<span class="comment">// The stuff below could be in some other crate</span>
+
+<span class="doccomment">/// Global singleton</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufferedSerial1</span>;
+
+<span class="comment">// NOTE private</span>
+<span class="kw">static</span> <span class="ident">BUFFER1</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">CircularBuffer</span><span class="op">&gt;</span> <span class="op">=</span> {
+    <span class="comment">// ..</span>
+};
+<span class="kw">static</span> <span class="ident">SERIAL1</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Serial1</span><span class="op">&gt;</span> <span class="op">=</span> {
+    <span class="comment">// ..</span>
+};
+
+<span class="kw">impl</span> <span class="ident">BufferedSerial1</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
+        <span class="self">self</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span>[<span class="ident">byte</span>])
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">BUFFER1</span>.<span class="ident">lock</span>();
+        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">bytes</span> {
+            <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">byte</span>).<span class="ident">expect</span>(<span class="string">&quot;buffer overrun&quot;</span>);
+        }
+        <span class="comment">// omitted: pend / enable interrupt_handler</span>
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">interrupt_handler</span>() {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serial</span> <span class="op">=</span> <span class="ident">SERIAL1</span>.<span class="ident">lock</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">BUFFER1</span>.<span class="ident">lock</span>();
+
+    <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">serial</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>);
+}
+
+</code></pre></div>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="adc/index.html" title="embedded_hal::adc mod">adc</a></div><div class="item-right docblock-short"><p>Analog-digital conversion traits</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="blocking/index.html" title="embedded_hal::blocking mod">blocking</a></div><div class="item-right docblock-short"><p>Blocking API</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="capture/index.html" title="embedded_hal::capture mod">capture</a></div><div class="item-right docblock-short"><p>Input capture</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="digital/index.html" title="embedded_hal::digital mod">digital</a></div><div class="item-right docblock-short"><p>Digital I/O</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="fmt/index.html" title="embedded_hal::fmt mod">fmt</a></div><div class="item-right docblock-short"><p>Implementation of <code>core::fmt::Write</code> for the HAL’s <code>serial::Write</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="embedded_hal::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>The prelude is a collection of all the traits in this crate</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="pwm/index.html" title="embedded_hal::pwm mod">pwm</a></div><div class="item-right docblock-short"><p>Pulse Width Modulation</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="qei/index.html" title="embedded_hal::qei mod">qei</a></div><div class="item-right docblock-short"><p>Quadrature encoder interface</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="rng/index.html" title="embedded_hal::rng mod">rng</a></div><div class="item-right docblock-short"><p>Random Number Generator Interface</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="serial/index.html" title="embedded_hal::serial mod">serial</a></div><div class="item-right docblock-short"><p>Serial interface</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="spi/index.html" title="embedded_hal::spi mod">spi</a></div><div class="item-right docblock-short"><p>Serial Peripheral Interface</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="timer/index.html" title="embedded_hal::timer mod">timer</a></div><div class="item-right docblock-short"><p>Timers</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="watchdog/index.html" title="embedded_hal::watchdog mod">watchdog</a></div><div class="item-right docblock-short"><p>Traits for interactions with a processors watchdog timer.</p>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="embedded_hal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
+</body></html>

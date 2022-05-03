@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["LEAP_YEAR_A","Is leap year. 1 is leap year, 0 is not leap year"]],"struct":[["CENTURY_W","Write proxy for field `century`"],["LEAP_YEAR_W","Write proxy for field `leap_year`"]],"type":[["CENTURY_R","Reader of field `century`"],["LEAP_YEAR_R","Reader of field `leap_year`"],["R","Reader of register extended"],["W","Writer for register extended"]]});

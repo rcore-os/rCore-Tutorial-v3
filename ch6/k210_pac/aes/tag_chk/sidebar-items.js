@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TAG_CHK_A","Tag check status"]],"struct":[["TAG_CHK_W","Write proxy for field `tag_chk`"]],"type":[["R","Reader of register tag_chk"],["TAG_CHK_R","Reader of field `tag_chk`"],["W","Writer for register tag_chk"]]});

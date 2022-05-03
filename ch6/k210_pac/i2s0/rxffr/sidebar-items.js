@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["RXFFR_A","Receiver FIFO reset"]],"struct":[["RXFFR_W","Write proxy for field `rxffr`"]],"type":[["R","Reader of register rxffr"],["RXFFR_R","Reader of field `rxffr`"],["W","Writer for register rxffr"]]});

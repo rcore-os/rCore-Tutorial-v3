@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["IC_ENABLE_R","Reader of field `ic_enable`"],["R","Reader of register enable_status"],["SLV_DIS_BUSY_R","Reader of field `slv_dis_busy`"],["SLV_RX_DATA_LOST_R","Reader of field `slv_rx_data_lost`"]]});

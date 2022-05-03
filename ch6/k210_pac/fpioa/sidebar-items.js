@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["io","FPIOA GPIO multiplexer io array"],["tie_en","FPIOA GPIO multiplexer tie enable array"],["tie_val","FPIOA GPIO multiplexer tie value array"]],"struct":[["RegisterBlock","Register block"]],"type":[["IO","FPIOA GPIO multiplexer io array"],["TIE_EN","FPIOA GPIO multiplexer tie enable array"],["TIE_VAL","FPIOA GPIO multiplexer tie value array"]]});

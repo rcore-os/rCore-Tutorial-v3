@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register comp_version"],["VALUE_R","Reader of field `value`"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["_reserved","Padding to make sure targets is an array"],["claim","Claim/Complete Register"],["threshold","Priority Threshold Register"]],"type":[["CLAIM","Claim/Complete Register"],["THRESHOLD","Priority Threshold Register"],["_RESERVED","Padding to make sure targets is an array"]]});

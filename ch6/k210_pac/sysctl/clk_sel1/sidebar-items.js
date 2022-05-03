@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SPI3_SAMPLE_CLK_SEL_W","Write proxy for field `spi3_sample_clk_sel`"]],"type":[["R","Reader of register clk_sel1"],["SPI3_SAMPLE_CLK_SEL_R","Reader of field `spi3_sample_clk_sel`"],["W","Writer for register clk_sel1"]]});

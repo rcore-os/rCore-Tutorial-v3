@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register interrupt_polarity"],["W","Writer for register interrupt_polarity"]]});

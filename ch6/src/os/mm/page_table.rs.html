@@ -253,7 +253,31 @@
 <span id="248">248</span>
 <span id="249">249</span>
 <span id="250">250</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">StepByOne</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation of [`PageTableEntry`] and [`PageTable`].</span>
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">StepByOne</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
 <span class="kw">use</span> <span class="ident">alloc::string::String</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
@@ -274,39 +298,49 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// page table entry structure</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PageTableEntry</span> {
+    <span class="doccomment">///PTE</span>
     <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PageTableEntry</span> {
+    <span class="doccomment">///Create a PTE from ppn</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>, <span class="ident">flags</span>: <span class="ident">PTEFlags</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">PageTableEntry</span> {
             <span class="ident">bits</span>: <span class="ident">ppn</span>.<span class="number">0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span> <span class="op">|</span> <span class="ident">flags</span>.<span class="ident">bits</span> <span class="kw">as</span> <span class="ident">usize</span>,
         }
     }
+    <span class="doccomment">///Return an empty PTE</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">PageTableEntry</span> { <span class="ident">bits</span>: <span class="number">0</span> }
     }
+    <span class="doccomment">///Return 44bit ppn </span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ppn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PhysPageNum</span> {
         (<span class="self">self</span>.<span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">10</span> <span class="op">&amp;</span> ((<span class="number">1usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">44</span>) <span class="op">-</span> <span class="number">1</span>)).<span class="ident">into</span>()
     }
+    <span class="doccomment">///Return 10bit flag</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PTEFlags</span> {
         <span class="ident">PTEFlags::from_bits</span>(<span class="self">self</span>.<span class="ident">bits</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">unwrap</span>()
     }
+    <span class="doccomment">///Check PTE valid</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">PTEFlags::V</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">PTEFlags::empty</span>()
     }
+    <span class="doccomment">///Check PTE readable</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">PTEFlags::R</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">PTEFlags::empty</span>()
     }
+    <span class="doccomment">///Check PTE writable</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">PTEFlags::W</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">PTEFlags::empty</span>()
     }
+    <span class="doccomment">///Check PTE executable</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">executable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">flags</span>() <span class="op">&amp;</span> <span class="ident">PTEFlags::X</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">PTEFlags::empty</span>()
     }
 }
-
+<span class="doccomment">///Record root ppn and has the same lifetime as 1 and 2 level `PageTableEntry`</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PageTable</span> {
     <span class="ident">root_ppn</span>: <span class="ident">PhysPageNum</span>,
     <span class="ident">frames</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span>,
@@ -314,6 +348,7 @@
 
 <span class="doccomment">/// Assume that it won&#39;t oom when creating/mapping.</span>
 <span class="kw">impl</span> <span class="ident">PageTable</span> {
+    <span class="doccomment">/// Create an empty `PageTable`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame_alloc</span>().<span class="ident">unwrap</span>();
         <span class="ident">PageTable</span> {
@@ -328,6 +363,7 @@
             <span class="ident">frames</span>: <span class="ident">Vec::new</span>(),
         }
     }
+    <span class="doccomment">/// Find phsical address by virtual address, create a frame if not exist</span>
     <span class="kw">fn</span> <span class="ident">find_pte_create</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">PageTableEntry</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">idxs</span> <span class="op">=</span> <span class="ident">vpn</span>.<span class="ident">indexes</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root_ppn</span>;
@@ -347,6 +383,7 @@
         }
         <span class="ident">result</span>
     }
+    <span class="doccomment">/// Find phsical address by virtual address</span>
     <span class="kw">fn</span> <span class="ident">find_pte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">PageTableEntry</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">idxs</span> <span class="op">=</span> <span class="ident">vpn</span>.<span class="ident">indexes</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root_ppn</span>;
@@ -365,20 +402,24 @@
         <span class="ident">result</span>
     }
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="doccomment">/// Create a mapping form `vpn` to `ppn`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>, <span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>, <span class="ident">flags</span>: <span class="ident">PTEFlags</span>) {
         <span class="kw">let</span> <span class="ident">pte</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_pte_create</span>(<span class="ident">vpn</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">pte</span>.<span class="ident">is_valid</span>(), <span class="string">&quot;vpn {:?} is mapped before mapping&quot;</span>, <span class="ident">vpn</span>);
         <span class="kw-2">*</span><span class="ident">pte</span> <span class="op">=</span> <span class="ident">PageTableEntry::new</span>(<span class="ident">ppn</span>, <span class="ident">flags</span> <span class="op">|</span> <span class="ident">PTEFlags::V</span>);
     }
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="doccomment">/// Delete a mapping form `vpn`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>) {
         <span class="kw">let</span> <span class="ident">pte</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_pte</span>(<span class="ident">vpn</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="ident">pte</span>.<span class="ident">is_valid</span>(), <span class="string">&quot;vpn {:?} is invalid before unmapping&quot;</span>, <span class="ident">vpn</span>);
         <span class="kw-2">*</span><span class="ident">pte</span> <span class="op">=</span> <span class="ident">PageTableEntry::empty</span>();
     }
+    <span class="doccomment">/// Translate `VirtPageNum` to `PageTableEntry`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PageTableEntry</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_pte</span>(<span class="ident">vpn</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pte</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">pte</span>)
     }
+    <span class="doccomment">/// Translate `VirtAddr` to `PhysAddr`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate_va</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">va</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysAddr</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_pte</span>(<span class="ident">va</span>.<span class="ident">clone</span>().<span class="ident">floor</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pte</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">aligned_pa</span>: <span class="ident">PhysAddr</span> <span class="op">=</span> <span class="ident">pte</span>.<span class="ident">ppn</span>().<span class="ident">into</span>();
@@ -387,12 +428,13 @@
             (<span class="ident">aligned_pa_usize</span> <span class="op">+</span> <span class="ident">offset</span>).<span class="ident">into</span>()
         })
     }
+    <span class="doccomment">/// Get root ppn </span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="number">8usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">60</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">root_ppn</span>.<span class="number">0</span>
     }
 }
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="doccomment">/// Translate a pointer to a mutable u8 Vec through page table</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">len</span>;
@@ -414,7 +456,7 @@
     <span class="ident">v</span>
 }
 
-<span class="doccomment">/// Load a string from other address spaces into kernel space without an end `\0`.</span>
+<span class="doccomment">/// Translate a pointer to a mutable u8 Vec end with `\0` through page table to a `String`</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_str</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">String::new</span>();
@@ -434,6 +476,7 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+<span class="doccomment">///Translate a generic through page table and return a reference</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_ref</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">T</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="ident">page_table</span>
@@ -441,7 +484,7 @@
         .<span class="ident">unwrap</span>()
         .<span class="ident">get_ref</span>()
 }
-
+<span class="doccomment">///Translate a generic through page table and return a mutable reference</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_refmut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">T</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="ident">va</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
@@ -450,15 +493,18 @@
         .<span class="ident">unwrap</span>()
         .<span class="ident">get_mut</span>()
 }
-
+<span class="doccomment">///Array of u8 slice that user communicate with os</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserBuffer</span> {
+    <span class="doccomment">///U8 vec</span>
     <span class="kw">pub</span> <span class="ident">buffers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">UserBuffer</span> {
+    <span class="doccomment">///Create a `UserBuffer` by parameter</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buffers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">buffers</span> }
     }
+    <span class="doccomment">///Length of `UserBuffer`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">buffers</span>.<span class="ident">iter</span>() {
@@ -479,7 +525,7 @@
         }
     }
 }
-
+<span class="doccomment">/// Iterator of `UserBuffer`</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserBufferIterator</span> {
     <span class="ident">buffers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
     <span class="ident">current_buffer</span>: <span class="ident">usize</span>,

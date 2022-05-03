@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RwLock","A lock that provides data access to either one writer or many readers."],["RwLockReadGuard","A guard that provides immutable data access."],["RwLockUpgradableGuard","A guard that provides immutable data access but can be upgraded to [`RwLockWriteGuard`]."],["RwLockWriteGuard","A guard that provides mutable data access."]]});

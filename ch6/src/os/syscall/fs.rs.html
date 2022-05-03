@@ -73,7 +73,9 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
+<span id="71">71</span>
+</pre><pre class="rust"><code><span class="doccomment">//! File and filesystem-related syscalls</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">translated_byte_buffer</span>, <span class="ident">translated_str</span>, <span class="ident">UserBuffer</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_task</span>, <span class="ident">current_user_token</span>};
 

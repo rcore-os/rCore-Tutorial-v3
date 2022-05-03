@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register xip_mode_bits"],["W","Writer for register xip_mode_bits"]]});

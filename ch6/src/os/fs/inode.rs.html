@@ -142,7 +142,28 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `Arc&lt;Inode&gt;` -&gt; `OSInodeInner`: In order to open files concurrently </span>
+<span class="doccomment">//! we need to wrap `Inode` into `Arc`,but `Mutex` in `Inode` prevents </span>
+<span class="doccomment">//! file systems from being accessed simultaneously </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! `UPSafeCell&lt;OSInodeInner&gt;` -&gt; `OSInode`: for static `ROOT_INODE`,we </span>
+<span class="doccomment">//! need to wrap `OSInodeInner` into `UPSafeCell`</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::BLOCK_DEVICE</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
@@ -151,19 +172,21 @@
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">easy_fs</span>::{<span class="ident">EasyFileSystem</span>, <span class="ident">Inode</span>};
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-
+<span class="doccomment">/// A wrapper around a filesystem inode</span>
+<span class="doccomment">/// to implement File trait atop </span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OSInode</span> {
     <span class="ident">readable</span>: <span class="ident">bool</span>,
     <span class="ident">writable</span>: <span class="ident">bool</span>,
     <span class="ident">inner</span>: <span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">OSInodeInner</span><span class="op">&gt;</span>,
 }
-
+<span class="doccomment">/// The OS inode inner in &#39;UPSafeCell&#39;</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OSInodeInner</span> {
     <span class="ident">offset</span>: <span class="ident">usize</span>,
     <span class="ident">inode</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inode</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">OSInode</span> {
+    <span class="doccomment">/// Construct an OS inode from a inode</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">readable</span>: <span class="ident">bool</span>, <span class="ident">writable</span>: <span class="ident">bool</span>, <span class="ident">inode</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inode</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">readable</span>,
@@ -171,6 +194,7 @@
             <span class="ident">inner</span>: <span class="kw">unsafe</span> { <span class="ident">UPSafeCell::new</span>(<span class="ident">OSInodeInner</span> { <span class="ident">offset</span>: <span class="number">0</span>, <span class="ident">inode</span> }) },
         }
     }
+    <span class="doccomment">/// Read all data inside a inode into vector</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_access</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">512</span>];
@@ -193,7 +217,7 @@
         <span class="ident">Arc::new</span>(<span class="ident">EasyFileSystem::root_inode</span>(<span class="kw-2">&amp;</span><span class="ident">efs</span>))
     };
 }
-
+<span class="doccomment">/// List all files in the filesystems</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_apps</span>() {
     <span class="macro">println!</span>(<span class="string">&quot;/**** APPS ****&quot;</span>);
     <span class="kw">for</span> <span class="ident">app</span> <span class="kw">in</span> <span class="ident">ROOT_INODE</span>.<span class="ident">ls</span>() {
@@ -202,12 +226,18 @@
     <span class="macro">println!</span>(<span class="string">&quot;**************/&quot;</span>);
 }
 
-<span class="macro">bitflags!</span> {
+<span class="macro">bitflags!</span> {    
+    <span class="doccomment">///Open file flags</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenFlags</span>: <span class="ident">u32</span> {
+        <span class="doccomment">///Read only</span>
         <span class="kw">const</span> <span class="ident">RDONLY</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="doccomment">///Write only</span>
         <span class="kw">const</span> <span class="ident">WRONLY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="doccomment">///Read &amp; Write</span>
         <span class="kw">const</span> <span class="ident">RDWR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="doccomment">///Allow create</span>
         <span class="kw">const</span> <span class="ident">CREATE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="doccomment">///Clear file and return an empty one</span>
         <span class="kw">const</span> <span class="ident">TRUNC</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
     }
 }
@@ -225,7 +255,7 @@
         }
     }
 }
-
+<span class="doccomment">///Open file with flags</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_file</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flags</span>: <span class="ident">OpenFlags</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">OSInode</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">readable</span>, <span class="ident">writable</span>) <span class="op">=</span> <span class="ident">flags</span>.<span class="ident">read_write</span>();
     <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">OpenFlags::CREATE</span>) {

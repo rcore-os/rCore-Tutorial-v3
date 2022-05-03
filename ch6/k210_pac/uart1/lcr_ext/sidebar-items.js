@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register lcr_ext"],["W","Writer for register lcr_ext"]]});

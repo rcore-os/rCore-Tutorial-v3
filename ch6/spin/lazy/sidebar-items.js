@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Lazy","A value which is initialized on the first access."]]});

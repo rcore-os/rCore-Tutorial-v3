@@ -40,26 +40,34 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskControlBlock</span>;
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+</pre><pre class="rust"><code><span class="doccomment">//!Implementation of [`TaskManager`]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TaskControlBlock</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::VecDeque</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-
+<span class="doccomment">///A array of `TaskControlBlock` that is thread-safe</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskManager</span> {
     <span class="ident">ready_queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A simple FIFO scheduler.</span>
 <span class="kw">impl</span> <span class="ident">TaskManager</span> {
+    <span class="doccomment">///Creat an empty TaskManager</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ready_queue</span>: <span class="ident">VecDeque::new</span>(),
         }
     }
+    <span class="doccomment">///Add a task to `TaskManager`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">ready_queue</span>.<span class="ident">push_back</span>(<span class="ident">task</span>);
     }
+    <span class="doccomment">///Remove the first task and return it,or `None` if `TaskManager` is empty</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fetch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ready_queue</span>.<span class="ident">pop_front</span>()
     }
@@ -69,11 +77,11 @@
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TASK_MANAGER</span>: <span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">TaskManager</span><span class="op">&gt;</span> <span class="op">=</span>
         <span class="kw">unsafe</span> { <span class="ident">UPSafeCell::new</span>(<span class="ident">TaskManager::new</span>()) };
 }
-
+<span class="doccomment">///Interface offered to add task</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_task</span>(<span class="ident">task</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span>) {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">exclusive_access</span>().<span class="ident">add</span>(<span class="ident">task</span>);
 }
-
+<span class="doccomment">///Interface offered to pop the first task</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fetch_task</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">exclusive_access</span>().<span class="ident">fetch</span>()
 }

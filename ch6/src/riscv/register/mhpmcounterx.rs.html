@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/riscv-ab2abd16c438337b/11d43cf/src/register/mhpmcounterx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mhpmcounterx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../riscv/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../riscv/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../riscv/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+</pre><pre class="rust"><code><span class="macro">macro_rules!</span> <span class="ident">reg</span> {
+    (
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrl</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrh</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>:<span class="ident">ident</span>
+    ) =&gt; {
+        <span class="doccomment">/// Machine performance-monitoring counter</span>
+        <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrl</span> {
+            <span class="macro">read_csr_as_usize!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>);
+            <span class="macro">write_csr_as_usize!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>);
+            <span class="macro">read_composite_csr!</span>(<span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrh::read</span>(), <span class="ident">read</span>());
+        }
+    }
+}
+
+<span class="macro">macro_rules!</span> <span class="ident">regh</span> {
+    (
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrh</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>:<span class="ident">ident</span>
+    ) =&gt; {
+        <span class="doccomment">/// Upper 32 bits of machine performance-monitoring counter (RV32I only)</span>
+        <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">csrh</span> {
+            <span class="macro">read_csr_as_usize_rv32!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">readf</span>);
+            <span class="macro">write_csr_as_usize_rv32!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">addr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">writef</span>);
+        }
+    }
+}
+
+<span class="macro">reg!</span>(<span class="number">0xB03</span>, <span class="ident">mhpmcounter3</span>,  <span class="ident">mhpmcounter3h</span>,  <span class="ident">__read_mhpmcounter3</span>,  <span class="ident">__write_mhpmcounter3</span>);
+<span class="macro">reg!</span>(<span class="number">0xB04</span>, <span class="ident">mhpmcounter4</span>,  <span class="ident">mhpmcounter4h</span>,  <span class="ident">__read_mhpmcounter4</span>,  <span class="ident">__write_mhpmcounter4</span>);
+<span class="macro">reg!</span>(<span class="number">0xB05</span>, <span class="ident">mhpmcounter5</span>,  <span class="ident">mhpmcounter5h</span>,  <span class="ident">__read_mhpmcounter5</span>,  <span class="ident">__write_mhpmcounter5</span>);
+<span class="macro">reg!</span>(<span class="number">0xB06</span>, <span class="ident">mhpmcounter6</span>,  <span class="ident">mhpmcounter6h</span>,  <span class="ident">__read_mhpmcounter6</span>,  <span class="ident">__write_mhpmcounter6</span>);
+<span class="macro">reg!</span>(<span class="number">0xB07</span>, <span class="ident">mhpmcounter7</span>,  <span class="ident">mhpmcounter7h</span>,  <span class="ident">__read_mhpmcounter7</span>,  <span class="ident">__write_mhpmcounter7</span>);
+<span class="macro">reg!</span>(<span class="number">0xB08</span>, <span class="ident">mhpmcounter8</span>,  <span class="ident">mhpmcounter8h</span>,  <span class="ident">__read_mhpmcounter8</span>,  <span class="ident">__write_mhpmcounter8</span>);
+<span class="macro">reg!</span>(<span class="number">0xB09</span>, <span class="ident">mhpmcounter9</span>,  <span class="ident">mhpmcounter9h</span>,  <span class="ident">__read_mhpmcounter9</span>,  <span class="ident">__write_mhpmcounter9</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0A</span>, <span class="ident">mhpmcounter10</span>, <span class="ident">mhpmcounter10h</span>, <span class="ident">__read_mhpmcounter10</span>, <span class="ident">__write_mhpmcounter10</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0B</span>, <span class="ident">mhpmcounter11</span>, <span class="ident">mhpmcounter11h</span>, <span class="ident">__read_mhpmcounter11</span>, <span class="ident">__write_mhpmcounter11</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0C</span>, <span class="ident">mhpmcounter12</span>, <span class="ident">mhpmcounter12h</span>, <span class="ident">__read_mhpmcounter12</span>, <span class="ident">__write_mhpmcounter12</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0D</span>, <span class="ident">mhpmcounter13</span>, <span class="ident">mhpmcounter13h</span>, <span class="ident">__read_mhpmcounter13</span>, <span class="ident">__write_mhpmcounter13</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0E</span>, <span class="ident">mhpmcounter14</span>, <span class="ident">mhpmcounter14h</span>, <span class="ident">__read_mhpmcounter14</span>, <span class="ident">__write_mhpmcounter14</span>);
+<span class="macro">reg!</span>(<span class="number">0xB0F</span>, <span class="ident">mhpmcounter15</span>, <span class="ident">mhpmcounter15h</span>, <span class="ident">__read_mhpmcounter15</span>, <span class="ident">__write_mhpmcounter15</span>);
+<span class="macro">reg!</span>(<span class="number">0xB10</span>, <span class="ident">mhpmcounter16</span>, <span class="ident">mhpmcounter16h</span>, <span class="ident">__read_mhpmcounter16</span>, <span class="ident">__write_mhpmcounter16</span>);
+<span class="macro">reg!</span>(<span class="number">0xB11</span>, <span class="ident">mhpmcounter17</span>, <span class="ident">mhpmcounter17h</span>, <span class="ident">__read_mhpmcounter17</span>, <span class="ident">__write_mhpmcounter17</span>);
+<span class="macro">reg!</span>(<span class="number">0xB12</span>, <span class="ident">mhpmcounter18</span>, <span class="ident">mhpmcounter18h</span>, <span class="ident">__read_mhpmcounter18</span>, <span class="ident">__write_mhpmcounter18</span>);
+<span class="macro">reg!</span>(<span class="number">0xB13</span>, <span class="ident">mhpmcounter19</span>, <span class="ident">mhpmcounter19h</span>, <span class="ident">__read_mhpmcounter19</span>, <span class="ident">__write_mhpmcounter19</span>);
+<span class="macro">reg!</span>(<span class="number">0xB14</span>, <span class="ident">mhpmcounter20</span>, <span class="ident">mhpmcounter20h</span>, <span class="ident">__read_mhpmcounter20</span>, <span class="ident">__write_mhpmcounter20</span>);
+<span class="macro">reg!</span>(<span class="number">0xB15</span>, <span class="ident">mhpmcounter21</span>, <span class="ident">mhpmcounter21h</span>, <span class="ident">__read_mhpmcounter21</span>, <span class="ident">__write_mhpmcounter21</span>);
+<span class="macro">reg!</span>(<span class="number">0xB16</span>, <span class="ident">mhpmcounter22</span>, <span class="ident">mhpmcounter22h</span>, <span class="ident">__read_mhpmcounter22</span>, <span class="ident">__write_mhpmcounter22</span>);
+<span class="macro">reg!</span>(<span class="number">0xB17</span>, <span class="ident">mhpmcounter23</span>, <span class="ident">mhpmcounter23h</span>, <span class="ident">__read_mhpmcounter23</span>, <span class="ident">__write_mhpmcounter23</span>);
+<span class="macro">reg!</span>(<span class="number">0xB18</span>, <span class="ident">mhpmcounter24</span>, <span class="ident">mhpmcounter24h</span>, <span class="ident">__read_mhpmcounter24</span>, <span class="ident">__write_mhpmcounter24</span>);
+<span class="macro">reg!</span>(<span class="number">0xB19</span>, <span class="ident">mhpmcounter25</span>, <span class="ident">mhpmcounter25h</span>, <span class="ident">__read_mhpmcounter25</span>, <span class="ident">__write_mhpmcounter25</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1A</span>, <span class="ident">mhpmcounter26</span>, <span class="ident">mhpmcounter26h</span>, <span class="ident">__read_mhpmcounter26</span>, <span class="ident">__write_mhpmcounter26</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1B</span>, <span class="ident">mhpmcounter27</span>, <span class="ident">mhpmcounter27h</span>, <span class="ident">__read_mhpmcounter27</span>, <span class="ident">__write_mhpmcounter27</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1C</span>, <span class="ident">mhpmcounter28</span>, <span class="ident">mhpmcounter28h</span>, <span class="ident">__read_mhpmcounter28</span>, <span class="ident">__write_mhpmcounter28</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1D</span>, <span class="ident">mhpmcounter29</span>, <span class="ident">mhpmcounter29h</span>, <span class="ident">__read_mhpmcounter29</span>, <span class="ident">__write_mhpmcounter29</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1E</span>, <span class="ident">mhpmcounter30</span>, <span class="ident">mhpmcounter30h</span>, <span class="ident">__read_mhpmcounter30</span>, <span class="ident">__write_mhpmcounter30</span>);
+<span class="macro">reg!</span>(<span class="number">0xB1F</span>, <span class="ident">mhpmcounter31</span>, <span class="ident">mhpmcounter31h</span>, <span class="ident">__read_mhpmcounter31</span>, <span class="ident">__write_mhpmcounter31</span>);
+
+<span class="macro">regh!</span>(<span class="number">0xB83</span>, <span class="ident">mhpmcounter3h</span>,  <span class="ident">__read_mhpmcounter3h</span>,  <span class="ident">__write_mhpmcounter3h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB84</span>, <span class="ident">mhpmcounter4h</span>,  <span class="ident">__read_mhpmcounter4h</span>,  <span class="ident">__write_mhpmcounter4h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB85</span>, <span class="ident">mhpmcounter5h</span>,  <span class="ident">__read_mhpmcounter5h</span>,  <span class="ident">__write_mhpmcounter5h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB86</span>, <span class="ident">mhpmcounter6h</span>,  <span class="ident">__read_mhpmcounter6h</span>,  <span class="ident">__write_mhpmcounter6h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB87</span>, <span class="ident">mhpmcounter7h</span>,  <span class="ident">__read_mhpmcounter7h</span>,  <span class="ident">__write_mhpmcounter7h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB88</span>, <span class="ident">mhpmcounter8h</span>,  <span class="ident">__read_mhpmcounter8h</span>,  <span class="ident">__write_mhpmcounter8h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB89</span>, <span class="ident">mhpmcounter9h</span>,  <span class="ident">__read_mhpmcounter9h</span>,  <span class="ident">__write_mhpmcounter9h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8A</span>, <span class="ident">mhpmcounter10h</span>, <span class="ident">__read_mhpmcounter10h</span>, <span class="ident">__write_mhpmcounter10h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8B</span>, <span class="ident">mhpmcounter11h</span>, <span class="ident">__read_mhpmcounter11h</span>, <span class="ident">__write_mhpmcounter11h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8C</span>, <span class="ident">mhpmcounter12h</span>, <span class="ident">__read_mhpmcounter12h</span>, <span class="ident">__write_mhpmcounter12h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8D</span>, <span class="ident">mhpmcounter13h</span>, <span class="ident">__read_mhpmcounter13h</span>, <span class="ident">__write_mhpmcounter13h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8E</span>, <span class="ident">mhpmcounter14h</span>, <span class="ident">__read_mhpmcounter14h</span>, <span class="ident">__write_mhpmcounter14h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB8F</span>, <span class="ident">mhpmcounter15h</span>, <span class="ident">__read_mhpmcounter15h</span>, <span class="ident">__write_mhpmcounter15h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB90</span>, <span class="ident">mhpmcounter16h</span>, <span class="ident">__read_mhpmcounter16h</span>, <span class="ident">__write_mhpmcounter16h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB91</span>, <span class="ident">mhpmcounter17h</span>, <span class="ident">__read_mhpmcounter17h</span>, <span class="ident">__write_mhpmcounter17h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB92</span>, <span class="ident">mhpmcounter18h</span>, <span class="ident">__read_mhpmcounter18h</span>, <span class="ident">__write_mhpmcounter18h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB93</span>, <span class="ident">mhpmcounter19h</span>, <span class="ident">__read_mhpmcounter19h</span>, <span class="ident">__write_mhpmcounter19h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB94</span>, <span class="ident">mhpmcounter20h</span>, <span class="ident">__read_mhpmcounter20h</span>, <span class="ident">__write_mhpmcounter20h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB95</span>, <span class="ident">mhpmcounter21h</span>, <span class="ident">__read_mhpmcounter21h</span>, <span class="ident">__write_mhpmcounter21h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB96</span>, <span class="ident">mhpmcounter22h</span>, <span class="ident">__read_mhpmcounter22h</span>, <span class="ident">__write_mhpmcounter22h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB97</span>, <span class="ident">mhpmcounter23h</span>, <span class="ident">__read_mhpmcounter23h</span>, <span class="ident">__write_mhpmcounter23h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB98</span>, <span class="ident">mhpmcounter24h</span>, <span class="ident">__read_mhpmcounter24h</span>, <span class="ident">__write_mhpmcounter24h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB99</span>, <span class="ident">mhpmcounter25h</span>, <span class="ident">__read_mhpmcounter25h</span>, <span class="ident">__write_mhpmcounter25h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9A</span>, <span class="ident">mhpmcounter26h</span>, <span class="ident">__read_mhpmcounter26h</span>, <span class="ident">__write_mhpmcounter26h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9B</span>, <span class="ident">mhpmcounter27h</span>, <span class="ident">__read_mhpmcounter27h</span>, <span class="ident">__write_mhpmcounter27h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9C</span>, <span class="ident">mhpmcounter28h</span>, <span class="ident">__read_mhpmcounter28h</span>, <span class="ident">__write_mhpmcounter28h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9D</span>, <span class="ident">mhpmcounter29h</span>, <span class="ident">__read_mhpmcounter29h</span>, <span class="ident">__write_mhpmcounter29h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9E</span>, <span class="ident">mhpmcounter30h</span>, <span class="ident">__read_mhpmcounter30h</span>, <span class="ident">__write_mhpmcounter30h</span>);
+<span class="macro">regh!</span>(<span class="number">0xB9F</span>, <span class="ident">mhpmcounter31h</span>, <span class="ident">__read_mhpmcounter31h</span>, <span class="ident">__write_mhpmcounter31h</span>);
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="riscv" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
+</body></html>

@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["R","Reader of register tor"],["TXCHO_R","Reader of field `txcho`"]]});

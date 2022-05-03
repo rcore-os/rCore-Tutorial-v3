@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MXL","Machine XLEN"]],"fn":[["read","Reads the CSR"]],"struct":[["Misa","misa register"]]});

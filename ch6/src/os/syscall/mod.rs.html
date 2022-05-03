@@ -37,7 +37,29 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-</pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation of syscalls</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The single entry point to all system calls, [`syscall()`], is called</span>
+<span class="doccomment">//! whenever userspace wishes to perform a system call using the `ecall`</span>
+<span class="doccomment">//! instruction. In this case, the processor raises an &#39;Environment call from</span>
+<span class="doccomment">//! U-mode&#39; exception, which is handled as one of the cases in</span>
+<span class="doccomment">//! [`crate::trap::trap_handler`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For clarity, each single syscall is implemented as its own function, named</span>
+<span class="doccomment">//! `sys_` then the name of the syscall. You can find functions like this in</span>
+<span class="doccomment">//! submodules, and you should also implement syscalls this way.</span>
+<span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_READ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">63</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_WRITE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
@@ -54,7 +76,7 @@
 
 <span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
-
+<span class="doccomment">/// handle syscall exception with `syscall_id` and other arguments</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syscall</span>(<span class="ident">syscall_id</span>: <span class="ident">usize</span>, <span class="ident">args</span>: [<span class="ident">usize</span>; <span class="number">3</span>]) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">syscall_id</span> {
         <span class="ident">SYSCALL_OPEN</span> =&gt; <span class="ident">sys_open</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>),

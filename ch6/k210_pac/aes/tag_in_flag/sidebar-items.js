@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TAG_IN_FLAG_W","Write proxy for field `tag_in_flag`"]],"type":[["R","Reader of register tag_in_flag"],["TAG_IN_FLAG_A","GCM tag can be written to gcm_in_tag when this flag is set"],["TAG_IN_FLAG_R","Reader of field `tag_in_flag`"],["W","Writer for register tag_in_flag"]]});

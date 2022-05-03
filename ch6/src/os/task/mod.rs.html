@@ -87,28 +87,63 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Task management implementation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Everything about task management, like starting and switching tasks is</span>
+<span class="doccomment">//! implemented here.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A single global instance of [`TaskManager`] called `TASK_MANAGER` controls</span>
+<span class="doccomment">//! all the tasks in the whole operating system.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! A single global instance of [`Processor`] called `PROCESSOR` monitors running </span>
+<span class="doccomment">//! task(s) for each core. </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! A single global instance of [`PidAllocator`] called `PID_ALLOCATOR` allocates </span>
+<span class="doccomment">//! pid for user apps.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Be careful when you see `__switch` ASM function in `switch.S`. Control flow around this function</span>
+<span class="doccomment">//! might not be what you expect.</span>
+<span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
 <span class="kw">mod</span> <span class="ident">pid</span>;
 <span class="kw">mod</span> <span class="ident">processor</span>;
 <span class="kw">mod</span> <span class="ident">switch</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::module_inception</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">rustdoc::private_intra_doc_links</span>)]</span>
 <span class="kw">mod</span> <span class="ident">task</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context::TaskContext</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">manager::fetch_task</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager</span>::{<span class="ident">fetch_task</span>,<span class="ident">TaskManager</span>};
 <span class="kw">use</span> <span class="ident">switch::__switch</span>;
 <span class="kw">use</span> <span class="ident">task</span>::{<span class="ident">TaskControlBlock</span>, <span class="ident">TaskStatus</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager::add_task</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pid</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pid</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>,<span class="ident">PidAllocator</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">processor</span>::{
-    <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>, <span class="ident">run_tasks</span>, <span class="ident">schedule</span>, <span class="ident">take_current_task</span>,
+    <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>, <span class="ident">run_tasks</span>, <span class="ident">schedule</span>, <span class="ident">take_current_task</span>,<span class="ident">Processor</span>
 };
-
+<span class="doccomment">/// Suspend the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suspend_current_and_run_next</span>() {
     <span class="comment">// There must be an application running.</span>
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
@@ -126,7 +161,7 @@
     <span class="comment">// jump to scheduling cycle</span>
     <span class="ident">schedule</span>(<span class="ident">task_cx_ptr</span>);
 }
-
+<span class="doccomment">/// Exit the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
     <span class="comment">// take from Processor</span>
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
@@ -161,13 +196,14 @@
 }
 
 <span class="macro">lazy_static!</span> {
+    <span class="doccomment">///Globle process that init user shell </span>
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">INITPROC</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>({
         <span class="kw">let</span> <span class="ident">inode</span> <span class="op">=</span> <span class="ident">open_file</span>(<span class="string">&quot;initproc&quot;</span>, <span class="ident">OpenFlags::RDONLY</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">inode</span>.<span class="ident">read_all</span>();
         <span class="ident">TaskControlBlock::new</span>(<span class="ident">v</span>.<span class="ident">as_slice</span>())
     });
 }
-
+<span class="doccomment">///Add init process to the manager</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_initproc</span>() {
     <span class="ident">add_task</span>(<span class="ident">INITPROC</span>.<span class="ident">clone</span>());
 }

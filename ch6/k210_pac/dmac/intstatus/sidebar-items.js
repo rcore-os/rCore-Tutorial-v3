@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CH_INTSTAT_W","Write proxy for fields `ch(1-6)_intstat`"],["COMMONREG_INTSTAT_W","Write proxy for field `commonreg_intstat`"]],"type":[["CH_INTSTAT_R","Reader of fields `ch(1-6)_intstat`"],["COMMONREG_INTSTAT_R","Reader of field `commonreg_intstat`"],["R","Reader of register intstatus"],["W","Writer for register intstatus"]]});

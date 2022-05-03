@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["gpax4",""],["page",""],["sv32",""],["sv39",""],["sv48",""]],"trait":[["Address",""],["AddressL2",""],["AddressL3",""],["AddressL4",""],["AddressX32",""],["AddressX64",""],["PhysicalAddress",""],["VirtualAddress",""]],"type":[["Frame",""],["Page",""],["PhysAddr",""],["VirtAddr",""]]});

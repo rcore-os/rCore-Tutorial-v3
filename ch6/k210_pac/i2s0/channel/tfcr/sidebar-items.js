@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TXCHET_W","Write proxy for field `txchet`"]],"type":[["R","Reader of register tfcr"],["TXCHET_A","Trigger level in the TX FIFO at which the transmitter data available interrupt generate"],["TXCHET_R","Reader of field `txchet`"],["W","Writer for register tfcr"]]});
