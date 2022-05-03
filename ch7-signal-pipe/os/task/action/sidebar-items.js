@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SignalAction","Action for a signal"],["SignalActions",""]]});
