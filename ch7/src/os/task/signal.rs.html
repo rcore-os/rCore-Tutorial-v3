@@ -63,6 +63,7 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_SIG</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">31</span>;
@@ -119,6 +120,7 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SIGSEGV</span>) {
             <span class="prelude-val">Some</span>((<span class="op">-</span><span class="number">11</span>, <span class="string">&quot;Segmentation Fault, SIGSEGV=11&quot;</span>))
         } <span class="kw">else</span> {
+            <span class="comment">//println!(&quot;[K] signalflags check_error  {:?}&quot;, self);</span>
             <span class="prelude-val">None</span>
         }
     }

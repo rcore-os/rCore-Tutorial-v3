@@ -131,6 +131,7 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT</span>};
@@ -219,6 +220,7 @@
         }
     }
     <span class="comment">// handle signals (handle the sent signal)</span>
+    <span class="comment">//println!(&quot;[K] trap_handler:: handle_signals&quot;);</span>
     <span class="ident">handle_signals</span>();
 
     <span class="comment">// check error signals (if error then exit)</span>
