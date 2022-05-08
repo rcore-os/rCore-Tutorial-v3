@@ -395,7 +395,7 @@
         <span class="ident">trap_ctx</span>.<span class="ident">x</span>[<span class="number">10</span>] <span class="op">=</span> <span class="ident">sig</span>;
     } <span class="kw">else</span> {
         <span class="comment">// default action</span>
-        <span class="comment">//println!(&quot;[K] task/call_user_signal_handler: default action, kill current process&quot;);</span>
+        <span class="macro">println!</span>(<span class="string">&quot;[K] task/call_user_signal_handler: default action: ignore it or kill process&quot;</span>);
     }
 }
 
