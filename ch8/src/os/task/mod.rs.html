@@ -132,6 +132,16 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
@@ -142,8 +152,9 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::module_inception</span>)]</span>
 <span class="kw">mod</span> <span class="ident">task</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::id::TaskUserRes</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
-<span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">manager::fetch_task</span>;
 <span class="kw">use</span> <span class="ident">process::ProcessControlBlock</span>;
@@ -220,12 +231,21 @@
         <span class="comment">// deallocate user res (including tid/trap_cx/ustack) of all threads</span>
         <span class="comment">// it has to be done before we dealloc the whole memory_set</span>
         <span class="comment">// otherwise they will be deallocated twice</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">recycle_res</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">TaskUserRes</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">for</span> <span class="ident">task</span> <span class="kw">in</span> <span class="ident">process_inner</span>.<span class="ident">tasks</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">is_some</span>()) {
             <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
-            <span class="ident">task_inner</span>.<span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">res</span>.<span class="ident">take</span>() {
+                <span class="ident">recycle_res</span>.<span class="ident">push</span>(<span class="ident">res</span>);
+            }
         }
+        <span class="comment">// dealloc_tid and dealloc_user_res require access to PCB inner, so we</span>
+        <span class="comment">// need to collect those user res first, then release process_inner</span>
+        <span class="comment">// for now to avoid deadlock/double borrow problem.</span>
+        <span class="ident">drop</span>(<span class="ident">process_inner</span>);
+        <span class="ident">recycle_res</span>.<span class="ident">clear</span>();
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="ident">process_inner</span>.<span class="ident">children</span>.<span class="ident">clear</span>();
         <span class="comment">// deallocate other data in user space i.e. program code/data section</span>
         <span class="ident">process_inner</span>.<span class="ident">memory_set</span>.<span class="ident">recycle_data_pages</span>();
