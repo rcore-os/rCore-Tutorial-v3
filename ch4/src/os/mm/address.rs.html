@@ -254,6 +254,10 @@
 <span id="249">249</span>
 <span id="250">250</span>
 <span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of physical and virtual address and page number.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PageTableEntry</span>;
@@ -341,7 +345,11 @@
 }
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">VirtAddr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">usize</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">v</span>.<span class="number">0</span>
+        <span class="kw">if</span> <span class="ident">v</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">VA_WIDTH_SV39</span> <span class="op">-</span> <span class="number">1</span>)) {
+            <span class="ident">v</span>.<span class="number">0</span> <span class="op">|</span> (<span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">VA_WIDTH_SV39</span>) <span class="op">-</span> <span class="number">1</span>))
+        } <span class="kw">else</span> {
+            <span class="ident">v</span>.<span class="number">0</span>
+        }
     }
 }
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">VirtPageNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">usize</span> {
