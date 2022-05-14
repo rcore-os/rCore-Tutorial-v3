@@ -68,6 +68,7 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
@@ -116,7 +117,8 @@
 <span class="kw">use</span> <span class="ident">sync::UPIntrFreeCell</span>;
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEV_NON_BLOCKING_ACCESS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="bool-val">false</span>) };
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEV_NON_BLOCKING_ACCESS</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="bool-val">false</span>) };
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>

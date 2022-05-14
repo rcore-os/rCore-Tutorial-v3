@@ -80,10 +80,16 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::id::TaskUserRes</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">kstack_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">ProcessControlBlock</span>, <span class="ident">TaskContext</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap::TrapContext</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">mm::PhysPageNum</span>, <span class="ident">sync</span>::{<span class="ident">UPIntrFreeCell</span>, <span class="ident">UPIntrRefMut</span>}};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">mm::PhysPageNum</span>,
+    <span class="ident">sync</span>::{<span class="ident">UPIntrFreeCell</span>, <span class="ident">UPIntrRefMut</span>},
+};
 <span class="kw">use</span> <span class="ident">alloc::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TaskControlBlock</span> {

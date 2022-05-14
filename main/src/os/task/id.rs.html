@@ -226,6 +226,8 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ProcessControlBlock</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">KERNEL_STACK_SIZE</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT_BASE</span>, <span class="ident">USER_STACK_SIZE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
@@ -273,6 +275,8 @@
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KSTACK_ALLOCATOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">RecycleAllocator</span><span class="op">&gt;</span> <span class="op">=</span>
         <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">RecycleAllocator::new</span>()) };
 }
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_PID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PidHandle</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
 

@@ -133,6 +133,7 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
+<span id="131">131</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BlockDevice</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{
     <span class="ident">frame_alloc</span>, <span class="ident">frame_dealloc</span>, <span class="ident">kernel_token</span>, <span class="ident">FrameTracker</span>, <span class="ident">PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>,
@@ -155,7 +156,8 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">QUEUE_FRAMES</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Vec::new</span>()) };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">QUEUE_FRAMES</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Vec::new</span>()) };
 }
 
 <span class="kw">impl</span> <span class="ident">BlockDevice</span> <span class="kw">for</span> <span class="ident">VirtIOBlock</span> {

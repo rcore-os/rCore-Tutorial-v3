@@ -137,10 +137,16 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::cell</span>::{<span class="ident">RefCell</span>, <span class="ident">RefMut</span>, <span class="ident">UnsafeCell</span>};
 <span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">riscv::register::sstatus</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">riscv::register::sstatus</span>;
 
 <span class="comment">/*
 /// Wrap a static data structure inside it so that we are
@@ -195,9 +201,8 @@ impl&lt;T&gt; UPSafeCell&lt;T&gt; {
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">INTR_MASKING_INFO</span>: <span class="ident">UPSafeCellRaw</span><span class="op">&lt;</span><span class="ident">IntrMaskingInfo</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">UPSafeCellRaw::new</span>(<span class="ident">IntrMaskingInfo::new</span>()) 
-    };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">INTR_MASKING_INFO</span>: <span class="ident">UPSafeCellRaw</span><span class="op">&lt;</span><span class="ident">IntrMaskingInfo</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">unsafe</span> { <span class="ident">UPSafeCellRaw::new</span>(<span class="ident">IntrMaskingInfo::new</span>()) };
 }
 
 <span class="kw">impl</span> <span class="ident">IntrMaskingInfo</span> {
@@ -210,7 +215,9 @@ impl&lt;T&gt; UPSafeCell&lt;T&gt; {
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">sie</span> <span class="op">=</span> <span class="ident">sstatus::read</span>().<span class="ident">sie</span>();
-        <span class="kw">unsafe</span> { <span class="ident">sstatus::clear_sie</span>(); }
+        <span class="kw">unsafe</span> {
+            <span class="ident">sstatus::clear_sie</span>();
+        }
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nested_level</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">sie_before_masking</span> <span class="op">=</span> <span class="ident">sie</span>;
         }
@@ -220,7 +227,9 @@ impl&lt;T&gt; UPSafeCell&lt;T&gt; {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">nested_level</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nested_level</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sie_before_masking</span> {
-            <span class="kw">unsafe</span> { <span class="ident">sstatus::set_sie</span>(); }            
+            <span class="kw">unsafe</span> {
+                <span class="ident">sstatus::set_sie</span>();
+            }
         }
     }
 }
@@ -240,13 +249,17 @@ impl&lt;T&gt; UPSafeCell&lt;T&gt; {
             <span class="ident">inner</span>: <span class="ident">RefCell::new</span>(<span class="ident">value</span>),
         }
     }
+
     <span class="doccomment">/// Panic if the data has been borrowed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exclusive_access</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UPIntrRefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">INTR_MASKING_INFO</span>.<span class="ident">get_mut</span>().<span class="ident">enter</span>();
         <span class="ident">UPIntrRefMut</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">borrow_mut</span>()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exclusive_session</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">V</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exclusive_session</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">V</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">V</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exclusive_access</span>();
         <span class="ident">f</span>(<span class="ident">inner</span>.<span class="ident">deref_mut</span>())
     }
@@ -270,7 +283,6 @@ impl&lt;T&gt; UPSafeCell&lt;T&gt; {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">deref_mut</span>()
     }
 }
-
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>
