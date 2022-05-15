@@ -1,6 +1,7 @@
 //! The panic handler
 
-use crate::sbi::shutdown;
+//use crate::sbi::shutdown;
+use crate::qemu_exit::{QEMUExit,QEMU_EXIT_HANDLE};
 use core::panic::PanicInfo;
 
 #[panic_handler]
@@ -15,5 +16,7 @@ fn panic(info: &PanicInfo) -> ! {
     } else {
         println!("[kernel] Panicked: {}", info.message().unwrap());
     }
-    shutdown()
+    //shutdown()
+   // QEMU_EXIT_HANDLE.exit(13)
+    QEMU_EXIT_HANDLE.exit_success()
 }
