@@ -89,7 +89,7 @@
     <span class="ident">sbi_call</span>(<span class="ident">SBI_CONSOLE_GETCHAR</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="ident">exit_code</span>: <span class="ident">usize</span>) -&gt; <span class="op">!</span> {
     <span class="ident">sbi_call</span>(<span class="ident">SBI_SHUTDOWN</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
     <span class="macro">panic!</span>(<span class="string">&quot;It should shutdown!&quot;</span>);
 }
