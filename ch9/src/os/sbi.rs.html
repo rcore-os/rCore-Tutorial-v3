@@ -48,6 +48,8 @@
 <span id="43">43</span>
 <span id="44">44</span>
 <span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
@@ -66,7 +68,7 @@
 <span class="kw">fn</span> <span class="ident">sbi_call</span>(<span class="ident">which</span>: <span class="ident">usize</span>, <span class="ident">arg0</span>: <span class="ident">usize</span>, <span class="ident">arg1</span>: <span class="ident">usize</span>, <span class="ident">arg2</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>;
     <span class="kw">unsafe</span> {
-        <span class="macro">asm!</span>(
+        <span class="macro">core::arch::asm!</span>(
             <span class="string">&quot;ecall&quot;</span>,
             <span class="ident">inlateout</span>(<span class="string">&quot;x10&quot;</span>) <span class="ident">arg0</span> =&gt; <span class="ident">ret</span>,
             <span class="kw">in</span>(<span class="string">&quot;x11&quot;</span>) <span class="ident">arg1</span>,
@@ -89,8 +91,10 @@
     <span class="ident">sbi_call</span>(<span class="ident">SBI_CONSOLE_GETCHAR</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {
-    <span class="ident">sbi_call</span>(<span class="ident">SBI_SHUTDOWN</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="ident">exit_code</span>: <span class="ident">usize</span>) -&gt; <span class="op">!</span> {
+    <span class="comment">//sbi_call(SBI_SHUTDOWN, exit_code, 0, 0);</span>
+    <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
     <span class="macro">panic!</span>(<span class="string">&quot;It should shutdown!&quot;</span>);
 }
 </code></pre></div>

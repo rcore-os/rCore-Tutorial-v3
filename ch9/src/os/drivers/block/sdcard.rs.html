@@ -1093,14 +1093,14 @@
      * Get SD card data response.
      * @param  None
      * @retval The SD status: Read data response xxx0&lt;status&gt;1
-     *         - status 010: Data accecpted
+     *         - status 010: Data accepted
      *         - status 101: Data rejected due to a crc error
      *         - status 110: Data rejected due to a Write error.
      *         - status 111: Data rejected due to other error.
      */</span>
     <span class="kw">fn</span> <span class="ident">get_dataresponse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> [<span class="number">0u8</span>];
-        <span class="comment">/* Read resonse */</span>
+        <span class="comment">/* Read response */</span>
         <span class="self">self</span>.<span class="ident">read_data</span>(<span class="ident">response</span>);
         <span class="comment">/* Mask unused bits */</span>
         <span class="ident">response</span>[<span class="number">0</span>] <span class="op">&amp;=</span> <span class="number">0x1F</span>;
@@ -1195,7 +1195,7 @@
             <span class="comment">/* Byte 15 */</span>
             <span class="ident">CSD_CRC</span>: (<span class="ident">csd_tab</span>[<span class="number">15</span>] <span class="op">&amp;</span> <span class="number">0xFE</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>,
             <span class="ident">Reserved4</span>: <span class="number">1</span>,
-            <span class="comment">/* Return the reponse */</span>
+            <span class="comment">/* Return the response */</span>
         })
     }
 

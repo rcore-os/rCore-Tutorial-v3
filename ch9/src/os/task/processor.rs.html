@@ -138,7 +138,8 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PROCESSOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Processor</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Processor::new</span>()) };
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">PROCESSOR</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">Processor</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">Processor::new</span>()) };
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_tasks</span>() {
@@ -202,9 +203,8 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule</span>(<span class="ident">switched_task_cx_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">TaskContext</span>) {
-    <span class="kw">let</span> <span class="ident">idle_task_cx_ptr</span> <span class="op">=</span> <span class="ident">PROCESSOR</span>.<span class="ident">exclusive_session</span>(<span class="op">|</span><span class="ident">processor</span><span class="op">|</span> {
-        <span class="ident">processor</span>.<span class="ident">get_idle_task_cx_ptr</span>()
-    });
+    <span class="kw">let</span> <span class="ident">idle_task_cx_ptr</span> <span class="op">=</span>
+        <span class="ident">PROCESSOR</span>.<span class="ident">exclusive_session</span>(<span class="op">|</span><span class="ident">processor</span><span class="op">|</span> <span class="ident">processor</span>.<span class="ident">get_idle_task_cx_ptr</span>());
     <span class="kw">unsafe</span> {
         <span class="ident">__switch</span>(<span class="ident">switched_task_cx_ptr</span>, <span class="ident">idle_task_cx_ptr</span>);
     }

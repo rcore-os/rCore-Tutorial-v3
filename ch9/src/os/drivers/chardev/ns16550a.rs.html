@@ -178,11 +178,9 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-<span id="176">176</span>
 </pre><pre class="rust"><code><span class="doccomment">///! Ref: https://www.lammertbies.nl/comm/info/serial-uart</span>
 <span class="doccomment">///! Ref: ns16550a datasheet: https://datasheetspdf.com/pdf-file/605590/NationalSemiconductor/NS16550A/1</span>
 <span class="doccomment">///! Ref: ns16450 datasheet: https://datasheetspdf.com/pdf-file/1311818/NationalSemiconductor/NS16450/1</span>
-
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CharDevice</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{<span class="ident">Condvar</span>, <span class="ident">UPIntrFreeCell</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::schedule</span>;
@@ -193,7 +191,7 @@
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// InterruptEnableRegister</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IER</span>: <span class="ident">u8</span> {
-        <span class="kw">const</span> <span class="ident">RX_AVALIABLE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">RX_AVAILABLE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="kw">const</span> <span class="ident">TX_EMPTY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
     }
 
@@ -276,7 +274,7 @@
         <span class="ident">mcr</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MCR::REQUEST_TO_SEND</span>;
         <span class="ident">mcr</span> <span class="op">|</span><span class="op">=</span> <span class="ident">MCR::AUX_OUTPUT2</span>;
         <span class="ident">read_end</span>.<span class="ident">mcr</span>.<span class="ident">write</span>(<span class="ident">mcr</span>);
-        <span class="kw">let</span> <span class="ident">ier</span> <span class="op">=</span> <span class="ident">IER::RX_AVALIABLE</span>;
+        <span class="kw">let</span> <span class="ident">ier</span> <span class="op">=</span> <span class="ident">IER::RX_AVAILABLE</span>;
         <span class="ident">read_end</span>.<span class="ident">ier</span>.<span class="ident">write</span>(<span class="ident">ier</span>);
     }
 
