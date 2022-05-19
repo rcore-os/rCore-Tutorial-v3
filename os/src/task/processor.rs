@@ -98,9 +98,8 @@ pub fn current_kstack_top() -> usize {
 }
 
 pub fn schedule(switched_task_cx_ptr: *mut TaskContext) {
-    let idle_task_cx_ptr = PROCESSOR.exclusive_session(|processor| {
-        processor.get_idle_task_cx_ptr()
-    });
+    let idle_task_cx_ptr =
+        PROCESSOR.exclusive_session(|processor| processor.get_idle_task_cx_ptr());
     unsafe {
         __switch(switched_task_cx_ptr, idle_task_cx_ptr);
     }

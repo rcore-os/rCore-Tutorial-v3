@@ -3,6 +3,8 @@ rCore-Tutorial version 3.5. See the [Documentation in Chinese](https://rcore-os.
 
 rCore-Tutorial API Docs.  See the [API Docs of Ten OSes ](#OS-API-DOCS)
 
+If you don't know  Rust Language and try to learn it, please visit [Rust Learning Resources](https://github.com/rcore-os/rCore/wiki/study-resource-of-system-programming-in-RUST)
+
 Official QQ group number: 735045051
 
 ## news
@@ -226,6 +228,10 @@ $ make run
 [KERN] mm::frame_allocator::lazy_static!FRAME_ALLOCATOR begin
 ......
 ```
+<<<<<<< HEAD
+=======
+
+>>>>>>> ch9
 ## Rustdoc
 
 Currently it can only help you view the code since only a tiny part of the code has been documented.
