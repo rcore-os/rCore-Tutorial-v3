@@ -19,6 +19,7 @@ use crate::drivers::plic::{IntrTargetPriority, PLIC};
 
 pub fn device_init() {
     use riscv::register::sie;
+    
     kprintln!("[KERN] board::qemu::device_init() begin");
     let mut plic = unsafe { PLIC::new(VIRT_PLIC) };
     let hart_id: usize = 0;

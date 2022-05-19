@@ -20,6 +20,6 @@ virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers" }
 # easy-fs = { path = "../easy-fs" }
 #log = "0.4"
 spin = "0.7.0"
-# [features]
-# board_qemu = []
-# board_k210 = []
+[features]
+board_qemu = []
+board_k210 = []

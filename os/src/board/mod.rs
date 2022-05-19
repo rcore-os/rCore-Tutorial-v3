@@ -1,3 +1,6 @@
+mod qemu;
+pub use qemu::*;
+
 pub const CLOCK_FREQ: usize = 12500000;
 
 pub const MMIO: &[(usize, usize)] = &[

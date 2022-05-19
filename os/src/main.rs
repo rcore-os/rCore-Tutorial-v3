@@ -12,8 +12,8 @@ extern crate bitflags;
 // #[path = "boards/k210.rs"]
 // mod board;
 // #[cfg(not(any(feature = "board_k210")))]
-// #[path = "boards/qemu.rs"]
-
+// #[path = "board/qemu.rs"]
+// mod board::qemu;
 
 #[macro_use]
 mod console;
