@@ -1,8 +1,8 @@
+use super::BLOCK_SZ;
 use super::{
     block_cache_sync_all, get_block_cache, Bitmap, BlockDevice, DiskInode, DiskInodeType, Inode,
     SuperBlock,
 };
-use super::BLOCK_SZ;
 use alloc::sync::Arc;
 use spin::Mutex;
 

@@ -17,6 +17,7 @@ extern crate bitflags;
 
 #[macro_use]
 mod console;
+mod board;
 mod config;
 mod drivers;
 mod fs;
@@ -28,7 +29,6 @@ mod syscall;
 mod task;
 mod timer;
 mod trap;
-mod board;
 // use board::*;
 
 core::arch::global_asm!(include_str!("entry.asm"));

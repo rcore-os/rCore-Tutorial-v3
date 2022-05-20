@@ -164,7 +164,9 @@ impl ProcessControlBlock {
         kprintln!("[KERN] task::process::PCB::exec():  set  trap_cx_ppn for this thread");
         task_inner.trap_cx_ppn = task_inner.res.as_mut().unwrap().trap_cx_ppn();
         // push arguments on user stack
-        kprintln!("[KERN] task::process::PCB::exec():  push arguments on user stack for this thread");
+        kprintln!(
+            "[KERN] task::process::PCB::exec():  push arguments on user stack for this thread"
+        );
         let mut user_sp = task_inner.res.as_mut().unwrap().ustack_top();
         user_sp -= (args.len() + 1) * core::mem::size_of::<usize>();
         let argv_base = user_sp;
@@ -270,12 +272,16 @@ impl ProcessControlBlock {
         child_inner.tasks.push(Some(Arc::clone(&task)));
         drop(child_inner);
         // modify kstack_top in trap_cx of this thread
-        kprintln!("[KERN] task::process::PCB::fork(): modify child's kstack_top in trap_cx of child");
+        kprintln!(
+            "[KERN] task::process::PCB::fork(): modify child's kstack_top in trap_cx of child"
+        );
         let task_inner = task.inner_exclusive_access();
         let trap_cx = task_inner.get_trap_cx();
         trap_cx.kernel_sp = task.kstack.get_top();
         drop(task_inner);
-        kprintln!("[KERN] task::process::PCB::fork(): insert <child pid, child PCB> in PID2PCB BTreeMap");
+        kprintln!(
+            "[KERN] task::process::PCB::fork(): insert <child pid, child PCB> in PID2PCB BTreeMap"
+        );
         insert_into_pid2process(child.getpid(), Arc::clone(&child));
         // add this thread to scheduler
         kprintln!("[KERN] task::process::PCB::fork(): add_task(child task): add child thread to scheduler");

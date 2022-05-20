@@ -37,11 +37,15 @@ use sync::*;
 use thread::*;
 
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
-    if syscall_id !=SYSCALL_YIELD && 
-       syscall_id !=SYSCALL_WAITPID &&
-       !(syscall_id ==SYSCALL_READ && args[0] == 0) &&
-       !(syscall_id ==SYSCALL_WRITE && (args[0] == 1|| args[0] == 2)) {
-        kprintln!("[KERN] syscall::syscall(id: {}) begin", sys_id_str(syscall_id));
+    if syscall_id != SYSCALL_YIELD
+        && syscall_id != SYSCALL_WAITPID
+        && !(syscall_id == SYSCALL_READ && args[0] == 0)
+        && !(syscall_id == SYSCALL_WRITE && (args[0] == 1 || args[0] == 2))
+    {
+        kprintln!(
+            "[KERN] syscall::syscall(id: {}) begin",
+            sys_id_str(syscall_id)
+        );
     }
     match syscall_id {
         SYSCALL_DUP => sys_dup(args[0]),

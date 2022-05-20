@@ -47,7 +47,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref KSTACK_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> ={
+    static ref KSTACK_ALLOCATOR: UPIntrFreeCell<RecycleAllocator> = {
         kprintln!("[KERN] task::id::lazy_static!KSTACK_ALLOCATOR begin");
         unsafe { UPIntrFreeCell::new(RecycleAllocator::new()) }
     };
@@ -101,7 +101,7 @@ impl Drop for KernelStack {
         KERNEL_SPACE
             .exclusive_access()
             .remove_area_with_start_vpn(kernel_stack_bottom_va.into());
-        kprintln!("[KERN] task::id::Drop<KernelStack>::drop end");    
+        kprintln!("[KERN] task::id::Drop<KernelStack>::drop end");
     }
 }
 
@@ -201,8 +201,8 @@ impl TaskUserRes {
         process_inner
             .memory_set
             .remove_area_with_start_vpn(trap_cx_bottom_va.into());
-        
-        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res() end");    
+
+        kprintln!("[KERN] task::id::TaskUserRes::dealloc_user_res() end");
     }
 
     #[allow(unused)]

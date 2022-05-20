@@ -25,7 +25,7 @@ extern "C" {
 }
 
 lazy_static! {
-    pub static ref KERNEL_SPACE: Arc<UPIntrFreeCell<MemorySet>> ={
+    pub static ref KERNEL_SPACE: Arc<UPIntrFreeCell<MemorySet>> = {
         kprintln!("[KERN] mm::memory_set::lazy_static!KERNEL_SPACE begin");
         Arc::new(unsafe { UPIntrFreeCell::new(MemorySet::new_kernel()) })
     };
@@ -95,9 +95,18 @@ impl MemorySet {
         // map trampoline
         memory_set.map_trampoline();
         // map kernel sections
-        println!("[KERN] .text [{:#x}, {:#x})", stext as usize, etext as usize);
-        println!("[KERN] .rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
-        println!("[KERN] .data [{:#x}, {:#x})", sdata as usize, edata as usize);
+        println!(
+            "[KERN] .text [{:#x}, {:#x})",
+            stext as usize, etext as usize
+        );
+        println!(
+            "[KERN] .rodata [{:#x}, {:#x})",
+            srodata as usize, erodata as usize
+        );
+        println!(
+            "[KERN] .data [{:#x}, {:#x})",
+            sdata as usize, edata as usize
+        );
         println!(
             "[KERN] .bss [{:#x}, {:#x})",
             sbss_with_stack as usize, ebss as usize
@@ -271,7 +280,11 @@ impl MapArea {
         kprintln!("[KERN] mm::memory_set::MapArea::new() begin");
         let start_vpn: VirtPageNum = start_va.floor();
         let end_vpn: VirtPageNum = end_va.ceil();
-        kprintln!("[KERN] mm::memory_set::MapArea::new(start_vpn: {:?}, end_vpn: {:?}) end", start_vpn, end_vpn);
+        kprintln!(
+            "[KERN] mm::memory_set::MapArea::new(start_vpn: {:?}, end_vpn: {:?}) end",
+            start_vpn,
+            end_vpn
+        );
         Self {
             vpn_range: VPNRange::new(start_vpn, end_vpn),
             data_frames: BTreeMap::new(),

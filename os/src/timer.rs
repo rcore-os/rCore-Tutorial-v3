@@ -52,7 +52,7 @@ impl Ord for TimerCondVar {
 }
 
 lazy_static! {
-    static ref TIMERS: UPIntrFreeCell<BinaryHeap<TimerCondVar>> ={
+    static ref TIMERS: UPIntrFreeCell<BinaryHeap<TimerCondVar>> = {
         kprintln!("[KERN] timer::lazy_static!TIMERS begin");
         unsafe { UPIntrFreeCell::new(BinaryHeap::<TimerCondVar>::new()) }
     };

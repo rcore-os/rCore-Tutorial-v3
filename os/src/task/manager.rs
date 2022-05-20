@@ -24,14 +24,14 @@ impl TaskManager {
 }
 
 lazy_static! {
-    pub static ref TASK_MANAGER: UPIntrFreeCell<TaskManager> ={
+    pub static ref TASK_MANAGER: UPIntrFreeCell<TaskManager> = {
         kprintln!("[KERN] task::manager::lazy_static!TASK_MANAGER begin");
         unsafe { UPIntrFreeCell::new(TaskManager::new()) }
     };
 }
 
 lazy_static! {
-    pub static ref PID2PCB: UPIntrFreeCell<BTreeMap<usize, Arc<ProcessControlBlock>>> ={
+    pub static ref PID2PCB: UPIntrFreeCell<BTreeMap<usize, Arc<ProcessControlBlock>>> = {
         kprintln!("[KERN] task::manager::lazy_static!PID2PCB begin");
         unsafe { UPIntrFreeCell::new(BTreeMap::new()) }
     };

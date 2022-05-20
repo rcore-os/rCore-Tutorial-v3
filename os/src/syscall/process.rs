@@ -96,13 +96,17 @@ pub fn sys_waitpid(pid: isize, exit_code_ptr: *mut i32) -> isize {
         // ++++ release child PCB
     });
     if let Some((idx, _)) = pair {
-        kprintln!("[KERN] syscall::process::sys_waitpid(): remove child from PCB's children Vector");
+        kprintln!(
+            "[KERN] syscall::process::sys_waitpid(): remove child from PCB's children Vector"
+        );
         let child = inner.children.remove(idx);
         // confirm that child will be deallocated after being removed from children list
         assert_eq!(Arc::strong_count(&child), 1);
         let found_pid = child.getpid();
         // ++++ temporarily access child PCB exclusively
-        kprintln!("[KERN] syscall::process::sys_waitpid(): get child's exit_code and return child pid");
+        kprintln!(
+            "[KERN] syscall::process::sys_waitpid(): get child's exit_code and return child pid"
+        );
         let exit_code = child.inner_exclusive_access().exit_code;
         // ++++ release child PCB
         *translated_refmut(inner.memory_set.token(), exit_code_ptr) = exit_code;

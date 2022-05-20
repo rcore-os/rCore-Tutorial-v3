@@ -5,8 +5,8 @@ mod virtio_blk;
 pub use virtio_blk::VirtIOBlock;
 
 use crate::board::BlockDeviceImpl;
-use alloc::sync::Arc;
 use crate::fs::easy_fs::BlockDevice;
+use alloc::sync::Arc;
 use lazy_static::*;
 
 lazy_static! {

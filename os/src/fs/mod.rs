@@ -1,7 +1,7 @@
+pub mod easy_fs;
 mod inode;
 mod pipe;
 mod stdio;
-pub mod easy_fs;
 use crate::mm::UserBuffer;
 
 pub trait File: Send + Sync {
@@ -11,7 +11,7 @@ pub trait File: Send + Sync {
     fn write(&self, buf: UserBuffer) -> usize;
 }
 
+pub use easy_fs::*;
 pub use inode::{list_apps, open_file, OSInode, OpenFlags};
 pub use pipe::{make_pipe, Pipe};
 pub use stdio::{Stdin, Stdout};
-pub use easy_fs::*;

@@ -4,9 +4,9 @@ use crate::task::{current_process, current_user_token};
 use alloc::sync::Arc;
 
 pub fn sys_write(fd: usize, buf: *const u8, len: usize) -> isize {
-    if fd!=1 && fd!=2 {
+    if fd != 1 && fd != 2 {
         kprintln!("[KERN] syscall::fs::sys_write(fd: {}) begin", fd);
-       }
+    }
     let token = current_user_token();
     let process = current_process();
     let inner = process.inner_exclusive_access();
@@ -27,8 +27,8 @@ pub fn sys_write(fd: usize, buf: *const u8, len: usize) -> isize {
 }
 
 pub fn sys_read(fd: usize, buf: *const u8, len: usize) -> isize {
-    if fd!=0 {
-     kprintln!("[KERN] syscall::fs::sys_read(fd: {}) begin", fd);
+    if fd != 0 {
+        kprintln!("[KERN] syscall::fs::sys_read(fd: {}) begin", fd);
     }
     let token = current_user_token();
     let process = current_process();
@@ -58,7 +58,7 @@ pub fn sys_open(path: *const u8, flags: u32) -> isize {
         let mut inner = process.inner_exclusive_access();
         let fd = inner.alloc_fd();
         inner.fd_table[fd] = Some(inode);
-        kprintln!("[KERN] syscall::fs::sys_open() return fd {}, end",fd);
+        kprintln!("[KERN] syscall::fs::sys_open() return fd {}, end", fd);
         fd as isize
     } else {
         -1
@@ -66,7 +66,7 @@ pub fn sys_open(path: *const u8, flags: u32) -> isize {
 }
 
 pub fn sys_close(fd: usize) -> isize {
-    kprintln!("[KERN] syscall::fs::sys_close(fd: {}) begin",fd);
+    kprintln!("[KERN] syscall::fs::sys_close(fd: {}) begin", fd);
     let process = current_process();
     let mut inner = process.inner_exclusive_access();
     if fd >= inner.fd_table.len() {

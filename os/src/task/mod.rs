@@ -101,7 +101,9 @@ pub fn exit_current_and_run_next(exit_code: i32) {
         remove_from_pid2process(pid);
         let mut process_inner = process.inner_exclusive_access();
         // mark this process as a zombie process
-        kprintln!("[KERN] task::exit_current_and_run_next(): mark this process as a zombie process");
+        kprintln!(
+            "[KERN] task::exit_current_and_run_next(): mark this process as a zombie process"
+        );
         process_inner.is_zombie = true;
         // record exit code of main process
         kprintln!("[KERN] task::exit_current_and_run_next(): record exit code in process_inner");
@@ -109,7 +111,9 @@ pub fn exit_current_and_run_next(exit_code: i32) {
 
         {
             // move all child processes under init process
-            kprintln!("[KERN] task::exit_current_and_run_next(): move all child processes under INITPROC");
+            kprintln!(
+                "[KERN] task::exit_current_and_run_next(): move all child processes under INITPROC"
+            );
             let mut initproc_inner = INITPROC.inner_exclusive_access();
             for child in process_inner.children.iter() {
                 child.inner_exclusive_access().parent = Some(Arc::downgrade(&INITPROC));
@@ -130,7 +134,9 @@ pub fn exit_current_and_run_next(exit_code: i32) {
             }
         }
 
-        kprintln!("[KERN] task::exit_current_and_run_next(): clear children Vector in process_inner");
+        kprintln!(
+            "[KERN] task::exit_current_and_run_next(): clear children Vector in process_inner"
+        );
         // dealloc_tid and dealloc_user_res require access to PCB inner, so we
         // need to collect those user res first, then release process_inner
         // for now to avoid deadlock/double borrow problem.

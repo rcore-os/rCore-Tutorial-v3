@@ -127,7 +127,8 @@ pub fn waitpid(pid: usize, exit_code: &mut i32) -> isize {
             // -1 or a real pid
             exit_pid => {
                 println!("[USER] lib::waitpid() end: exit_pid {}", exit_pid);
-                return exit_pid; }
+                return exit_pid;
+            }
         }
     }
 }
@@ -204,14 +205,14 @@ pub fn condvar_wait(condvar_id: usize, mutex_id: usize) {
 
 #[macro_export]
 macro_rules! vstore {
-    ($var_ref: expr, $value: expr) => { 
+    ($var_ref: expr, $value: expr) => {
         unsafe { core::intrinsics::volatile_store($var_ref as *const _ as _, $value) }
     };
 }
 
 #[macro_export]
 macro_rules! vload {
-    ($var_ref: expr) => { 
+    ($var_ref: expr) => {
         unsafe { core::intrinsics::volatile_load($var_ref as *const _ as _) }
     };
 }

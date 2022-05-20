@@ -1,3 +1,4 @@
+use super::easy_fs::{EasyFileSystem, Inode};
 use super::File;
 use crate::drivers::BLOCK_DEVICE;
 use crate::mm::UserBuffer;
@@ -5,7 +6,6 @@ use crate::sync::UPIntrFreeCell;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bitflags::*;
-use super::easy_fs::{EasyFileSystem, Inode};
 use lazy_static::*;
 
 pub struct OSInode {
