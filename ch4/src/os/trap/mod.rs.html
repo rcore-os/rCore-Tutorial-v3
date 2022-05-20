@@ -126,6 +126,8 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Trap handling functionality</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! For rCore, we have a single trap entry point, namely `__alltraps`. At</span>
@@ -192,8 +194,10 @@
             <span class="ident">cx</span>.<span class="ident">sepc</span> <span class="op">+</span><span class="op">=</span> <span class="number">4</span>;
             <span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">10</span>] <span class="op">=</span> <span class="ident">syscall</span>(<span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">17</span>], [<span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">10</span>], <span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">11</span>], <span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">12</span>]]) <span class="kw">as</span> <span class="ident">usize</span>;
         }
-        <span class="ident">Trap::Exception</span>(<span class="ident">Exception::StoreFault</span>) <span class="op">|</span> <span class="ident">Trap::Exception</span>(<span class="ident">Exception::StorePageFault</span>) <span class="op">|</span>
-        <span class="ident">Trap::Exception</span>(<span class="ident">Exception::LoadFault</span>)  <span class="op">|</span> <span class="ident">Trap::Exception</span>(<span class="ident">Exception::LoadPageFault</span>) =&gt; {
+        <span class="ident">Trap::Exception</span>(<span class="ident">Exception::StoreFault</span>)
+        <span class="op">|</span> <span class="ident">Trap::Exception</span>(<span class="ident">Exception::StorePageFault</span>)
+        <span class="op">|</span> <span class="ident">Trap::Exception</span>(<span class="ident">Exception::LoadFault</span>)
+        <span class="op">|</span> <span class="ident">Trap::Exception</span>(<span class="ident">Exception::LoadPageFault</span>) =&gt; {
             <span class="macro">println!</span>(<span class="string">&quot;[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it.&quot;</span>, <span class="ident">stval</span>, <span class="ident">cx</span>.<span class="ident">sepc</span>);
             <span class="ident">exit_current_and_run_next</span>();
         }
@@ -243,7 +247,7 @@
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="doccomment">/// Unimplement: traps/interrupts/exceptions from kernel mode</span>
-<span class="doccomment">/// Todo: Chapter 9: I/O device </span>
+<span class="doccomment">/// Todo: Chapter 9: I/O device</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_from_kernel</span>() -&gt; <span class="op">!</span> {
     <span class="macro">panic!</span>(<span class="string">&quot;a trap from kernel!&quot;</span>);
 }
