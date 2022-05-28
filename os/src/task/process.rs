@@ -150,25 +150,23 @@ impl ProcessControlBlock {
         let mut user_sp = task_inner.res.as_mut().unwrap().ustack_top();
         user_sp -= (args.len() + 1) * core::mem::size_of::<usize>();
         let argv_base = user_sp;
-        let mut argv: Vec<_> = (0..=args.len())
-            .map(|arg| {
-                translated_refmut(
-                    new_token,
-                    (argv_base + arg * core::mem::size_of::<usize>()) as *mut usize,
-                )
-            })
-            .collect();
-        *argv[args.len()] = 0;
+        let mut argv = (0..=args.len()).map(|arg| {
+            translated_refmut(
+                new_token,
+                (argv_base + arg * core::mem::size_of::<usize>()) as *mut usize,
+            )
+        });
         for i in 0..args.len() {
             user_sp -= args[i].len() + 1;
-            *argv[i] = user_sp;
+            argv.next().unwrap().write(user_sp);
             let mut p = user_sp;
             for c in args[i].as_bytes() {
-                *translated_refmut(new_token, p as *mut u8) = *c;
+                translated_refmut(new_token, p as *mut u8).write(*c);
                 p += 1;
             }
-            *translated_refmut(new_token, p as *mut u8) = 0;
+            translated_refmut(new_token, p as *mut u8).write(0);
         }
+        argv.next().unwrap().write(0);
         // make the user_sp aligned to 8B for k210 platform
         user_sp -= user_sp % core::mem::size_of::<usize>();
         // initialize trap_cx

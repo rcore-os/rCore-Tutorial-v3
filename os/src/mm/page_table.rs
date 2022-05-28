@@ -3,6 +3,9 @@ use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use bitflags::*;
+use core::marker::PhantomData;
+use core::mem::size_of;
+use core::ptr::slice_from_raw_parts;
 
 bitflags! {
     pub struct PTEFlags: u8 {
@@ -178,21 +181,47 @@ pub fn translated_str(token: usize, ptr: *const u8) -> String {
     string
 }
 
-pub fn translated_ref<T>(token: usize, ptr: *const T) -> &'static T {
-    let page_table = PageTable::from_token(token);
-    page_table
-        .translate_va(VirtAddr::from(ptr as usize))
-        .unwrap()
-        .get_ref()
+pub fn translated_value<T: Copy>(token: usize, ptr: *const T) -> T {
+    let mut value_buffer = vec![0u8; size_of::<T>()];
+    let user_buffer = UserBuffer::new(translated_byte_buffer(
+        token,
+        ptr as *const _,
+        size_of::<T>(),
+    ));
+    for (i, byte) in user_buffer.into_iter().enumerate() {
+        unsafe {
+            value_buffer[i] = *byte;
+        }
+    }
+    unsafe { *(value_buffer.as_ptr() as *const _) }
 }
 
-pub fn translated_refmut<T>(token: usize, ptr: *mut T) -> &'static mut T {
-    let page_table = PageTable::from_token(token);
-    let va = ptr as usize;
-    page_table
-        .translate_va(VirtAddr::from(va))
-        .unwrap()
-        .get_mut()
+pub fn translated_refmut<T: Copy>(token: usize, ptr: *mut T) -> UserRefMutProxy<T> {
+    let user_buffer = UserBuffer::new(translated_byte_buffer(
+        token,
+        ptr as *const _,
+        size_of::<T>(),
+    ));
+    UserRefMutProxy {
+        user_buffer,
+        marker: PhantomData,
+    }
+}
+
+pub struct UserRefMutProxy<T: Copy> {
+    user_buffer: UserBuffer,
+    marker: PhantomData<T>,
+}
+
+impl<T: Copy> UserRefMutProxy<T> {
+    pub fn write(self, value: T) {
+        let value_buffer = slice_from_raw_parts(&value as *const _ as *const u8, size_of::<T>());
+        for (i, byte) in self.user_buffer.into_iter().enumerate() {
+            unsafe {
+                *byte = (*value_buffer)[i];
+            }
+        }
+    }
 }
 
 pub struct UserBuffer {

@@ -1,5 +1,5 @@
 use crate::fs::{open_file, OpenFlags};
-use crate::mm::{translated_ref, translated_refmut, translated_str};
+use crate::mm::{translated_refmut, translated_str, translated_value};
 use crate::task::{
     current_process, current_task, current_user_token, exit_current_and_run_next, pid2process,
     suspend_current_and_run_next, SignalFlags,
@@ -46,7 +46,7 @@ pub fn sys_exec(path: *const u8, mut args: *const usize) -> isize {
     let path = translated_str(token, path);
     let mut args_vec: Vec<String> = Vec::new();
     loop {
-        let arg_str_ptr = *translated_ref(token, args);
+        let arg_str_ptr = translated_value(token, args);
         if arg_str_ptr == 0 {
             break;
         }
@@ -95,7 +95,7 @@ pub fn sys_waitpid(pid: isize, exit_code_ptr: *mut i32) -> isize {
         // ++++ temporarily access child PCB exclusively
         let exit_code = child.inner_exclusive_access().exit_code;
         // ++++ release child PCB
-        *translated_refmut(inner.memory_set.token(), exit_code_ptr) = exit_code;
+        translated_refmut(inner.memory_set.token(), exit_code_ptr).write(exit_code);
         found_pid as isize
     } else {
         -2
