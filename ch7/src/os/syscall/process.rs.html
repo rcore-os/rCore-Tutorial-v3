@@ -189,11 +189,18 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">translated_ref</span>, <span class="ident">translated_refmut</span>, <span class="ident">translated_str</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{
     <span class="ident">add_task</span>, <span class="ident">current_task</span>, <span class="ident">current_user_token</span>, <span class="ident">exit_current_and_run_next</span>, <span class="ident">pid2task</span>,
-    <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalFlags</span>, <span class="ident">SignalAction</span>, <span class="ident">MAX_SIG</span>,
+    <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalAction</span>, <span class="ident">SignalFlags</span>, <span class="ident">MAX_SIG</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::timer::get_time_ms</span>;
 <span class="kw">use</span> <span class="ident">alloc::string::String</span>;
@@ -342,15 +349,22 @@
 }
 
 <span class="kw">fn</span> <span class="ident">check_sigaction_error</span>(<span class="ident">signal</span>: <span class="ident">SignalFlags</span>, <span class="ident">action</span>: <span class="ident">usize</span>, <span class="ident">old_action</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">action</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">old_action</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGKILL</span> <span class="op">|</span><span class="op">|</span>
-        <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGSTOP</span> {
+    <span class="kw">if</span> <span class="ident">action</span> <span class="op">==</span> <span class="number">0</span>
+        <span class="op">|</span><span class="op">|</span> <span class="ident">old_action</span> <span class="op">==</span> <span class="number">0</span>
+        <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGKILL</span>
+        <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGSTOP</span>
+    {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> {
         <span class="bool-val">false</span>
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_sigaction</span>(<span class="ident">signum</span>: <span class="ident">i32</span>, <span class="ident">action</span>: <span class="kw-2">*const</span> <span class="ident">SignalAction</span>, <span class="ident">old_action</span>: <span class="kw-2">*mut</span> <span class="ident">SignalAction</span>) -&gt; <span class="ident">isize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_sigaction</span>(
+    <span class="ident">signum</span>: <span class="ident">i32</span>,
+    <span class="ident">action</span>: <span class="kw-2">*const</span> <span class="ident">SignalAction</span>,
+    <span class="ident">old_action</span>: <span class="kw-2">*mut</span> <span class="ident">SignalAction</span>,
+) -&gt; <span class="ident">isize</span> {
     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">current_user_token</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">current_task</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();

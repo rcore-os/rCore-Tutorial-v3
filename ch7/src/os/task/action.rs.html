@@ -34,23 +34,21 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-<span id="32">32</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">SignalFlags</span>, <span class="ident">MAX_SIG</span>};
-
 
 <span class="doccomment">/// Action for a signal</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignalAction</span> {
-    <span class="kw">pub</span> <span class="ident">handler</span>: <span class="ident">usize</span>, 
-    <span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">SignalFlags</span>
+    <span class="kw">pub</span> <span class="ident">handler</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">SignalFlags</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SignalAction</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">handler</span>: <span class="number">0</span>,
-            <span class="ident">mask</span>: <span class="ident">SignalFlags::from_bits</span>(<span class="number">40</span>).<span class="ident">unwrap</span>()
+            <span class="ident">mask</span>: <span class="ident">SignalFlags::from_bits</span>(<span class="number">40</span>).<span class="ident">unwrap</span>(),
         }
     }
 }

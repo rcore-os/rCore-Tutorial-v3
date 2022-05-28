@@ -36,13 +36,13 @@
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">sdcard</span>;
 <span class="kw">mod</span> <span class="ident">virtio_blk</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">virtio_blk::VirtIOBlock</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sdcard::SDCardWrapper</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">virtio_blk::VirtIOBlock</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::BlockDeviceImpl</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">easy_fs::BlockDevice</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::BlockDeviceImpl</span>;
 
 <span class="macro">lazy_static!</span> {
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BLOCK_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">BlockDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">BlockDeviceImpl::new</span>());

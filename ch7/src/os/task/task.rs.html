@@ -247,8 +247,8 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">TaskContext</span>, <span class="ident">SignalActions</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>, <span class="ident">SignalFlags</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>, <span class="ident">SignalFlags</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">SignalActions</span>, <span class="ident">TaskContext</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::TRAP_CONTEXT</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">File</span>, <span class="ident">Stdin</span>, <span class="ident">Stdout</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">translated_refmut</span>, <span class="ident">MemorySet</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
@@ -288,7 +288,7 @@
     <span class="kw">pub</span> <span class="ident">killed</span>: <span class="ident">bool</span>,
     <span class="comment">// if the task is frozen by a signal</span>
     <span class="kw">pub</span> <span class="ident">frozen</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">trap_ctx_backup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TrapContext</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="ident">trap_ctx_backup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TrapContext</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TaskControlBlockInner</span> {
@@ -356,7 +356,7 @@
                     <span class="ident">signal_actions</span>: <span class="ident">SignalActions::default</span>(),
                     <span class="ident">killed</span>: <span class="bool-val">false</span>,
                     <span class="ident">frozen</span>: <span class="bool-val">false</span>,
-                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>
+                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>,
                 })
             },
         };
@@ -465,7 +465,7 @@
                     <span class="ident">signal_actions</span>: <span class="ident">parent_inner</span>.<span class="ident">signal_actions</span>.<span class="ident">clone</span>(),
                     <span class="ident">killed</span>: <span class="bool-val">false</span>,
                     <span class="ident">frozen</span>: <span class="bool-val">false</span>,
-                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>
+                    <span class="ident">trap_ctx_backup</span>: <span class="prelude-val">None</span>,
                 })
             },
         });

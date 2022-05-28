@@ -68,7 +68,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::console_getchar</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">suspend_current_and_run_next</span>,<span class="ident">current_add_signal</span>,<span class="ident">SignalFlags</span>,};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_add_signal</span>, <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalFlags</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stdin</span>;
 
