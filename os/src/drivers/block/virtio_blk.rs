@@ -1,7 +1,6 @@
 use super::BlockDevice;
 use crate::mm::{
-    frame_alloc, frame_dealloc, kernel_token, FrameTracker, PageTable, PhysAddr, PhysPageNum,
-    StepByOne, VirtAddr,
+    frame_alloc, kernel_token, FrameTracker, PageTable, PhysAddr, PhysPageNum, VirtAddr,
 };
 use crate::sync::{Condvar, UPIntrFreeCell};
 use crate::task::schedule;
@@ -110,11 +109,11 @@ pub extern "C" fn virtio_dma_alloc(pages: usize) -> PhysAddr {
 
 #[no_mangle]
 pub extern "C" fn virtio_dma_dealloc(pa: PhysAddr, pages: usize) -> i32 {
-    let mut ppn_base: PhysPageNum = pa.into();
-    for _ in 0..pages {
-        frame_dealloc(ppn_base);
-        ppn_base.step();
-    }
+    let start_ppn: PhysPageNum = pa.into();
+    let end_ppn: PhysPageNum = (start_ppn.0 + pages).into();
+    QUEUE_FRAMES
+        .exclusive_access()
+        .retain(|frame| !(start_ppn..end_ppn).contains(&frame.ppn));
     0
 }
 
