@@ -161,10 +161,9 @@ impl DiskInode {
         }
         // alloc indirect1
         if total_blocks > INODE_DIRECT_COUNT as u32 {
-            assert!(current_blocks == INODE_DIRECT_COUNT as u32, "[allocation error] illegal allocation for indirect1Block!");
-            if current_blocks == INODE_DIRECT_COUNT as u32 {
-                self.indirect1 = new_blocks.next().unwrap();
-            }
+            assert!(current_blocks == INODE_DIRECT_COUNT as u32, "[allocation error] illegal allocation for indirect1Block!"); 
+            self.indirect1 = new_blocks.next().unwrap();
+            
             current_blocks -= INODE_DIRECT_COUNT as u32;
             total_blocks -= INODE_DIRECT_COUNT as u32;
         } else {
