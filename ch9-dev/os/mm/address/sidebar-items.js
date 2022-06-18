@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["PA_WIDTH_SV39",""],["PPN_WIDTH_SV39",""],["VA_WIDTH_SV39",""],["VPN_WIDTH_SV39",""]],"struct":[["PhysAddr","Definitions"],["PhysPageNum",""],["SimpleRange",""],["SimpleRangeIterator",""],["VirtAddr",""],["VirtPageNum",""]],"trait":[["StepByOne",""]],"type":[["VPNRange",""]]});
