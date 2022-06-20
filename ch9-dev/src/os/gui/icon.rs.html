@@ -81,45 +81,48 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-</pre><pre class="rust"><code>
-
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec::Vec</span>, <span class="ident">string::String</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{<span class="ident">prelude</span>::{<span class="ident">Size</span>, <span class="ident">Point</span>, <span class="ident">RgbColor</span>}, <span class="ident">image::Image</span>, <span class="ident">text::Text</span>, <span class="ident">mono_font</span>::{<span class="ident">MonoTextStyle</span>, <span class="ident">iso_8859_13::FONT_6X12</span>, <span class="ident">ascii::FONT_10X20</span>}, <span class="ident">pixelcolor::Rgb888</span>, <span class="ident">Drawable</span>};
+<span id="79">79</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::String</span>, <span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
+<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{
+    <span class="ident">image::Image</span>,
+    <span class="ident">mono_font</span>::{<span class="ident">ascii::FONT_10X20</span>, <span class="ident">iso_8859_13::FONT_6X12</span>, <span class="ident">MonoTextStyle</span>},
+    <span class="ident">pixelcolor::Rgb888</span>,
+    <span class="ident">prelude</span>::{<span class="ident">Point</span>, <span class="ident">RgbColor</span>, <span class="ident">Size</span>},
+    <span class="ident">text::Text</span>,
+    <span class="ident">Drawable</span>,
+};
 <span class="kw">use</span> <span class="ident">tinybmp::Bmp</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sync::UPIntrFreeCell</span>, <span class="ident">drivers::GPU_DEVICE</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">drivers::GPU_DEVICE</span>, <span class="ident">sync::UPIntrFreeCell</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Graphics</span>, <span class="ident">Component</span>, <span class="ident">ImageComp</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Component</span>, <span class="ident">Graphics</span>, <span class="ident">ImageComp</span>};
 
 <span class="kw">static</span> <span class="ident">FILEICON</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../assert/file.bmp&quot;</span>);
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IconController</span> {
-    <span class="ident">inner</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">IconControllerInner</span><span class="op">&gt;</span>
+    <span class="ident">inner</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">IconControllerInner</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IconControllerInner</span> {
     <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">graphic</span>: <span class="ident">Graphics</span>,
-    <span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">IconController</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,<span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">IconController</span> { 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">IconController</span> {
             <span class="ident">inner</span>: <span class="kw">unsafe</span> {
-                <span class="ident">UPIntrFreeCell::new</span>(
-                    <span class="ident">IconControllerInner</span> {
-                        <span class="ident">files</span>,
-                        <span class="ident">graphic</span>: <span class="ident">Graphics</span> { 
-                            <span class="ident">size</span>: <span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>),
-                            <span class="ident">point</span>: <span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>), 
-                            <span class="ident">drv</span>: <span class="ident">GPU_DEVICE</span>.<span class="ident">clone</span>()
-                        },
-                        <span class="ident">parent</span>,
-                    }
-                )
-                
-            }
+                <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">IconControllerInner</span> {
+                    <span class="ident">files</span>,
+                    <span class="ident">graphic</span>: <span class="ident">Graphics</span> {
+                        <span class="ident">size</span>: <span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>),
+                        <span class="ident">point</span>: <span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>),
+                        <span class="ident">drv</span>: <span class="ident">GPU_DEVICE</span>.<span class="ident">clone</span>(),
+                    },
+                    <span class="ident">parent</span>,
+                })
+            },
         }
     }
 }
@@ -134,20 +137,19 @@
         <span class="kw">for</span> <span class="ident">file</span> <span class="kw">in</span> <span class="ident">v</span> {
             <span class="macro">println!</span>(<span class="string">&quot;file&quot;</span>);
             <span class="kw">let</span> <span class="ident">bmp</span> <span class="op">=</span> <span class="ident">Bmp</span>::<span class="op">&lt;</span><span class="ident">Rgb888</span><span class="op">&gt;</span><span class="ident">::from_slice</span>(<span class="ident">FILEICON</span>).<span class="ident">unwrap</span>();
-                <span class="ident">Image::new</span>(<span class="kw-2">&amp;</span><span class="ident">bmp</span>, <span class="ident">Point::new</span>(<span class="ident">x</span>, <span class="ident">y</span>),).<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">graphic</span>);
-                <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">Text::new</span>(
-                    <span class="ident">file</span>.<span class="ident">as_str</span>(), 
-                    <span class="ident">Point::new</span>(<span class="ident">x</span> <span class="op">+</span> <span class="number">20</span>, <span class="ident">y</span> <span class="op">+</span> <span class="number">80</span>), 
-                    <span class="ident">MonoTextStyle::new</span>(<span class="kw-2">&amp;</span><span class="ident">FONT_10X20</span>,<span class="ident">Rgb888::BLACK</span>)
-                );
-                <span class="ident">text</span>.<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">graphic</span>);
-                <span class="kw">if</span> <span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">600</span> {
-                    <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">70</span>;
-                    <span class="ident">y</span> <span class="op">=</span> <span class="number">10</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">y</span> <span class="op">=</span> <span class="ident">y</span> <span class="op">+</span> <span class="number">90</span>;
-                }
-                
+            <span class="ident">Image::new</span>(<span class="kw-2">&amp;</span><span class="ident">bmp</span>, <span class="ident">Point::new</span>(<span class="ident">x</span>, <span class="ident">y</span>)).<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">graphic</span>);
+            <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">Text::new</span>(
+                <span class="ident">file</span>.<span class="ident">as_str</span>(),
+                <span class="ident">Point::new</span>(<span class="ident">x</span> <span class="op">+</span> <span class="number">20</span>, <span class="ident">y</span> <span class="op">+</span> <span class="number">80</span>),
+                <span class="ident">MonoTextStyle::new</span>(<span class="kw-2">&amp;</span><span class="ident">FONT_10X20</span>, <span class="ident">Rgb888::BLACK</span>),
+            );
+            <span class="ident">text</span>.<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">graphic</span>);
+            <span class="kw">if</span> <span class="ident">y</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">600</span> {
+                <span class="ident">x</span> <span class="op">=</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">70</span>;
+                <span class="ident">y</span> <span class="op">=</span> <span class="number">10</span>;
+            } <span class="kw">else</span> {
+                <span class="ident">y</span> <span class="op">=</span> <span class="ident">y</span> <span class="op">+</span> <span class="number">90</span>;
+            }
         }
     }
 
@@ -158,6 +160,7 @@
     <span class="kw">fn</span> <span class="ident">bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Size</span>, <span class="ident">Point</span>) {
         <span class="macro">todo!</span>()
     }
-}</code></pre></div>
+}
+</code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>

@@ -106,17 +106,17 @@
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_WAIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1032</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CREATE_DESKTOP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;
 <span class="kw">mod</span> <span class="ident">fs</span>;
+<span class="kw">mod</span> <span class="ident">gui</span>;
 <span class="kw">mod</span> <span class="ident">process</span>;
 <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
-<span class="kw">mod</span> <span class="ident">gui</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::gui::create_desktop</span>;
 <span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gui::PAD</span>;
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sync</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">thread</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gui::PAD</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::gui::create_desktop</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syscall</span>(<span class="ident">syscall_id</span>: <span class="ident">usize</span>, <span class="ident">args</span>: [<span class="ident">usize</span>; <span class="number">3</span>]) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">syscall_id</span> {

@@ -69,9 +69,6 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">core::any::Any</span>;
@@ -124,7 +121,6 @@
             }
         }
     }
-
 }
 
 <span class="kw">impl</span> <span class="ident">GPUDevice</span> <span class="kw">for</span> <span class="ident">VirtIOGPU</span> {
@@ -137,9 +133,7 @@
             <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">fb</span>.<span class="ident">len</span>())
         }
     }
-    <span class="kw">fn</span> <span class="ident">update_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-
-    }
+    <span class="kw">fn</span> <span class="ident">update_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>

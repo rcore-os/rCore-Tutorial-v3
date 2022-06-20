@@ -71,13 +71,26 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::any::Any</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">string::ToString</span>};
-<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{<span class="ident">text::Text</span>, <span class="ident">prelude</span>::{<span class="ident">Size</span>, <span class="ident">Point</span>}};
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">gui</span>::{<span class="ident">Button</span>, <span class="ident">Component</span>},
+    <span class="ident">sync::UPIntrFreeCell</span>,
+    <span class="ident">syscall::PAD</span>,
+};
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::ToString</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">core::any::Any</span>;
+<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{
+    <span class="ident">prelude</span>::{<span class="ident">Point</span>, <span class="ident">Size</span>},
+    <span class="ident">text::Text</span>,
+};
 <span class="kw">use</span> <span class="ident">k210_hal::cache::Uncache</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOHeader</span>, <span class="ident">VirtIOInput</span>};
 <span class="kw">use</span> <span class="ident">virtio_input_decoder</span>::{<span class="ident">Decoder</span>, <span class="ident">Key</span>, <span class="ident">KeyType</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">gui</span>::{<span class="ident">Button</span>, <span class="ident">Component</span>}, <span class="ident">sync::UPIntrFreeCell</span>, <span class="ident">syscall::PAD</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GPU_DEVICE</span>;
 
@@ -87,7 +100,7 @@
 <span class="kw">struct</span> <span class="ident">VirtIOINPUT</span>(<span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInput</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">INPUTDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
-    <span class="kw">fn</span> <span class="ident">handler_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
 
 <span class="macro">lazy_static::lazy_static!</span>(
@@ -104,7 +117,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">INPUTDevice</span> <span class="kw">for</span> <span class="ident">VirtIOINPUT</span> {
-    <span class="kw">fn</span> <span class="ident">handler_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">exclusive_access</span>();
         <span class="ident">input</span>.<span class="ident">ack_interrupt</span>();
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">pop_pending_event</span>().<span class="ident">unwrap</span>();
@@ -129,15 +142,15 @@
                             } <span class="kw">else</span> {
                                 <span class="ident">a</span>.<span class="ident">repaint</span>(<span class="ident">k</span>.<span class="ident">to_string</span>())
                             }
-                        },
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {},
+                        }
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {}
                     }
-                    
                 }
             }
             <span class="ident">virtio_input_decoder::DecodeType::Mouse</span>(<span class="ident">mouse</span>) =&gt; <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">mouse</span>),
         }
     }
-}</code></pre></div>
+}
+</code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>
