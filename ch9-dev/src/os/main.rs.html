@@ -79,6 +79,9 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
@@ -112,6 +115,8 @@
 <span class="kw">mod</span> <span class="ident">task</span>;
 <span class="kw">mod</span> <span class="ident">timer</span>;
 <span class="kw">mod</span> <span class="ident">trap</span>;
+
+<span class="kw">use</span> <span class="ident">syscall::create_desktop</span>;
 
 <span class="macro">core::arch::global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 
@@ -150,6 +155,7 @@
     <span class="ident">timer::set_next_trigger</span>();
     <span class="ident">board::device_init</span>();
     <span class="ident">fs::list_apps</span>();
+    <span class="ident">syscall::create_desktop</span>();
     <span class="ident">task::add_initproc</span>();
     <span class="kw-2">*</span><span class="ident">DEV_NON_BLOCKING_ACCESS</span>.<span class="ident">exclusive_access</span>() <span class="op">=</span> <span class="bool-val">true</span>;
     <span class="ident">task::run_tasks</span>();

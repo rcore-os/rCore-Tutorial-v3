@@ -20,8 +20,8 @@
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_HEAP_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x20_0000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEMORY_END</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x80800000</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_HEAP_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x100_0000</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEMORY_END</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x88000000</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x1000</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAGE_SIZE_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0xc</span>;
 

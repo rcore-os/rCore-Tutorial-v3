@@ -54,10 +54,27 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec</span>::{<span class="ident">Vec</span>, }, <span class="ident">string::ToString</span>};
-<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{<span class="ident">prelude</span>::{<span class="ident">Point</span>, <span class="ident">Size</span>}, <span class="ident">primitives::arc</span>};
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::ToString</span>, <span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
+<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{
+    <span class="ident">prelude</span>::{<span class="ident">Point</span>, <span class="ident">Size</span>},
+    <span class="ident">primitives::arc</span>,
+};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">gui</span>::{<span class="ident">Component</span>, <span class="ident">Panel</span>, <span class="ident">ImageComp</span>, <span class="ident">IconController</span>, <span class="ident">Terminal</span>, <span class="ident">Button</span>}, <span class="ident">fs::ROOT_INODE</span>, <span class="ident">sync::UPIntrFreeCell</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">fs::ROOT_INODE</span>,
+    <span class="ident">gui</span>::{<span class="ident">Button</span>, <span class="ident">Component</span>, <span class="ident">IconController</span>, <span class="ident">ImageComp</span>, <span class="ident">Panel</span>, <span class="ident">Terminal</span>},
+    <span class="ident">sync::UPIntrFreeCell</span>,
+};
 
 <span class="kw">static</span> <span class="ident">DT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../assert/desktop.bmp&quot;</span>);
 
@@ -71,8 +88,9 @@
 );
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_desktop</span>() -&gt; <span class="ident">isize</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>:<span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Panel::new</span>(<span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>), <span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>)));
-    <span class="kw">let</span> <span class="ident">image</span> <span class="op">=</span> <span class="ident">ImageComp::new</span>(<span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>),<span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>),<span class="ident">DT</span>,<span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>()));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Component</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="ident">Arc::new</span>(<span class="ident">Panel::new</span>(<span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>), <span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>)));
+    <span class="kw">let</span> <span class="ident">image</span> <span class="op">=</span> <span class="ident">ImageComp::new</span>(<span class="ident">Size::new</span>(<span class="number">1024</span>, <span class="number">768</span>), <span class="ident">Point::new</span>(<span class="number">0</span>, <span class="number">0</span>), <span class="ident">DT</span>, <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>()));
     <span class="kw">let</span> <span class="ident">icon</span> <span class="op">=</span> <span class="ident">IconController::new</span>(<span class="ident">ROOT_INODE</span>.<span class="ident">ls</span>(), <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">clone</span>()));
     <span class="ident">p</span>.<span class="ident">add</span>(<span class="ident">Arc::new</span>(<span class="ident">image</span>));
     <span class="ident">p</span>.<span class="ident">add</span>(<span class="ident">Arc::new</span>(<span class="ident">icon</span>));
@@ -86,17 +104,20 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_terminal</span>() {
     <span class="kw">let</span> <span class="ident">desktop</span> <span class="op">=</span> <span class="ident">DESKTOP</span>.<span class="ident">exclusive_access</span>();
-    <span class="kw">let</span> <span class="ident">arc_t</span> <span class="op">=</span> <span class="ident">Arc::new</span>(
-        <span class="ident">Terminal::new</span>(
-            <span class="ident">Size::new</span>(<span class="number">400</span>, <span class="number">400</span>), 
-            <span class="ident">Point::new</span>(<span class="number">200</span>, <span class="number">100</span>), 
-            <span class="prelude-val">Some</span>(<span class="ident">desktop</span>.<span class="ident">clone</span>()), 
-            <span class="prelude-val">Some</span>(<span class="string">&quot;demo.txt&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-        )
-    );
+    <span class="kw">let</span> <span class="ident">arc_t</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Terminal::new</span>(
+        <span class="ident">Size::new</span>(<span class="number">400</span>, <span class="number">400</span>),
+        <span class="ident">Point::new</span>(<span class="number">200</span>, <span class="number">100</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">desktop</span>.<span class="ident">clone</span>()),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;demo.txt&quot;</span>.<span class="ident">to_string</span>()),
+        <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+    ));
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">Panel::new</span>(<span class="ident">Size::new</span>(<span class="number">400</span>, <span class="number">400</span>), <span class="ident">Point::new</span>(<span class="number">200</span>, <span class="number">100</span>));
-    <span class="kw">let</span> <span class="ident">button</span> <span class="op">=</span> <span class="ident">Button::new</span>(<span class="ident">Size::new</span>(<span class="number">20</span>, <span class="number">20</span>), <span class="ident">Point::new</span>(<span class="number">370</span>, <span class="number">10</span>), <span class="prelude-val">Some</span>(<span class="ident">arc_t</span>.<span class="ident">clone</span>()), <span class="string">&quot;X&quot;</span>.<span class="ident">to_string</span>());
+    <span class="kw">let</span> <span class="ident">button</span> <span class="op">=</span> <span class="ident">Button::new</span>(
+        <span class="ident">Size::new</span>(<span class="number">20</span>, <span class="number">20</span>),
+        <span class="ident">Point::new</span>(<span class="number">370</span>, <span class="number">10</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">arc_t</span>.<span class="ident">clone</span>()),
+        <span class="string">&quot;X&quot;</span>.<span class="ident">to_string</span>(),
+    );
     <span class="ident">arc_t</span>.<span class="ident">add</span>(<span class="ident">Arc::new</span>(<span class="ident">text</span>));
     <span class="ident">arc_t</span>.<span class="ident">add</span>(<span class="ident">Arc::new</span>(<span class="ident">button</span>));
     <span class="ident">arc_t</span>.<span class="ident">paint</span>();
@@ -104,7 +125,6 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pad</span> <span class="op">=</span> <span class="ident">PAD</span>.<span class="ident">exclusive_access</span>();
     <span class="kw-2">*</span><span class="ident">pad</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">arc_t</span>);
 }
-
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>

@@ -132,10 +132,10 @@
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOCK_FREQ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12500000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO</span>: <span class="kw-2">&amp;</span>[(<span class="ident">usize</span>, <span class="ident">usize</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    (<span class="number">0x1000_0000</span>, <span class="number">0xa000</span>), <span class="comment">// VIRT_UART0 in virt machine</span>
-    <span class="comment">//    (0x1000_1000, 0x9000),    // VIRT_VIRTIO with GPU in virt machine</span>
-    (<span class="number">0x0C00_0000</span>, <span class="number">0x40_0000</span>), <span class="comment">// VIRT_PLIC in virt machine</span>
-    (<span class="number">0x0010_0000</span>, <span class="number">0x00_2000</span>), <span class="comment">// VIRT_TEST/RTC  in virt machine</span>
+<span class="comment">//    (0x0010_0000, 0x00_2000), // VIRT_TEST/RTC  in virt machine</span>
+    (<span class="number">0x2000000</span>, <span class="number">0x10000</span>),
+    (<span class="number">0xc000000</span>, <span class="number">0x210000</span>), <span class="comment">// VIRT_PLIC in virt machine</span>
+    (<span class="number">0x10000000</span>, <span class="number">0x9000</span>), <span class="comment">// VIRT_UART0 with GPU  in virt machine</span>
 ];
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BlockDeviceImpl</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::drivers::block::VirtIOBlock</span>;
