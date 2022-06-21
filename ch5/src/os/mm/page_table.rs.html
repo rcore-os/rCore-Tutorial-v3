@@ -245,7 +245,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">PageTableEntry</span> { <span class="ident">bits</span>: <span class="number">0</span> }
     }
-    <span class="doccomment">///Return 44bit ppn </span>
+    <span class="doccomment">///Return 44bit ppn</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ppn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PhysPageNum</span> {
         (<span class="self">self</span>.<span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">10</span> <span class="op">&amp;</span> ((<span class="number">1usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">44</span>) <span class="op">-</span> <span class="number">1</span>)).<span class="ident">into</span>()
     }
@@ -357,8 +357,8 @@
         <span class="number">8usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">60</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">root_ppn</span>.<span class="number">0</span>
     }
 }
-    <span class="doccomment">/// translate a pointer to a mutable u8 Vec through page table</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+<span class="doccomment">/// translate a pointer to a mutable u8 Vec through page table</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">len</span>;
@@ -378,9 +378,9 @@
         <span class="ident">start</span> <span class="op">=</span> <span class="ident">end_va</span>.<span class="ident">into</span>();
     }
     <span class="ident">v</span>
-    }
-    <span class="doccomment">/// translate a pointer to a mutable u8 Vec end with `\0` through page table to a `String`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_str</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
+}
+<span class="doccomment">/// translate a pointer to a mutable u8 Vec end with `\0` through page table to a `String`</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_str</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">va</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
@@ -397,9 +397,9 @@
         }
     }
     <span class="ident">string</span>
-    }
-    <span class="doccomment">///translate a generic through page table and return a mutable reference</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_refmut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">T</span> {
+}
+<span class="doccomment">///translate a generic through page table and return a mutable reference</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_refmut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">T</span> {
     <span class="comment">//println!(&quot;into translated_refmut!&quot;);</span>
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="ident">va</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
@@ -408,7 +408,7 @@
         .<span class="ident">translate_va</span>(<span class="ident">VirtAddr::from</span>(<span class="ident">va</span>))
         .<span class="ident">unwrap</span>()
         .<span class="ident">get_mut</span>()
-    }
+}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>

@@ -395,12 +395,6 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of [`MapArea`] and [`MemorySet`].</span>
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>, <span class="ident">PageTableEntry</span>};
@@ -776,27 +770,21 @@
     <span class="kw">let</span> <span class="ident">mid_text</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> ((<span class="ident">stext</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">etext</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">/</span> <span class="number">2</span>).<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">mid_rodata</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> ((<span class="ident">srodata</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">erodata</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">/</span> <span class="number">2</span>).<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">mid_data</span>: <span class="ident">VirtAddr</span> <span class="op">=</span> ((<span class="ident">sdata</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">edata</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">/</span> <span class="number">2</span>).<span class="ident">into</span>();
-    <span class="macro">assert!</span>(
-        <span class="op">!</span><span class="ident">kernel_space</span>
-            .<span class="ident">page_table</span>
-            .<span class="ident">translate</span>(<span class="ident">mid_text</span>.<span class="ident">floor</span>())
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">writable</span>(),
-    );
-    <span class="macro">assert!</span>(
-        <span class="op">!</span><span class="ident">kernel_space</span>
-            .<span class="ident">page_table</span>
-            .<span class="ident">translate</span>(<span class="ident">mid_rodata</span>.<span class="ident">floor</span>())
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">writable</span>(),
-    );
-    <span class="macro">assert!</span>(
-        <span class="op">!</span><span class="ident">kernel_space</span>
-            .<span class="ident">page_table</span>
-            .<span class="ident">translate</span>(<span class="ident">mid_data</span>.<span class="ident">floor</span>())
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">executable</span>(),
-    );
+    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">kernel_space</span>
+        .<span class="ident">page_table</span>
+        .<span class="ident">translate</span>(<span class="ident">mid_text</span>.<span class="ident">floor</span>())
+        .<span class="ident">unwrap</span>()
+        .<span class="ident">writable</span>(),);
+    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">kernel_space</span>
+        .<span class="ident">page_table</span>
+        .<span class="ident">translate</span>(<span class="ident">mid_rodata</span>.<span class="ident">floor</span>())
+        .<span class="ident">unwrap</span>()
+        .<span class="ident">writable</span>(),);
+    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">kernel_space</span>
+        .<span class="ident">page_table</span>
+        .<span class="ident">translate</span>(<span class="ident">mid_data</span>.<span class="ident">floor</span>())
+        .<span class="ident">unwrap</span>()
+        .<span class="ident">executable</span>(),);
     <span class="macro">println!</span>(<span class="string">&quot;remap_test passed!&quot;</span>);
 }
 </code></pre></div>
