@@ -148,7 +148,7 @@
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">BlkResp</span>, <span class="ident">RespStatus</span>, <span class="ident">VirtIOBlk</span>, <span class="ident">VirtIOHeader</span>};
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">const</span> <span class="ident">VIRTIO0</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10001000</span>;
+<span class="kw">const</span> <span class="ident">VIRTIO0</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10008000</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VirtIOBlock</span> {
     <span class="ident">virtio_blk</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOBlk</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
