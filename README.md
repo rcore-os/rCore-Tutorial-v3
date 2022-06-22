@@ -190,6 +190,7 @@ $ make run BOARD=k210
 
 Type `Ctrl+]` to disconnect from K210.
 
+
 ## Show runtime debug info of OS kernel version
 The branch of ch9-log contains a lot of debug info. You could try to run rcore tutorial 
 for understand the internal behavior of os kernel.
@@ -228,6 +229,7 @@ $ make run
 [KERN] mm::frame_allocator::lazy_static!FRAME_ALLOCATOR begin
 ......
 ```
+
 ## Rustdoc
 
 Currently it can only help you view the code since only a tiny part of the code has been documented.
