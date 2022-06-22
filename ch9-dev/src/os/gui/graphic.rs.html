@@ -59,6 +59,7 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">embedded_graphics</span>::{
     <span class="ident">draw_target::DrawTarget</span>,
@@ -66,7 +67,8 @@
     <span class="ident">prelude</span>::{<span class="ident">OriginDimensions</span>, <span class="ident">Point</span>, <span class="ident">RgbColor</span>, <span class="ident">Size</span>},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers</span>::{<span class="ident">GPUDevice</span>, <span class="ident">GPU_DEVICE</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers</span>::{<span class="ident">GPUDevice</span>, <span class="ident">GPU_DEVICE</span>,};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board</span>::{<span class="ident">VIRTGPU_XRES</span>, <span class="ident">VIRTGPU_YRES</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Graphics</span> {
@@ -103,7 +105,7 @@
         <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">drv</span>.<span class="ident">getfreambuffer</span>();
 
         <span class="ident">pixels</span>.<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">px</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">point</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">px</span>.<span class="number">0</span>.<span class="ident">y</span>) <span class="op">*</span> <span class="number">1024</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">point</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">px</span>.<span class="number">0</span>.<span class="ident">x</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">4</span>;
+            <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">point</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">px</span>.<span class="number">0</span>.<span class="ident">y</span>) <span class="op">*</span> <span class="ident">VIRTGPU_XRES</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">point</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">px</span>.<span class="number">0</span>.<span class="ident">x</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">4</span>;
             <span class="kw">if</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">fb</span>.<span class="ident">len</span>() {
                 <span class="kw">return</span>;
             }
