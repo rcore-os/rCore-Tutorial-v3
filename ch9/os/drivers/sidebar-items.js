@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["block",""],["chardev",""],["plic",""]]});
+initSidebarItems({"mod":[["block",""],["chardev",""],["gpu",""],["input",""],["plic",""]]});
