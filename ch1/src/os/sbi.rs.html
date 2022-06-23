@@ -54,6 +54,7 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
@@ -94,6 +95,7 @@
     <span class="ident">sbi_call</span>(<span class="ident">SBI_CONSOLE_GETCHAR</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
 <span class="doccomment">/// use sbi call to shutdown the kernel</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {
