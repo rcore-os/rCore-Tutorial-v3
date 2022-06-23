@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register claim"],["W","Writer for register claim"]]});

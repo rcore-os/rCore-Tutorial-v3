@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Mode",""]],"fn":[["read","Reads the CSR"],["set",""],["write","Writes the CSR"]],"struct":[["Satp","satp register"]]});

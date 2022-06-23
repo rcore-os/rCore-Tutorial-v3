@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register interrupt_level"],["W","Writer for register interrupt_level"]]});

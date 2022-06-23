@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register vobuf_dma_rdata"],["W","Writer for register vobuf_dma_rdata"]]});

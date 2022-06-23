@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register idr"],["W","Writer for register idr"]]});

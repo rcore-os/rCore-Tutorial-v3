@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register rar"],["W","Writer for register rar"]]});

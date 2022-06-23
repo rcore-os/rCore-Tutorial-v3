@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["uncached","Convert a buffer or a pointer into ones with uncached address."]],"trait":[["Uncache","Uncacheable buffer or pointer."]]});

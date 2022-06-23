@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register ucv"],["W","Writer for register ucv"]]});

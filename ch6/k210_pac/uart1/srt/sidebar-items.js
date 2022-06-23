@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register srt"],["W","Writer for register srt"]]});

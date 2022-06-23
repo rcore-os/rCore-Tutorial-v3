@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["dmac_id",""],["dmac_version",""]],"struct":[["Dmac",""]],"trait":[["DmacExt",""]]});

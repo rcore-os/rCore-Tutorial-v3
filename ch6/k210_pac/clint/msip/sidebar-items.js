@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register msip[%s]"],["W","Writer for register msip[%s]"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["RXCHDT_A","Trigger level in the RX FIFO at which the receiver data available interrupt generate"]],"struct":[["RXCHDT_W","Write proxy for field `rxchdt`"]],"type":[["R","Reader of register rfcr"],["RXCHDT_R","Reader of field `rxchdt`"],["W","Writer for register rfcr"]]});

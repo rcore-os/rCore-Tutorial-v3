@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Once","A primitive that provides lazy one-time initialization."]]});

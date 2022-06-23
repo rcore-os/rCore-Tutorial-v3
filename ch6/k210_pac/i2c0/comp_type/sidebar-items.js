@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register comp_type"],["VALUE_R","Reader of field `value`"]]});

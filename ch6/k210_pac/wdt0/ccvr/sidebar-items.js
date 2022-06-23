@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register ccvr"],["W","Writer for register ccvr"]]});

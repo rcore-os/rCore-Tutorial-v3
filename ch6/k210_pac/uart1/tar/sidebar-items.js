@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register tar"],["W","Writer for register tar"]]});

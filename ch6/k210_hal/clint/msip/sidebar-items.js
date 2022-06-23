@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["clear_ipi","clear IPI interrupt flag for one given hart"],["set_ipi","set IPI interrupt flag for one given hart"]]});

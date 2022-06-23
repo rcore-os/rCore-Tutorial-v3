@@ -251,7 +251,7 @@
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="doccomment">/// set the new addr of __restore asm function in TRAMPOLINE page,</span>
 <span class="doccomment">/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,</span>
-<span class="doccomment">/// finally, jump to new addr of __restore asm function </span>
+<span class="doccomment">/// finally, jump to new addr of __restore asm function</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_return</span>() -&gt; <span class="op">!</span> {
     <span class="ident">set_user_trap_entry</span>();
     <span class="kw">let</span> <span class="ident">trap_cx_ptr</span> <span class="op">=</span> <span class="ident">TRAP_CONTEXT</span>;
@@ -275,7 +275,7 @@
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="doccomment">/// Unimplement: traps/interrupts/exceptions from kernel mode</span>
-<span class="doccomment">/// Todo: Chapter 9: I/O device </span>
+<span class="doccomment">/// Todo: Chapter 9: I/O device</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap_from_kernel</span>() -&gt; <span class="op">!</span> {
     <span class="kw">use</span> <span class="ident">riscv::register::sepc</span>;
     <span class="macro">println!</span>(<span class="string">&quot;stval = {:#x}, sepc = {:#x}&quot;</span>, <span class="ident">stval::read</span>(), <span class="ident">sepc::read</span>());

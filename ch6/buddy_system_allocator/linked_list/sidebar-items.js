@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Iter","An iterator over the linked list"],["IterMut","A mutable iterator over the linked list"],["LinkedList","An intrusive linked list"],["ListNode","Represent a mutable node in `LinkedList`"]]});

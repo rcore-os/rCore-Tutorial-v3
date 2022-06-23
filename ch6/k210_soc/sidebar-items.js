@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["dmac","DMAC peripheral"],["fpioa","FPIOA peripheral"],["gpio","GPIO peripheral"],["gpiohs","GPIOHS peripheral"],["sleep",""],["spi","SPI peripherals handling"],["sysctl","SYSCTL peripheral"],["utils","Miscelleneous utilities for SoC functions (private)"]]});

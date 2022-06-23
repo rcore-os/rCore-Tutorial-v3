@@ -315,7 +315,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">PageTableEntry</span> { <span class="ident">bits</span>: <span class="number">0</span> }
     }
-    <span class="doccomment">///Return 44bit ppn </span>
+    <span class="doccomment">///Return 44bit ppn</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ppn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PhysPageNum</span> {
         (<span class="self">self</span>.<span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">10</span> <span class="op">&amp;</span> ((<span class="number">1usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">44</span>) <span class="op">-</span> <span class="number">1</span>)).<span class="ident">into</span>()
     }
@@ -428,13 +428,13 @@
             (<span class="ident">aligned_pa_usize</span> <span class="op">+</span> <span class="ident">offset</span>).<span class="ident">into</span>()
         })
     }
-    <span class="doccomment">/// Get root ppn </span>
+    <span class="doccomment">/// Get root ppn</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="number">8usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">60</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">root_ppn</span>.<span class="number">0</span>
     }
 }
-    <span class="doccomment">/// Translate a pointer to a mutable u8 Vec through page table</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+<span class="doccomment">/// Translate a pointer to a mutable u8 Vec through page table</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translated_byte_buffer</span>(<span class="ident">token</span>: <span class="ident">usize</span>, <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">page_table</span> <span class="op">=</span> <span class="ident">PageTable::from_token</span>(<span class="ident">token</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">len</span>;

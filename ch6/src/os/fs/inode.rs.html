@@ -157,11 +157,11 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `Arc&lt;Inode&gt;` -&gt; `OSInodeInner`: In order to open files concurrently </span>
-<span class="doccomment">//! we need to wrap `Inode` into `Arc`,but `Mutex` in `Inode` prevents </span>
-<span class="doccomment">//! file systems from being accessed simultaneously </span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! `UPSafeCell&lt;OSInodeInner&gt;` -&gt; `OSInode`: for static `ROOT_INODE`,we </span>
+</pre><pre class="rust"><code><span class="doccomment">//! `Arc&lt;Inode&gt;` -&gt; `OSInodeInner`: In order to open files concurrently</span>
+<span class="doccomment">//! we need to wrap `Inode` into `Arc`,but `Mutex` in `Inode` prevents</span>
+<span class="doccomment">//! file systems from being accessed simultaneously</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `UPSafeCell&lt;OSInodeInner&gt;` -&gt; `OSInode`: for static `ROOT_INODE`,we</span>
 <span class="doccomment">//! need to wrap `OSInodeInner` into `UPSafeCell`</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::BLOCK_DEVICE</span>;
@@ -173,7 +173,7 @@
 <span class="kw">use</span> <span class="ident">easy_fs</span>::{<span class="ident">EasyFileSystem</span>, <span class="ident">Inode</span>};
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
 <span class="doccomment">/// A wrapper around a filesystem inode</span>
-<span class="doccomment">/// to implement File trait atop </span>
+<span class="doccomment">/// to implement File trait atop</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OSInode</span> {
     <span class="ident">readable</span>: <span class="ident">bool</span>,
     <span class="ident">writable</span>: <span class="ident">bool</span>,
@@ -226,7 +226,7 @@
     <span class="macro">println!</span>(<span class="string">&quot;**************/&quot;</span>);
 }
 
-<span class="macro">bitflags!</span> {    
+<span class="macro">bitflags!</span> {
     <span class="doccomment">///Open file flags</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">///Read only</span>

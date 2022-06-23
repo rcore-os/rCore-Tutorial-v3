@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["IEN_W","Write proxy for field `ien`"]],"type":[["IEN_R","Reader of field `ien`"],["R","Reader of register ier"],["W","Writer for register ier"]]});

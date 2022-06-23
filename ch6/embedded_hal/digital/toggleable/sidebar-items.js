@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Default","Software-driven `toggle()` implementation."]]});

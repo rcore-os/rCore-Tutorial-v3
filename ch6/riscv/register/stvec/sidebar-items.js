@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["read","Reads the CSR"],["write","Writes the CSR"]],"struct":[["Stvec","stvec register"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register i2s_comp_param_1"],["W","Writer for register i2s_comp_param_1"]]});

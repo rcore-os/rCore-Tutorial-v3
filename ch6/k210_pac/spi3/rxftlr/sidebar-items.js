@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register rxftlr"],["W","Writer for register rxftlr"]]});

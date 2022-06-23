@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["bare_metal","bit_field","bitflags","buddy_system_allocator","cfg_if","easy_fs","embedded_hal","k210_hal","k210_pac","k210_soc","lazy_static","log","os","riscv","spin","vcell","virtio_drivers","volatile","xmas_elf","zero"];
+window.ALL_CRATES = ["os"];

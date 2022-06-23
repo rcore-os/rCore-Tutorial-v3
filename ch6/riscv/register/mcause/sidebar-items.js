@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Exception","Exception"],["Interrupt","Interrupt"],["Trap","Trap Cause"]],"fn":[["read","Reads the CSR"]],"struct":[["Mcause","mcause register"]]});

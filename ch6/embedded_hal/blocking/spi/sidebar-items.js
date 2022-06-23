@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["transfer","Blocking transfer"],["write","Blocking write"],["write_iter","Blocking write (iterator version)"]],"trait":[["Transfer","Blocking transfer"],["Write","Blocking write"],["WriteIter","Blocking write (iterator version)"]]});

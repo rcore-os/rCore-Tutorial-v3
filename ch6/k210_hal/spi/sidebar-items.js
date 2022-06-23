@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Endian",""],["FrameFormat",""],["Phase","Clock phase"],["Polarity","Clock polarity"]],"struct":[["Mode","SPI mode"],["Spi",""]]});

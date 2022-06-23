@@ -105,6 +105,32 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Task management implementation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Everything about task management, like starting and switching tasks is</span>
@@ -112,13 +138,13 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A single global instance of [`TaskManager`] called `TASK_MANAGER` controls</span>
 <span class="doccomment">//! all the tasks in the whole operating system.</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! A single global instance of [`Processor`] called `PROCESSOR` monitors running </span>
-<span class="doccomment">//! task(s) for each core. </span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! A single global instance of [`PidAllocator`] called `PID_ALLOCATOR` allocates </span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A single global instance of [`Processor`] called `PROCESSOR` monitors running</span>
+<span class="doccomment">//! task(s) for each core.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A single global instance of [`PidAllocator`] called `PID_ALLOCATOR` allocates</span>
 <span class="doccomment">//! pid for user apps.</span>
-<span class="doccomment">//! </span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! Be careful when you see `__switch` ASM function in `switch.S`. Control flow around this function</span>
 <span class="doccomment">//! might not be what you expect.</span>
 <span class="kw">mod</span> <span class="ident">context</span>;
@@ -134,14 +160,15 @@
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context::TaskContext</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager</span>::{<span class="ident">fetch_task</span>,<span class="ident">TaskManager</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager</span>::{<span class="ident">fetch_task</span>, <span class="ident">TaskManager</span>};
 <span class="kw">use</span> <span class="ident">switch::__switch</span>;
 <span class="kw">use</span> <span class="ident">task</span>::{<span class="ident">TaskControlBlock</span>, <span class="ident">TaskStatus</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager::add_task</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pid</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>,<span class="ident">PidAllocator</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pid</span>::{<span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidAllocator</span>, <span class="ident">PidHandle</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">processor</span>::{
-    <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>, <span class="ident">run_tasks</span>, <span class="ident">schedule</span>, <span class="ident">take_current_task</span>,<span class="ident">Processor</span>
+    <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_user_token</span>, <span class="ident">run_tasks</span>, <span class="ident">schedule</span>, <span class="ident">take_current_task</span>,
+    <span class="ident">Processor</span>,
 };
 <span class="doccomment">/// Suspend the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suspend_current_and_run_next</span>() {
@@ -161,10 +188,35 @@
     <span class="comment">// jump to scheduling cycle</span>
     <span class="ident">schedule</span>(<span class="ident">task_cx_ptr</span>);
 }
+
+<span class="doccomment">/// pid of usertests app in make run TEST=1</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_PID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
+
 <span class="doccomment">/// Exit the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
     <span class="comment">// take from Processor</span>
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">getpid</span>();
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="kw">if</span> <span class="ident">pid</span> <span class="op">==</span> <span class="ident">IDLE_PID</span> {
+        <span class="macro">println!</span>(
+            <span class="string">&quot;[kernel] Idle process exit with exit_code {} ...&quot;</span>,
+            <span class="ident">exit_code</span>
+        );
+        <span class="kw">if</span> <span class="ident">exit_code</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="comment">//crate::sbi::shutdown(255); //255 == -1 for err hint</span>
+            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
+        } <span class="kw">else</span> {
+            <span class="comment">//crate::sbi::shutdown(0); //0 for success hint</span>
+            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
+        }
+    }
+
     <span class="comment">// **** access current TCB exclusively</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
     <span class="comment">// Change status to Zombie</span>
@@ -196,7 +248,7 @@
 }
 
 <span class="macro">lazy_static!</span> {
-    <span class="doccomment">///Globle process that init user shell </span>
+    <span class="doccomment">///Globle process that init user shell</span>
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">INITPROC</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>({
         <span class="kw">let</span> <span class="ident">inode</span> <span class="op">=</span> <span class="ident">open_file</span>(<span class="string">&quot;initproc&quot;</span>, <span class="ident">OpenFlags::RDONLY</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">inode</span>.<span class="ident">read_all</span>();

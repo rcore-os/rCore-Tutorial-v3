@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["CLKEN_W","Write proxy for field `clken`"]],"type":[["CLKEN_R","Reader of field `clken`"],["R","Reader of register cer"],["W","Writer for register cer"]]});

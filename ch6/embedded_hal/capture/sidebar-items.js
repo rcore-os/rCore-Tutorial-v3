@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Capture","Input capture"]]});

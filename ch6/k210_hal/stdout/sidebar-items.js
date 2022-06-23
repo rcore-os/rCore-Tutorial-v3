@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Stdout","Stdout implements the core::fmt::Write trait for hal::serial::Write implementations."]],"trait":[["Write","A trait for writing or formatting into Unicode-accepting buffers or streams."]]});

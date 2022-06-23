@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Clocks","Frozen clock frequencies"]]});

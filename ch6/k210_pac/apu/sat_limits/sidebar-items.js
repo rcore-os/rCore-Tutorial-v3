@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["BOTTOM_W","Write proxy for field `bottom`"],["UPPER_W","Write proxy for field `upper`"]],"type":[["BOTTOM_R","Reader of field `bottom`"],["R","Reader of register sat_limits"],["UPPER_R","Reader of field `upper`"],["W","Writer for register sat_limits"]]});

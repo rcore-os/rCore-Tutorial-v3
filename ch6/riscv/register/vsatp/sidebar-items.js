@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["HgatpValues",""]],"fn":[["read","Reads the CSR"]],"struct":[["Vsatp",""]]});

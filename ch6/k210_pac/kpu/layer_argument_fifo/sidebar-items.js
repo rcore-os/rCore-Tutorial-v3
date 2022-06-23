@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register layer_argument_fifo"],["W","Writer for register layer_argument_fifo"]]});

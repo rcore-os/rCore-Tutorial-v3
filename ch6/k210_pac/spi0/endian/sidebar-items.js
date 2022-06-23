@@ -1,1 +1,0 @@
-initSidebarItems({"type":[["R","Reader of register endian"],["W","Writer for register endian"]]});

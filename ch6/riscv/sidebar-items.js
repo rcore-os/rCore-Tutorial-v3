@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["use_sv32",""],["use_sv39",""],["use_sv48",""]],"mod":[["addr",""],["asm","Assembly instructions"],["interrupt","Interrupts"],["paging",""],["register","RISC-V CSR’s"]]});
