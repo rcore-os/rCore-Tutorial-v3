@@ -82,11 +82,15 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">alloc_error_handler</span>)]</span>
-
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers</span>::{<span class="ident">GPU_DEVICE</span>, <span class="ident">KEYBOARD_DEVICE</span>, <span class="ident">MOUSE_DEVICE</span>};
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
@@ -106,6 +110,7 @@
 <span class="kw">mod</span> <span class="ident">config</span>;
 <span class="kw">mod</span> <span class="ident">drivers</span>;
 <span class="kw">mod</span> <span class="ident">fs</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">gui</span>;
 <span class="kw">mod</span> <span class="ident">lang_items</span>;
 <span class="kw">mod</span> <span class="ident">mm</span>;
@@ -144,10 +149,13 @@
     <span class="ident">clear_bss</span>();
     <span class="ident">mm::init</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init gpu&quot;</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
     <span class="ident">GPU_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init keyboard&quot;</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
     <span class="ident">KEYBOARD_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init mouse&quot;</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
     <span class="ident">MOUSE_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init trap&quot;</span>);
     <span class="ident">trap::init</span>();
