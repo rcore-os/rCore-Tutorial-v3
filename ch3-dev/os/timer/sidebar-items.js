@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MSEC_PER_SEC",""],["TICKS_PER_SEC",""]],"fn":[["get_time","read the `mtime` register"],["get_time_ms","get current time in milliseconds"],["set_next_trigger","set the next timer interrupt"]]});
