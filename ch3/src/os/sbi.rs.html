@@ -54,12 +54,24 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SBI call wrappers</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
 
 <span class="kw">const</span> <span class="ident">SBI_SET_TIMER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 <span class="kw">const</span> <span class="ident">SBI_CONSOLE_PUTCHAR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
 <span class="kw">const</span> <span class="ident">SBI_SHUTDOWN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
 <span class="comment">// const SBI_CONSOLE_GETCHAR: usize = 2;</span>
 <span class="comment">// const SBI_CLEAR_IPI: usize = 3;</span>
@@ -100,9 +112,17 @@
 <span class="comment">//     sbi_call(SBI_CONSOLE_GETCHAR, 0, 0, 0)</span>
 <span class="comment">// }</span>
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
 <span class="doccomment">/// use sbi call to shutdown the kernel</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
     <span class="ident">sbi_call</span>(<span class="ident">SBI_SHUTDOWN</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
     <span class="macro">panic!</span>(<span class="string">&quot;It should shutdown!&quot;</span>);
 }
 </code></pre></div>
