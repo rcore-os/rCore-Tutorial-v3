@@ -63,6 +63,19 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The operating system and app also starts in this module. Kernel code starts</span>
@@ -85,6 +98,10 @@
 <span class="kw">mod</span> <span class="ident">lang_items</span>;
 <span class="kw">mod</span> <span class="ident">sbi</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/qemu.rs&quot;</span>]</span>
+<span class="kw">mod</span> <span class="ident">board</span>;
+
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 
 <span class="doccomment">/// clear BSS segment</span>
@@ -100,16 +117,16 @@
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rust_main</span>() -&gt; <span class="op">!</span> {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">fn</span> <span class="ident">stext</span>();               <span class="comment">// begin addr of text segment</span>
-        <span class="kw">fn</span> <span class="ident">etext</span>();               <span class="comment">// end addr of text segment</span>
-        <span class="kw">fn</span> <span class="ident">srodata</span>();             <span class="comment">// start addr of Read-Only data segment</span>
-        <span class="kw">fn</span> <span class="ident">erodata</span>();             <span class="comment">// end addr of Read-Only data ssegment</span>
-        <span class="kw">fn</span> <span class="ident">sdata</span>();               <span class="comment">// start addr of data segment</span>
-        <span class="kw">fn</span> <span class="ident">edata</span>();               <span class="comment">// end addr of data segment</span>
-        <span class="kw">fn</span> <span class="ident">sbss</span>();                <span class="comment">// start addr of BSS segment</span>
-        <span class="kw">fn</span> <span class="ident">ebss</span>();                <span class="comment">// end addr of BSS segment</span>
-        <span class="kw">fn</span> <span class="ident">boot_stack</span>();          <span class="comment">// stack bottom</span>
-        <span class="kw">fn</span> <span class="ident">boot_stack_top</span>();      <span class="comment">// stack top</span>
+        <span class="kw">fn</span> <span class="ident">stext</span>(); <span class="comment">// begin addr of text segment</span>
+        <span class="kw">fn</span> <span class="ident">etext</span>(); <span class="comment">// end addr of text segment</span>
+        <span class="kw">fn</span> <span class="ident">srodata</span>(); <span class="comment">// start addr of Read-Only data segment</span>
+        <span class="kw">fn</span> <span class="ident">erodata</span>(); <span class="comment">// end addr of Read-Only data ssegment</span>
+        <span class="kw">fn</span> <span class="ident">sdata</span>(); <span class="comment">// start addr of data segment</span>
+        <span class="kw">fn</span> <span class="ident">edata</span>(); <span class="comment">// end addr of data segment</span>
+        <span class="kw">fn</span> <span class="ident">sbss</span>(); <span class="comment">// start addr of BSS segment</span>
+        <span class="kw">fn</span> <span class="ident">ebss</span>(); <span class="comment">// end addr of BSS segment</span>
+        <span class="kw">fn</span> <span class="ident">boot_stack</span>(); <span class="comment">// stack bottom</span>
+        <span class="kw">fn</span> <span class="ident">boot_stack_top</span>(); <span class="comment">// stack top</span>
     }
     <span class="ident">clear_bss</span>();
     <span class="macro">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);
@@ -121,8 +138,16 @@
         <span class="ident">boot_stack</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">boot_stack_top</span> <span class="kw">as</span> <span class="ident">usize</span>
     );
     <span class="macro">println!</span>(<span class="string">&quot;.bss [{:#x}, {:#x})&quot;</span>, <span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="macro">panic!</span>(<span class="string">&quot;Shutdown machine!&quot;</span>);
-}
-</code></pre></div>
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>(); <span class="comment">// CI autotest success</span>
+    <span class="comment">//crate::board::QEMU_EXIT_HANDLE.exit_failure(); // CI autoest failed</span>
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
+    <span class="macro">panic!</span>(<span class="string">&quot;Unreachable in rust_main!&quot;</span>);
+}</code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>
