@@ -22,18 +22,18 @@
 <span id="17">17</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ns16550a</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ns16550a::NS16550a</span>;
-
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::CharDeviceImpl</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ns16550a::NS16550a</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CharDevice</span> {
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ch</span>: <span class="ident">u8</span>);
     <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
-
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="macro">lazy_static!</span> {
     <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">UART</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CharDeviceImpl</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">CharDeviceImpl::new</span>());
 }
