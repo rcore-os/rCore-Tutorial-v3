@@ -232,6 +232,31 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">action</span>;
 <span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
@@ -277,9 +302,34 @@
     <span class="ident">schedule</span>(<span class="ident">task_cx_ptr</span>);
 }
 
+<span class="doccomment">/// pid of usertests app in make run TEST=1</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_PID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
+
+<span class="doccomment">/// Exit the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
     <span class="comment">// take from Processor</span>
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">getpid</span>();
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+    <span class="kw">if</span> <span class="ident">pid</span> <span class="op">==</span> <span class="ident">IDLE_PID</span> {
+        <span class="macro">println!</span>(
+            <span class="string">&quot;[kernel] Idle process exit with exit_code {} ...&quot;</span>,
+            <span class="ident">exit_code</span>
+        );
+        <span class="kw">if</span> <span class="ident">exit_code</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="comment">//crate::sbi::shutdown(255); //255 == -1 for err hint</span>
+            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
+        } <span class="kw">else</span> {
+            <span class="comment">//crate::sbi::shutdown(0); //0 for success hint</span>
+            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
+        }
+    }
+
     <span class="comment">// remove from pid2task</span>
     <span class="ident">remove_from_pid2task</span>(<span class="ident">task</span>.<span class="ident">getpid</span>());
     <span class="comment">// **** access current TCB exclusively</span>

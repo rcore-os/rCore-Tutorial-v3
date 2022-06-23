@@ -21,14 +21,14 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_STACK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KERNEL_HEAP_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x20_0000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEMORY_END</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x80800000</span>;
+
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x1000</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAGE_SIZE_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0xc</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TRAMPOLINE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize::MAX</span> <span class="op">-</span> <span class="ident">PAGE_SIZE</span> <span class="op">+</span> <span class="number">1</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TRAP_CONTEXT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">TRAMPOLINE</span> <span class="op">-</span> <span class="ident">PAGE_SIZE</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board</span>::{<span class="ident">CLOCK_FREQ</span>, <span class="ident">MMIO</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board</span>::{<span class="ident">CLOCK_FREQ</span>, <span class="ident">MEMORY_END</span>, <span class="ident">MMIO</span>};
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (1f7fb6413 2022-04-10)" ></div>
 </body></html>
