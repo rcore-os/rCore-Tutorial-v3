@@ -157,6 +157,23 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
@@ -177,7 +194,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::timer::remove_timer</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context::TaskContext</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">id</span>::{<span class="ident">kstack_alloc</span>, <span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">id</span>::{<span class="ident">kstack_alloc</span>, <span class="ident">pid_alloc</span>, <span class="ident">KernelStack</span>, <span class="ident">PidHandle</span>, <span class="ident">IDLE_PID</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">manager</span>::{<span class="ident">add_task</span>, <span class="ident">remove_task</span>, <span class="ident">pid2process</span>, <span class="ident">remove_from_pid2process</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">processor</span>::{
     <span class="ident">current_kstack_top</span>, <span class="ident">current_process</span>, <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>, <span class="ident">current_trap_cx_user_va</span>,
@@ -212,6 +229,8 @@
     <span class="ident">drop</span>(<span class="ident">task_inner</span>);
     <span class="ident">schedule</span>(<span class="ident">task_cx_ptr</span>);
 }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
@@ -228,7 +247,22 @@
     <span class="comment">// however, if this is the main thread of current process</span>
     <span class="comment">// the process should terminate at once</span>
     <span class="kw">if</span> <span class="ident">tid</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="ident">remove_from_pid2process</span>(<span class="ident">process</span>.<span class="ident">getpid</span>());
+        <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">getpid</span>();
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="ident">pid</span> <span class="op">==</span> <span class="ident">IDLE_PID</span> {
+            <span class="macro">println!</span>(
+                <span class="string">&quot;[kernel] Idle process exit with exit_code {} ...&quot;</span>,
+                <span class="ident">exit_code</span>
+            );
+            <span class="kw">if</span> <span class="ident">exit_code</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="comment">//crate::sbi::shutdown(255); //255 == -1 for err hint</span>
+                <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
+            } <span class="kw">else</span> {
+                <span class="comment">//crate::sbi::shutdown(0); //0 for success hint</span>
+                <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
+            }
+        }
+        <span class="ident">remove_from_pid2process</span>(<span class="ident">pid</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">process_inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="comment">// mark this process as a zombie process</span>
         <span class="ident">process_inner</span>.<span class="ident">is_zombie</span> <span class="op">=</span> <span class="bool-val">true</span>;
