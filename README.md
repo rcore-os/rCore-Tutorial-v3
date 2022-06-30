@@ -1,4 +1,7 @@
 # rCore-Tutorial-v3
+
+Welcome to JOIN [**Open-Source-OS-Training-Camp-2022 !**](https://learningos.github.io/rust-based-os-comp2022/)
+
 rCore-Tutorial version 3.6. See the [Documentation in Chinese](https://rcore-os.github.io/rCore-Tutorial-Book-v3/).
 
 rCore-Tutorial API Docs.  See the [API Docs of Ten OSes ](#OS-API-DOCS)
