@@ -53,7 +53,7 @@ Here we manually compile and install Qemu 7.0.0. For example, on Ubuntu 18.04:
 # install dependency packages
 $ sudo apt install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev \
               gawk build-essential bison flex texinfo gperf libtool patchutils bc \
-              zlib1g-dev libexpat-dev pkg-config  libglib2.0-dev libpixman-1-dev git tmux python3 python3-pip
+              zlib1g-dev libexpat-dev pkg-config  libglib2.0-dev libpixman-1-dev git tmux python3 python3-pip ninja-build
 # download Qemu source code
 $ wget https://download.qemu.org/qemu-7.0.0.tar.xz
 # extract to qemu-7.0.0/
@@ -67,9 +67,7 @@ $ make -j$(nproc)
 Then, add following contents to `~/.bashrc`(please adjust these paths according to your environment):
 
 ```
-export PATH=$PATH:/home/shinbokuow/Downloads/built/qemu-7.0.0
-export PATH=$PATH:/home/shinbokuow/Downloads/built/qemu-7.0.0/riscv64-softmmu
-export PATH=$PATH:/home/shinbokuow/Downloads/built/qemu-7.0.0/riscv64-linux-user
+export PATH=$PATH:/path/to/qemu-7.0.0/build
 ```
 
 Finally, update the current shell:
