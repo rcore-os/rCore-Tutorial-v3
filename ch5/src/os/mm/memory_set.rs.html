@@ -642,7 +642,7 @@
         )
     }
     <span class="doccomment">///Clone a same `MemorySet`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_existed_user</span>(<span class="ident">user_space</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_existed_user</span>(<span class="ident">user_space</span>: <span class="kw-2">&amp;</span><span class="ident">MemorySet</span>) -&gt; <span class="ident">MemorySet</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">memory_set</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_bare</span>();
         <span class="comment">// map trampoline</span>
         <span class="ident">memory_set</span>.<span class="ident">map_trampoline</span>();
@@ -703,7 +703,7 @@
             <span class="ident">map_perm</span>,
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_another</span>(<span class="ident">another</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_another</span>(<span class="ident">another</span>: <span class="kw-2">&amp;</span><span class="ident">MapArea</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">vpn_range</span>: <span class="ident">VPNRange::new</span>(<span class="ident">another</span>.<span class="ident">vpn_range</span>.<span class="ident">get_start</span>(), <span class="ident">another</span>.<span class="ident">vpn_range</span>.<span class="ident">get_end</span>()),
             <span class="ident">data_frames</span>: <span class="ident">BTreeMap::new</span>(),
