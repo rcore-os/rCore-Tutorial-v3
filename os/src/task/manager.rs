@@ -9,8 +9,11 @@ use lazy_static::*;
 ///A array of `TaskControlBlock` that is thread-safe
 #[repr(C)]
 pub struct TaskManager {
+    /// upper_border
     pub upper_border:usize,
+    /// ready_queue
     pub ready_queue: VecDeque<Arc<TaskControlBlock>>,
+    /// lower_border
     pub lower_border:usize,
 }
 
@@ -33,6 +36,7 @@ impl TaskManager {
         self.ready_queue.pop_front()
     }
     
+    ///Get ready_queue_pointer
     pub fn get_ready_queue_pointer(&mut self) -> &VecDeque<Arc<TaskControlBlock>> {
         &self.ready_queue
     }
@@ -42,6 +46,9 @@ lazy_static! {
     pub static ref TASK_MANAGER: UPSafeCell<TaskManager> =
         unsafe { UPSafeCell::new(TaskManager::new()) };
 }
+
+static mut TM_RQ:usize=0;
+
 ///Interface offered to add task
 pub fn add_task(task: Arc<TaskControlBlock>) {
     TASK_MANAGER.exclusive_access().add(task);
