@@ -12,6 +12,12 @@ bitflags = "1.2.1"
 
 [profile.release]
 debug = true
+# opt-level=0
+# split-debuginfo="unpacked"
+debuginfo-level = 1
+
+# Debuginfo level for the compiler.
+debuginfo-level-rustc = 2
 
 [features]
 board_qemu = []

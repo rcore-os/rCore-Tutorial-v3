@@ -24,3 +24,8 @@ board_k210 = []
 
 [profile.release]
 debug = true
+opt-level=0
+# debuginfo-level = 1
+
+# Debuginfo level for the compiler.
+# debuginfo-level-rustc = 2
