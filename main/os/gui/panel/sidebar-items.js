@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Panel",""],["PanelInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Panel",""],["PanelInner",""]]};
