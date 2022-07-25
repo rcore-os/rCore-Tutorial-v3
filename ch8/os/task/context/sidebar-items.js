@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["TaskContext",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["TaskContext",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["TrapContext",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["TrapContext",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Semaphore",""],["SemaphoreInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Semaphore",""],["SemaphoreInner",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["backtrace",""],["panic",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["backtrace",""],["panic",""]]};
