@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ImageComp",""],["ImageInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["ImageComp",""],["ImageInner",""]]};

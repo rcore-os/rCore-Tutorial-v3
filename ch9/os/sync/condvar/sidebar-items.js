@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Condvar",""],["CondvarInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Condvar",""],["CondvarInner",""]]};

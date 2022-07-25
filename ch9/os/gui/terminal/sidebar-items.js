@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Terminal",""],["TerminalInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Terminal",""],["TerminalInner",""]]};

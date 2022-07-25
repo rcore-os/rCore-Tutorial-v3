@@ -1,1 +1,1 @@
-initSidebarItems({"static":[["FILEICON",""]],"struct":[["IconController",""],["IconControllerInner",""]]});
+window.SIDEBAR_ITEMS = {"static":[["FILEICON",""]],"struct":[["IconController",""],["IconControllerInner",""]]};
