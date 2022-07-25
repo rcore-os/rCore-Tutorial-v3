@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["APP_BASE_ADDRESS",""],["APP_SIZE_LIMIT",""],["KERNEL_STACK_SIZE",""],["MAX_APP_NUM",""],["USER_STACK_SIZE",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["APP_BASE_ADDRESS",""],["APP_SIZE_LIMIT",""],["KERNEL_STACK_SIZE",""],["MAX_APP_NUM",""],["USER_STACK_SIZE",""]]};
