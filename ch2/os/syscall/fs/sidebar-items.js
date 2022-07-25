@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["FD_STDOUT",""]],"fn":[["sys_write","write buf of length `len`  to a file with `fd`"]]});
+window.SIDEBAR_ITEMS = {"constant":[["FD_STDOUT",""]],"fn":[["sys_write","write buf of length `len`  to a file with `fd`"]]};
