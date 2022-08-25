@@ -1,9 +1,9 @@
 DOCKER_NAME ?= dinghao188/rcore-tutorial
 .PHONY: docker build_docker
 
-PWD_CMD := bash "pwd"
+PWD_CMD := bash -c "pwd"
 ifeq ($(OS),Windows_NT)
-	PWD_CMD := powershell "$$(pwd).Path"
+	PWD_CMD := powershell -NoProfile -Command "$$(Get-Location).Path"
 endif
 
 docker:
