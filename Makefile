@@ -3,7 +3,7 @@ DOCKER_NAME ?= dinghao188/rcore-tutorial
 
 PWD_CMD := bash -c "pwd"
 ifeq ($(OS),Windows_NT)
-	PWD_CMD := powershell -NoProfile -Command "$$(Get-Location).Path"
+	PWD_CMD := cmd.exe /c "echo %CD%"
 endif
 
 docker:
