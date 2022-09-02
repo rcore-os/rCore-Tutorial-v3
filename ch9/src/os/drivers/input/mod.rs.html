@@ -78,6 +78,7 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">gui</span>::{<span class="ident">Button</span>, <span class="ident">Component</span>},
     <span class="ident">sync::UPIntrFreeCell</span>,
@@ -91,6 +92,7 @@
 };
 <span class="kw">use</span> <span class="ident">k210_hal::cache::Uncache</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOHeader</span>, <span class="ident">VirtIOInput</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">use</span> <span class="ident">virtio_input_decoder</span>::{<span class="ident">Decoder</span>, <span class="ident">Key</span>, <span class="ident">KeyType</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GPU_DEVICE</span>;
@@ -98,7 +100,7 @@
 <span class="kw">const</span> <span class="ident">VIRTIO5</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10005000</span>;
 <span class="kw">const</span> <span class="ident">VIRTIO6</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10006000</span>;
 
-<span class="kw">struct</span> <span class="ident">VirtIOINPUT</span>(<span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInput</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">struct</span> <span class="ident">VirtIOINPUT</span>(<span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInput</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">INPUTDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
     <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
@@ -112,7 +114,7 @@
 <span class="kw">impl</span> <span class="ident">VirtIOINPUT</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="kw">unsafe</span> {
-            <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">VirtIOInput::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>())
+            <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">VirtIOInput</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>())
         })
     }
 }
