@@ -84,6 +84,9 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BlockDevice</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{
     <span class="ident">frame_alloc</span>, <span class="ident">frame_dealloc</span>, <span class="ident">kernel_token</span>, <span class="ident">FrameTracker</span>, <span class="ident">PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>,
@@ -92,12 +95,12 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOBlk</span>, <span class="ident">VirtIOHeader</span>};
+<span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">Hal</span>, <span class="ident">VirtIOBlk</span>, <span class="ident">VirtIOHeader</span>};
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 <span class="kw">const</span> <span class="ident">VIRTIO0</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10001000</span>;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VirtIOBlock</span>(<span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">VirtIOBlk</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VirtIOBlock</span>(<span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">VirtIOBlk</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="macro">lazy_static!</span> {
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">QUEUE_FRAMES</span>: <span class="ident">UPSafeCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameTracker</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">UPSafeCell::new</span>(<span class="ident">Vec::new</span>()) };
@@ -123,46 +126,49 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">unsafe</span> {
             <span class="self">Self</span>(<span class="ident">UPSafeCell::new</span>(
-                <span class="ident">VirtIOBlk::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">VIRTIO0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>(),
+                <span class="ident">VirtIOBlk</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">VIRTIO0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>(),
             ))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">virtio_dma_alloc</span>(<span class="ident">pages</span>: <span class="ident">usize</span>) -&gt; <span class="ident">PhysAddr</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn_base</span> <span class="op">=</span> <span class="ident">PhysPageNum</span>(<span class="number">0</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pages</span> {
-        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame_alloc</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">ppn_base</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">ppn</span>;
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VirtioHal</span>;
+
+<span class="kw">impl</span> <span class="ident">Hal</span> <span class="kw">for</span> <span class="ident">VirtioHal</span> {
+    <span class="kw">fn</span> <span class="ident">dma_alloc</span>(<span class="ident">pages</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn_base</span> <span class="op">=</span> <span class="ident">PhysPageNum</span>(<span class="number">0</span>);
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pages</span> {
+            <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame_alloc</span>().<span class="ident">unwrap</span>();
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="ident">ppn_base</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">ppn</span>;
+            }
+            <span class="macro">assert_eq!</span>(<span class="ident">frame</span>.<span class="ident">ppn</span>.<span class="number">0</span>, <span class="ident">ppn_base</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">i</span>);
+            <span class="ident">QUEUE_FRAMES</span>.<span class="ident">exclusive_access</span>().<span class="ident">push</span>(<span class="ident">frame</span>);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">frame</span>.<span class="ident">ppn</span>.<span class="number">0</span>, <span class="ident">ppn_base</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">i</span>);
-        <span class="ident">QUEUE_FRAMES</span>.<span class="ident">exclusive_access</span>().<span class="ident">push</span>(<span class="ident">frame</span>);
+        <span class="kw">let</span> <span class="ident">pa</span>: <span class="ident">PhysAddr</span> <span class="op">=</span> <span class="ident">ppn_base</span>.<span class="ident">into</span>();
+        <span class="ident">pa</span>.<span class="number">0</span>
     }
-    <span class="ident">ppn_base</span>.<span class="ident">into</span>()
-}
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">virtio_dma_dealloc</span>(<span class="ident">pa</span>: <span class="ident">PhysAddr</span>, <span class="ident">pages</span>: <span class="ident">usize</span>) -&gt; <span class="ident">i32</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn_base</span>: <span class="ident">PhysPageNum</span> <span class="op">=</span> <span class="ident">pa</span>.<span class="ident">into</span>();
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pages</span> {
-        <span class="ident">frame_dealloc</span>(<span class="ident">ppn_base</span>);
-        <span class="ident">ppn_base</span>.<span class="ident">step</span>();
+    <span class="kw">fn</span> <span class="ident">dma_dealloc</span>(<span class="ident">pa</span>: <span class="ident">usize</span>, <span class="ident">pages</span>: <span class="ident">usize</span>) -&gt; <span class="ident">i32</span> {
+        <span class="kw">let</span> <span class="ident">pa</span> <span class="op">=</span> <span class="ident">PhysAddr::from</span>(<span class="ident">pa</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppn_base</span>: <span class="ident">PhysPageNum</span> <span class="op">=</span> <span class="ident">pa</span>.<span class="ident">into</span>();
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pages</span> {
+            <span class="ident">frame_dealloc</span>(<span class="ident">ppn_base</span>);
+            <span class="ident">ppn_base</span>.<span class="ident">step</span>();
+        }
+        <span class="number">0</span>
     }
-    <span class="number">0</span>
-}
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">virtio_phys_to_virt</span>(<span class="ident">paddr</span>: <span class="ident">PhysAddr</span>) -&gt; <span class="ident">VirtAddr</span> {
-    <span class="ident">VirtAddr</span>(<span class="ident">paddr</span>.<span class="number">0</span>)
-}
+    <span class="kw">fn</span> <span class="ident">phys_to_virt</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+        <span class="ident">addr</span>
+    }
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">virtio_virt_to_phys</span>(<span class="ident">vaddr</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="ident">PhysAddr</span> {
-    <span class="ident">PageTable::from_token</span>(<span class="ident">kernel_token</span>())
-        .<span class="ident">translate_va</span>(<span class="ident">vaddr</span>)
-        .<span class="ident">unwrap</span>()
+    <span class="kw">fn</span> <span class="ident">virt_to_phys</span>(<span class="ident">vaddr</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+        <span class="ident">PageTable::from_token</span>(<span class="ident">kernel_token</span>())
+            .<span class="ident">translate_va</span>(<span class="ident">VirtAddr::from</span>(<span class="ident">vaddr</span>))
+            .<span class="ident">unwrap</span>()
+            .<span class="number">0</span>
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (9a7b7d5e5 2022-07-19)" ></div>
