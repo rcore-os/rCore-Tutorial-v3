@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
-#![feature(asm)]
+
+use core::arch::asm;
 
 #[macro_use]
 extern crate user_lib;
