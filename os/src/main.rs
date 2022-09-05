@@ -1,7 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(global_asm)]
-#![feature(asm)]
 #![feature(panic_info_message)]
 
 #[macro_use]
@@ -12,6 +10,8 @@ mod syscall;
 mod trap;
 mod batch;
 mod sync;
+
+use core::arch::global_asm;
 
 global_asm!(include_str!("entry.asm"));
 global_asm!(include_str!("link_app.S"));
