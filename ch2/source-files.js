@@ -1,3 +1,4 @@
-var sourcesIndex = {};
-sourcesIndex["os"] = {"name":"","dirs":[{"name":"boards","files":["qemu.rs"]},{"name":"sync","files":["mod.rs","up.rs"]},{"name":"syscall","files":["fs.rs","mod.rs","process.rs"]},{"name":"trap","files":["context.rs","mod.rs"]}],"files":["batch.rs","console.rs","lang_items.rs","main.rs","sbi.rs"]};
+var sourcesIndex = JSON.parse('{\
+"os":["",[["boards",[],["qemu.rs"]],["sync",[],["mod.rs","up.rs"]],["syscall",[],["fs.rs","mod.rs","process.rs"]],["trap",[],["context.rs","mod.rs"]]],["batch.rs","console.rs","lang_items.rs","main.rs","sbi.rs"]]\
+}');
 createSourceSidebar();
