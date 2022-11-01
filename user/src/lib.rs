@@ -84,6 +84,9 @@ pub fn pipe(pipe_fd: &mut [usize]) -> isize {
 pub fn read(fd: usize, buf: &mut [u8]) -> isize {
     sys_read(fd, buf)
 }
+pub fn read_fs_ls(fd: usize, buf: &mut [u8]) -> isize {
+    sys_fs_ls(fd, buf)
+}
 pub fn write(fd: usize, buf: &[u8]) -> isize {
     sys_write(fd, buf)
 }

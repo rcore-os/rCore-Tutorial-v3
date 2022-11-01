@@ -2,7 +2,7 @@ use super::File;
 use crate::drivers::BLOCK_DEVICE;
 use crate::mm::UserBuffer;
 use crate::sync::UPIntrFreeCell;
-use alloc::sync::Arc;
+use alloc::{sync::Arc, string::ToString};
 use alloc::vec::Vec;
 use bitflags::*;
 use easy_fs::{EasyFileSystem, Inode};
@@ -103,6 +103,17 @@ pub fn open_file(name: &str, flags: OpenFlags) -> Option<Arc<OSInode>> {
             Arc::new(OSInode::new(readable, writable, inode))
         })
     }
+}
+
+pub fn open_dir_context() -> Vec<u8> {
+    let mut list = "".to_string();
+    let mut v: Vec<u8> = Vec::new();
+    for fileObj in ROOT_INODE.ls(){
+        list += &fileObj.to_string();
+        list += &";".to_string();
+    }
+    v.extend_from_slice(&list.as_bytes());
+    v
 }
 
 impl File for OSInode {

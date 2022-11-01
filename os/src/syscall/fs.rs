@@ -1,4 +1,4 @@
-use crate::fs::{make_pipe, open_file, OpenFlags};
+use crate::fs::{make_pipe, open_dir_context, open_file, OpenFlags};
 use crate::mm::{translated_byte_buffer, translated_refmut, translated_str, UserBuffer};
 use crate::task::{current_process, current_user_token};
 use alloc::sync::Arc;
@@ -41,6 +41,31 @@ pub fn sys_read(fd: usize, buf: *const u8, len: usize) -> isize {
     } else {
         -1
     }
+}
+
+pub fn sys_fs_ls(fd: usize, buf: *const u8) -> isize {
+    //FIXME 以后实现dir之后就要换成从dir读取
+    let token = current_user_token();
+    let mut context = open_dir_context();
+    let mut buffers = translated_byte_buffer(token, buf, context.len());
+    let mut start = 0;
+    let mut total_read_size = 0;
+    for slice in buffers.iter_mut() {
+        let mut block_read_size = slice.len();
+        let dst = &mut slice[0..block_read_size];
+        if start + block_read_size <= context.len(){
+            let src = &context[start..start + block_read_size];
+            dst.copy_from_slice(src);
+            start = block_read_size + start + 1;
+            total_read_size += block_read_size;
+        }else{
+            let src = &context[start..];
+            dst.copy_from_slice(src);
+            total_read_size += src.len();
+            break;
+        }
+    }
+    total_read_size as isize
 }
 
 pub fn sys_open(path: *const u8, flags: u32) -> isize {

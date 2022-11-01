@@ -4,6 +4,7 @@ const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
 const SYSCALL_READ: usize = 63;
 const SYSCALL_WRITE: usize = 64;
+const SYSCALL_FS_LS: usize = 65;
 const SYSCALL_EXIT: usize = 93;
 const SYSCALL_SLEEP: usize = 101;
 const SYSCALL_YIELD: usize = 124;
@@ -61,6 +62,10 @@ pub fn sys_read(fd: usize, buffer: &mut [u8]) -> isize {
         SYSCALL_READ,
         [fd, buffer.as_mut_ptr() as usize, buffer.len()],
     )
+}
+
+pub fn sys_fs_ls(fd:usize,buffer: &mut [u8]) ->isize {
+    syscall(SYSCALL_FS_LS, [fd, buffer.as_mut_ptr() as usize, 0])
 }
 
 pub fn sys_write(fd: usize, buffer: &[u8]) -> isize {
