@@ -14,9 +14,9 @@ const BS: u8 = 0x08u8;
 const TAB: u8 = 0x0009;
 const LINE_START: &str = ">> ";
 
-use alloc::string::{String, ToString};
+use alloc::string::{String};
 use alloc::vec::Vec;
-use user_lib::console::{getchar, print};
+use user_lib::console::{getchar};
 use user_lib::{close, dup, exec, fork, open, pipe, waitpid,read_fs_ls, OpenFlags};
 
 #[derive(Debug)]
