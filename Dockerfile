@@ -4,7 +4,7 @@
 # - ubuntu 18.04 -> 20.04
 # - qemu 5.0.0 -> 7.0.0
 # - Extensive comments linking to relevant documentation
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG QEMU_VERSION=7.0.0
 ARG HOME=/root
@@ -16,7 +16,8 @@ RUN apt-get update && \
         curl \
         git \
         python3 \
-        wget
+        wget \
+        xz-utils
 
 # 1. Set up QEMU RISC-V
 # - https://learningos.github.io/rust-based-os-comp2022/0setup-devel-env.html#qemu
@@ -60,7 +61,7 @@ RUN qemu-system-riscv64 --version && \
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=nightly
+    RUST_VERSION=nightly 
 RUN set -eux; \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init; \
     chmod +x rustup-init; \
