@@ -85,12 +85,12 @@
             <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">suspend_current_and_run_next</span>();
                 <span class="kw">continue</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">3</span> {
-                <span class="comment">// 3 is ctrl_c</span>
-                <span class="comment">//println!(&quot;[K] os/fs/stdio/read: Got Ctrl_C&quot;);</span>
-                <span class="ident">current_add_signal</span>(<span class="ident">SignalFlags::SIGINT</span>);
-                <span class="kw">break</span>;
-            } <span class="kw">else</span> {
+            }<span class="comment">/* else if c == 3 {
+                // 3 is ctrl_c
+                //println!(&quot;[K] os/fs/stdio/read: Got Ctrl_C&quot;);
+                current_add_signal(SignalFlags::SIGINT);
+                break;
+            }*/</span> <span class="kw">else</span> {
                 <span class="kw">break</span>;
             }
         }
