@@ -11,12 +11,13 @@ const LF: u8 = 0x0au8;
 const CR: u8 = 0x0du8;
 const DL: u8 = 0x7fu8;
 const BS: u8 = 0x08u8;
+const TAB: u8 = 0x0009;
 const LINE_START: &str = ">> ";
 
-use alloc::string::String;
+use alloc::string::{String};
 use alloc::vec::Vec;
-use user_lib::console::getchar;
-use user_lib::{close, dup, exec, fork, open, pipe, waitpid, OpenFlags};
+use user_lib::console::{getchar};
+use user_lib::{close, dup, exec, fork, open, pipe, waitpid,read_fs_ls, OpenFlags};
 
 #[derive(Debug)]
 struct ProcessArguments {
@@ -203,6 +204,29 @@ pub fn main() -> i32 {
                     print!(" ");
                     print!("{}", BS as char);
                     line.pop();
+                }
+            }
+            TAB =>{
+                let mut matched = false;
+                if !line.is_empty() {
+                    let mut buffer = [0u8; 514];
+                    read_fs_ls(0, &mut buffer);
+                    let ls = String::from_utf8_lossy(&buffer);
+                    let lss = ls.split(";");
+                    for ele in lss {
+                        if(ele.starts_with(&line)){
+                            let word = ele.replace(&line, "");
+                            print!("{}",word);
+                            line.push_str(&word);
+                            matched = true;
+                            break;
+                            // line.push(ele);
+                        }
+                    }
+                }
+                if !matched {
+                    print!("{}", c as char);
+                    line.push(c as char);
                 }
             }
             _ => {
