@@ -185,12 +185,6 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">translated_ref</span>, <span class="ident">translated_refmut</span>, <span class="ident">translated_str</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{
@@ -361,28 +355,22 @@
     <span class="ident">old_action</span>: <span class="kw-2">*mut</span> <span class="ident">SignalAction</span>,
 ) -&gt; <span class="ident">isize</span> {
     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">current_user_token</span>();
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">current_task</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
-        <span class="kw">if</span> <span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">MAX_SIG</span> {
+    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">current_task</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
+    <span class="kw">if</span> <span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">MAX_SIG</span> {
+        <span class="kw">return</span> <span class="op">-</span><span class="number">1</span>;
+    }
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">flag</span>) <span class="op">=</span> <span class="ident">SignalFlags::from_bits</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">signum</span>) {
+        <span class="kw">if</span> <span class="ident">check_sigaction_error</span>(<span class="ident">flag</span>, <span class="ident">action</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">old_action</span> <span class="kw">as</span> <span class="ident">usize</span>) {
             <span class="kw">return</span> <span class="op">-</span><span class="number">1</span>;
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">flag</span>) <span class="op">=</span> <span class="ident">SignalFlags::from_bits</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">signum</span>) {
-            <span class="kw">if</span> <span class="ident">check_sigaction_error</span>(<span class="ident">flag</span>, <span class="ident">action</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">old_action</span> <span class="kw">as</span> <span class="ident">usize</span>) {
-                <span class="kw">return</span> <span class="op">-</span><span class="number">1</span>;
-            }
-            <span class="kw">let</span> <span class="ident">old_kernel_action</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span>];
-            <span class="kw">if</span> <span class="ident">old_kernel_action</span>.<span class="ident">mask</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SignalFlags::from_bits</span>(<span class="number">40</span>).<span class="ident">unwrap</span>() {
-                <span class="kw-2">*</span><span class="ident">translated_refmut</span>(<span class="ident">token</span>, <span class="ident">old_action</span>) <span class="op">=</span> <span class="ident">old_kernel_action</span>;
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ref_old_action</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">translated_refmut</span>(<span class="ident">token</span>, <span class="ident">old_action</span>);
-                <span class="ident">ref_old_action</span>.<span class="ident">handler</span> <span class="op">=</span> <span class="ident">old_kernel_action</span>.<span class="ident">handler</span>;
-            }
-            <span class="kw">let</span> <span class="ident">ref_action</span> <span class="op">=</span> <span class="ident">translated_ref</span>(<span class="ident">token</span>, <span class="ident">action</span>);
-            <span class="ident">inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ref_action</span>;
-            <span class="kw">return</span> <span class="number">0</span>;
-        }
+        <span class="kw">let</span> <span class="ident">prev_action</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="kw-2">*</span><span class="ident">translated_refmut</span>(<span class="ident">token</span>, <span class="ident">old_action</span>) <span class="op">=</span> <span class="ident">prev_action</span>;
+        <span class="ident">inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">signum</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="ident">translated_ref</span>(<span class="ident">token</span>, <span class="ident">action</span>);
+        <span class="number">0</span>
+    } <span class="kw">else</span> {
+        <span class="op">-</span><span class="number">1</span>
     }
-    <span class="op">-</span><span class="number">1</span>
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>

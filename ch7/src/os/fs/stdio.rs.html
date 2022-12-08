@@ -55,15 +55,10 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::console_getchar</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_add_signal</span>, <span class="ident">suspend_current_and_run_next</span>, <span class="ident">SignalFlags</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::suspend_current_and_run_next</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stdin</span>;
 
@@ -85,12 +80,7 @@
             <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">suspend_current_and_run_next</span>();
                 <span class="kw">continue</span>;
-            }<span class="comment">/* else if c == 3 {
-                // 3 is ctrl_c
-                //println!(&quot;[K] os/fs/stdio/read: Got Ctrl_C&quot;);
-                current_add_signal(SignalFlags::SIGINT);
-                break;
-            }*/</span> <span class="kw">else</span> {
+            } <span class="kw">else</span> {
                 <span class="kw">break</span>;
             }
         }
