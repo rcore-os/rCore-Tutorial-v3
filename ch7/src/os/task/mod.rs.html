@@ -243,15 +243,6 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">action</span>;
 <span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">manager</span>;
@@ -450,7 +441,20 @@
         <span class="kw">let</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="kw">let</span> <span class="ident">signal</span> <span class="op">=</span> <span class="ident">SignalFlags::from_bits</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">sig</span>).<span class="ident">unwrap</span>();
         <span class="kw">if</span> <span class="ident">task_inner</span>.<span class="ident">signals</span>.<span class="ident">contains</span>(<span class="ident">signal</span>) <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">task_inner</span>.<span class="ident">signal_mask</span>.<span class="ident">contains</span>(<span class="ident">signal</span>)) {
-            <span class="kw">if</span> <span class="ident">task_inner</span>.<span class="ident">handling_sig</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">masked</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="kw">let</span> <span class="ident">handling_sig</span> <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">handling_sig</span>;
+            <span class="kw">if</span> <span class="ident">handling_sig</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
+                <span class="ident">masked</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            } <span class="kw">else</span> {
+                <span class="kw">let</span> <span class="ident">handling_sig</span> <span class="op">=</span> <span class="ident">handling_sig</span> <span class="kw">as</span> <span class="ident">usize</span>;
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">task_inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">handling_sig</span>]
+                    .<span class="ident">mask</span>
+                    .<span class="ident">contains</span>(<span class="ident">signal</span>)
+                {
+                    <span class="ident">masked</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                }
+            }
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">masked</span> {
                 <span class="ident">drop</span>(<span class="ident">task_inner</span>);
                 <span class="ident">drop</span>(<span class="ident">task</span>);
                 <span class="kw">if</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGKILL</span>
@@ -465,45 +469,23 @@
                     <span class="ident">call_user_signal_handler</span>(<span class="ident">sig</span>, <span class="ident">signal</span>);
                     <span class="kw">return</span>;
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">task_inner</span>.<span class="ident">signal_actions</span>.<span class="ident">table</span>[<span class="ident">task_inner</span>.<span class="ident">handling_sig</span> <span class="kw">as</span> <span class="ident">usize</span>]
-                    .<span class="ident">mask</span>
-                    .<span class="ident">contains</span>(<span class="ident">signal</span>)
-                {
-                    <span class="ident">drop</span>(<span class="ident">task_inner</span>);
-                    <span class="ident">drop</span>(<span class="ident">task</span>);
-                    <span class="kw">if</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGKILL</span>
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGSTOP</span>
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGCONT</span>
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">signal</span> <span class="op">==</span> <span class="ident">SignalFlags::SIGDEF</span>
-                    {
-                        <span class="comment">// signal is a kernel signal</span>
-                        <span class="ident">call_kernel_signal_handler</span>(<span class="ident">signal</span>);
-                    } <span class="kw">else</span> {
-                        <span class="comment">// signal is a user signal</span>
-                        <span class="ident">call_user_signal_handler</span>(<span class="ident">sig</span>, <span class="ident">signal</span>);
-                        <span class="kw">return</span>;
-                    }
-                }
             }
         }
     }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_signals</span>() {
-    <span class="ident">check_pending_signals</span>();
     <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">current_task</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
-        <span class="kw">let</span> <span class="ident">frozen_flag</span> <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">frozen</span>;
-        <span class="kw">let</span> <span class="ident">killed_flag</span> <span class="op">=</span> <span class="ident">task_inner</span>.<span class="ident">killed</span>;
-        <span class="ident">drop</span>(<span class="ident">task_inner</span>);
-        <span class="ident">drop</span>(<span class="ident">task</span>);
-        <span class="kw">if</span> (<span class="op">!</span><span class="ident">frozen_flag</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">killed_flag</span> {
+        <span class="ident">check_pending_signals</span>();
+        <span class="kw">let</span> (<span class="ident">frozen</span>, <span class="ident">killed</span>) <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">current_task</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
+            (<span class="ident">task_inner</span>.<span class="ident">frozen</span>, <span class="ident">task_inner</span>.<span class="ident">killed</span>)
+        };
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">frozen</span> <span class="op">|</span><span class="op">|</span> <span class="ident">killed</span> {
             <span class="kw">break</span>;
         }
-        <span class="ident">check_pending_signals</span>();
-        <span class="ident">suspend_current_and_run_next</span>()
+        <span class="ident">suspend_current_and_run_next</span>();
     }
 }
 </code></pre></div>
