@@ -324,7 +324,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_sigretrun</span>() -&gt; <span class="ident">isize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_sigreturn</span>() -&gt; <span class="ident">isize</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">current_task</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
         <span class="ident">inner</span>.<span class="ident">handling_sig</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
