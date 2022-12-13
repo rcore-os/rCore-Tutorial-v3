@@ -45,6 +45,7 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SBI call wrappers</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 
@@ -59,6 +60,7 @@
 <span class="kw">const</span> <span class="ident">SBI_REMOTE_SFENCE_VMA</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
 <span class="kw">const</span> <span class="ident">SBI_REMOTE_SFENCE_VMA_ASID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
 <span class="kw">const</span> <span class="ident">SBI_SHUTDOWN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+
 <span class="doccomment">/// general sbi call</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="kw">fn</span> <span class="ident">sbi_call</span>(<span class="ident">which</span>: <span class="ident">usize</span>, <span class="ident">arg0</span>: <span class="ident">usize</span>, <span class="ident">arg1</span>: <span class="ident">usize</span>, <span class="ident">arg2</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
