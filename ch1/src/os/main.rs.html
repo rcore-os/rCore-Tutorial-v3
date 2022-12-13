@@ -65,12 +65,6 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The operating system and app also starts in this module. Kernel code starts</span>
@@ -93,7 +87,6 @@
 <span class="kw">mod</span> <span class="ident">lang_items</span>;
 <span class="kw">mod</span> <span class="ident">sbi</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/qemu.rs&quot;</span>]</span>
 <span class="kw">mod</span> <span class="ident">board</span>;
 
@@ -134,15 +127,10 @@
     );
     <span class="macro">println!</span>(<span class="string">&quot;.bss [{:#x}, {:#x})&quot;</span>, <span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
     <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>(); <span class="comment">// CI autotest success</span>
                                                    <span class="comment">//crate::board::QEMU_EXIT_HANDLE.exit_failure(); // CI autoest failed</span>
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
-    <span class="macro">panic!</span>(<span class="string">&quot;Unreachable in rust_main!&quot;</span>);
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
