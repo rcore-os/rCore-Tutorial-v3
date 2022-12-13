@@ -65,9 +65,6 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Various facilities of the kernels are implemented as submodules. The most</span>
@@ -93,12 +90,9 @@
 
 <span class="kw">use</span> <span class="ident">core::arch::global_asm</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/k210.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">board</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)))]</span>
 <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/qemu.rs&quot;</span>]</span>
 <span class="kw">mod</span> <span class="ident">board</span>;
+
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">console</span>;
 <span class="kw">mod</span> <span class="ident">config</span>;
