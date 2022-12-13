@@ -147,12 +147,6 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
 </pre><pre class="rust"><code><span class="doccomment">//! batch subsystem</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
@@ -224,14 +218,8 @@
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">app_id</span>: <span class="ident">usize</span>) {
         <span class="kw">if</span> <span class="ident">app_id</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">num_app</span> {
             <span class="macro">println!</span>(<span class="string">&quot;All applications completed!&quot;</span>);
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_qemu&quot;</span>)]</span>
             <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;board_k210&quot;</span>)]</span>
-            <span class="macro">panic!</span>(<span class="string">&quot;All applications completed!&quot;</span>);
         }
         <span class="macro">println!</span>(<span class="string">&quot;[kernel] Loading app_{}&quot;</span>, <span class="ident">app_id</span>);
         <span class="comment">// clear icache</span>
