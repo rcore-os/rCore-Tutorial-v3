@@ -131,6 +131,7 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOCK_FREQ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12500000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO</span>: <span class="kw-2">&amp;</span>[(<span class="ident">usize</span>, <span class="ident">usize</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
@@ -147,6 +148,7 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VIRT_UART</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x1000_0000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VIRTGPU_XRES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1280</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VIRTGPU_YRES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">800</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::block::BLOCK_DEVICE</span>;
@@ -163,7 +165,7 @@
     <span class="ident">plic</span>.<span class="ident">set_threshold</span>(<span class="ident">hart_id</span>, <span class="ident">supervisor</span>, <span class="number">0</span>);
     <span class="ident">plic</span>.<span class="ident">set_threshold</span>(<span class="ident">hart_id</span>, <span class="ident">machine</span>, <span class="number">1</span>);
     <span class="comment">//irq nums: 5 keyboard, 6 mouse, 8 block, 10 uart</span>
-    <span class="kw">for</span> <span class="ident">intr_src_id</span> <span class="kw">in</span> [<span class="number">5usize</span>, <span class="number">6</span>, <span class="number">8</span> , <span class="number">10</span>] {
+    <span class="kw">for</span> <span class="ident">intr_src_id</span> <span class="kw">in</span> [<span class="number">5usize</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>] {
         <span class="ident">plic</span>.<span class="ident">enable</span>(<span class="ident">hart_id</span>, <span class="ident">supervisor</span>, <span class="ident">intr_src_id</span>);
         <span class="ident">plic</span>.<span class="ident">set_priority</span>(<span class="ident">intr_src_id</span>, <span class="number">1</span>);
     }

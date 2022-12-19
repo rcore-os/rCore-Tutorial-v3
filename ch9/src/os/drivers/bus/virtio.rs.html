@@ -50,12 +50,12 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{
     <span class="ident">frame_alloc</span>, <span class="ident">frame_dealloc</span>, <span class="ident">kernel_token</span>, <span class="ident">FrameTracker</span>, <span class="ident">PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>,
     <span class="ident">StepByOne</span>, <span class="ident">VirtAddr</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers::Hal</span>;
 
@@ -101,5 +101,6 @@
             .<span class="ident">unwrap</span>()
             .<span class="number">0</span>
     }
-}</code></pre></div>
+}
+</code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>

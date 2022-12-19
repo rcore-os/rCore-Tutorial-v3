@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["button",""],["graphic",""],["icon",""],["image",""],["panel",""],["terminal",""]],"trait":[["Component",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["graphic",""],["paint",""]]};
