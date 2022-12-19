@@ -19,5 +19,6 @@ virtio-input-decoder = "0.1.4"
 embedded-graphics = "0.7.1"
 tinybmp = "0.3.1"
 
+
 [profile.release]
 debug = true
