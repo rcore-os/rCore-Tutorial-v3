@@ -84,13 +84,14 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BlockDevice</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{<span class="ident">Condvar</span>, <span class="ident">UPIntrFreeCell</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::schedule</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DEV_NON_BLOCKING_ACCESS</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">BlkResp</span>, <span class="ident">RespStatus</span>, <span class="ident">VirtIOBlk</span>, <span class="ident">VirtIOHeader</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 <span class="kw">const</span> <span class="ident">VIRTIO0</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10008000</span>;
@@ -155,7 +156,9 @@
 <span class="kw">impl</span> <span class="ident">VirtIOBlock</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">virtio_blk</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">VirtIOBlk</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">VIRTIO0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>())
+            <span class="ident">UPIntrFreeCell::new</span>(
+                <span class="ident">VirtIOBlk</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">VIRTIO0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>(),
+            )
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">condvars</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">virtio_blk</span>.<span class="ident">exclusive_access</span>().<span class="ident">virt_queue_size</span>();
@@ -169,6 +172,5 @@
         }
     }
 }
-
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>

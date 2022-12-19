@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["create_desktop",""],["create_terminal",""]],"static":[["DT",""]],"struct":[["DESKTOP",""],["PAD",""]]};

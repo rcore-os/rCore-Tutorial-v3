@@ -230,7 +230,7 @@
     <span class="ident">set_kernel_trap_entry</span>();
     <span class="kw">let</span> <span class="ident">scause</span> <span class="op">=</span> <span class="ident">scause::read</span>();
     <span class="kw">let</span> <span class="ident">stval</span> <span class="op">=</span> <span class="ident">stval::read</span>();
-    <span class="comment">//println!(&quot;into {:?}&quot;, scause.cause());</span>
+    <span class="comment">// println!(&quot;into {:?}&quot;, scause.cause());</span>
     <span class="kw">match</span> <span class="ident">scause</span>.<span class="ident">cause</span>() {
         <span class="ident">Trap::Exception</span>(<span class="ident">Exception::UserEnvCall</span>) =&gt; {
             <span class="comment">// jump to next instruction anyway</span>

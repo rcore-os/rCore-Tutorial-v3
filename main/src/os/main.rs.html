@@ -103,7 +103,7 @@
 <span class="kw">mod</span> <span class="ident">timer</span>;
 <span class="kw">mod</span> <span class="ident">trap</span>;
 
-<span class="comment">// use syscall::create_desktop; //for test</span>
+<span class="comment">//use syscall::create_desktop; //for test</span>
 
 <span class="macro">core::arch::global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 
@@ -131,18 +131,18 @@
     <span class="ident">clear_bss</span>();
     <span class="ident">mm::init</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init gpu&quot;</span>);
-    <span class="ident">GPU_DEVICE</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">_gpu</span> <span class="op">=</span> <span class="ident">GPU_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init keyboard&quot;</span>);
-    <span class="ident">KEYBOARD_DEVICE</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">_keyboard</span> <span class="op">=</span> <span class="ident">KEYBOARD_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init mouse&quot;</span>);
-    <span class="ident">MOUSE_DEVICE</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">_mouse</span> <span class="op">=</span> <span class="ident">MOUSE_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init trap&quot;</span>);
     <span class="ident">trap::init</span>();
     <span class="ident">trap::enable_timer_interrupt</span>();
     <span class="ident">timer::set_next_trigger</span>();
     <span class="ident">board::device_init</span>();
     <span class="ident">fs::list_apps</span>();
-    <span class="comment">//syscall::create_desktop(); //for test</span>
+    <span class="ident">gui::init_paint</span>();
     <span class="ident">task::add_initproc</span>();
     <span class="kw-2">*</span><span class="ident">DEV_NON_BLOCKING_ACCESS</span>.<span class="ident">exclusive_access</span>() <span class="op">=</span> <span class="bool-val">true</span>;
     <span class="ident">task::run_tasks</span>();

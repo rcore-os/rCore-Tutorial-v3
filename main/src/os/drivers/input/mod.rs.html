@@ -72,77 +72,79 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">gui</span>::{<span class="ident">Button</span>, <span class="ident">Component</span>},
+<span id="75">75</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">gui</span>::{<span class="ident">move_rect</span>, <span class="ident">reset</span>},
     <span class="ident">sync::UPIntrFreeCell</span>,
-    <span class="ident">syscall::PAD</span>,
 };
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::ToString</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">core::any::Any</span>;
-<span class="kw">use</span> <span class="ident">embedded_graphics</span>::{
-    <span class="ident">prelude</span>::{<span class="ident">Point</span>, <span class="ident">Size</span>},
-    <span class="ident">text::Text</span>,
-};
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOHeader</span>, <span class="ident">VirtIOInput</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">use</span> <span class="ident">virtio_input_decoder</span>::{<span class="ident">Decoder</span>, <span class="ident">Key</span>, <span class="ident">KeyType</span>};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GPU_DEVICE</span>;
 
 <span class="kw">const</span> <span class="ident">VIRTIO5</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10005000</span>;
 <span class="kw">const</span> <span class="ident">VIRTIO6</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10006000</span>;
 
-<span class="kw">struct</span> <span class="ident">VirtIOINPUT</span>(<span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInput</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">struct</span> <span class="ident">VirtIOInputWrapper</span>(<span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInput</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">INPUTDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InputDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
     <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
 
 <span class="macro">lazy_static::lazy_static!</span>(
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KEYBOARD_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">INPUTDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">VirtIOINPUT::new</span>(<span class="ident">VIRTIO5</span>));
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">MOUSE_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">INPUTDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">VirtIOINPUT::new</span>(<span class="ident">VIRTIO6</span>));
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">KEYBOARD_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">InputDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">VirtIOInputWrapper::new</span>(<span class="ident">VIRTIO5</span>));
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">MOUSE_DEVICE</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">InputDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">VirtIOInputWrapper::new</span>(<span class="ident">VIRTIO6</span>));
 );
 
-<span class="kw">impl</span> <span class="ident">VirtIOINPUT</span> {
+<span class="kw">impl</span> <span class="ident">VirtIOInputWrapper</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="kw">unsafe</span> {
-            <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">VirtIOInput</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>())
+            <span class="ident">UPIntrFreeCell::new</span>(
+                <span class="ident">VirtIOInput</span>::<span class="op">&lt;</span><span class="ident">VirtioHal</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">VirtIOHeader</span>)).<span class="ident">unwrap</span>(),
+            )
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">INPUTDevice</span> <span class="kw">for</span> <span class="ident">VirtIOINPUT</span> {
+<span class="kw">impl</span> <span class="ident">InputDevice</span> <span class="kw">for</span> <span class="ident">VirtIOInputWrapper</span> {
     <span class="kw">fn</span> <span class="ident">handle_irq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">exclusive_access</span>();
         <span class="ident">input</span>.<span class="ident">ack_interrupt</span>();
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">pop_pending_event</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">dtype</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Decoder::decode</span>(
-            <span class="ident">event</span>.<span class="ident">event_type</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">event</span>.<span class="ident">code</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">event</span>.<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>,
-        ) {
-            <span class="prelude-val">Ok</span>(<span class="ident">dtype</span>) =&gt; <span class="ident">dtype</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-        };
-        <span class="kw">match</span> <span class="ident">dtype</span> {
-            <span class="ident">virtio_input_decoder::DecodeType::Key</span>(<span class="ident">key</span>, <span class="ident">r#type</span>) =&gt; {
-                <span class="macro">println!</span>(<span class="string">&quot;{:?} {:?}&quot;</span>, <span class="ident">key</span>, <span class="ident">r#type</span>);
-                <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">KeyType::Press</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">PAD</span>.<span class="ident">exclusive_access</span>();
-                    <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                    <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">to_char</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">k</span>) =&gt; {
-                            <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span> {
-                                <span class="ident">a</span>.<span class="ident">repaint</span>(<span class="ident">k</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="string">&quot;\n&quot;</span>)
-                            } <span class="kw">else</span> {
-                                <span class="ident">a</span>.<span class="ident">repaint</span>(<span class="ident">k</span>.<span class="ident">to_string</span>())
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">pop_pending_event</span>() {
+            <span class="kw">let</span> <span class="ident">dtype</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Decoder::decode</span>(
+                <span class="ident">event</span>.<span class="ident">event_type</span> <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="ident">event</span>.<span class="ident">code</span> <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="ident">event</span>.<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>,
+            ) {
+                <span class="prelude-val">Ok</span>(<span class="ident">dtype</span>) =&gt; <span class="ident">dtype</span>,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+            };
+            <span class="kw">match</span> <span class="ident">dtype</span> {
+                <span class="ident">virtio_input_decoder::DecodeType::Key</span>(<span class="ident">key</span>, <span class="ident">r#type</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">KeyType::Press</span> {
+                        <span class="kw">match</span> <span class="ident">key</span> {
+                            <span class="ident">Key::C</span> <span class="op">|</span> <span class="ident">Key::MouseLeft</span> =&gt; {
+                                <span class="ident">reset</span>();
                             }
+                            <span class="ident">Key::W</span> =&gt; {
+                                <span class="ident">move_rect</span>(<span class="number">0</span>, <span class="op">-</span><span class="number">10</span>);
+                            }
+                            <span class="ident">Key::S</span> =&gt; {
+                                <span class="ident">move_rect</span>(<span class="number">0</span>, <span class="number">10</span>);
+                            }
+                            <span class="ident">Key::A</span> =&gt; {
+                                <span class="ident">move_rect</span>(<span class="op">-</span><span class="number">10</span>, <span class="number">0</span>);
+                            }
+                            <span class="ident">Key::D</span> =&gt; {
+                                <span class="ident">move_rect</span>(<span class="number">10</span>, <span class="number">0</span>);
+                            }
+                            <span class="kw">_</span> =&gt; {}
                         }
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {}
                     }
                 }
+                <span class="kw">_</span> =&gt; {}
             }
-            <span class="ident">virtio_input_decoder::DecodeType::Mouse</span>(<span class="ident">mouse</span>) =&gt; <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">mouse</span>),
         }
     }
 }

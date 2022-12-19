@@ -68,11 +68,6 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_DUP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">24</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
@@ -100,16 +95,13 @@
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_CREATE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1030</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_SIGNAL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1031</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_WAIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1032</span>;
-<span class="kw">const</span> <span class="ident">SYSCALL_CREATE_DESKTOP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;
+
 <span class="kw">mod</span> <span class="ident">fs</span>;
-<span class="kw">mod</span> <span class="ident">gui</span>;
 <span class="kw">mod</span> <span class="ident">process</span>;
 <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::gui::create_desktop</span>;
-<span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gui::PAD</span>;
+<span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sync</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">thread</span>::<span class="kw-2">*</span>;
@@ -143,10 +135,8 @@
         <span class="ident">SYSCALL_CONDVAR_CREATE</span> =&gt; <span class="ident">sys_condvar_create</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_CONDVAR_SIGNAL</span> =&gt; <span class="ident">sys_condvar_signal</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_CONDVAR_WAIT</span> =&gt; <span class="ident">sys_condvar_wait</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>]),
-        <span class="ident">SYSCALL_CREATE_DESKTOP</span> =&gt; <span class="ident">create_desktop</span>(),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported syscall_id: {}&quot;</span>, <span class="ident">syscall_id</span>),
     }
 }
-
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
