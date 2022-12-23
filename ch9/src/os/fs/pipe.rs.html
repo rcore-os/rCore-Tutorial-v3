@@ -164,6 +164,13 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -280,36 +287,40 @@
     }
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">UserBuffer</span>) -&gt; <span class="ident">usize</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">readable</span>());
+        <span class="kw">let</span> <span class="ident">want_to_read</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf_iter</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">into_iter</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read_size</span> <span class="op">=</span> <span class="number">0usize</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">already_read</span> <span class="op">=</span> <span class="number">0usize</span>;
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ring_buffer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">exclusive_access</span>();
             <span class="kw">let</span> <span class="ident">loop_read</span> <span class="op">=</span> <span class="ident">ring_buffer</span>.<span class="ident">available_read</span>();
             <span class="kw">if</span> <span class="ident">loop_read</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">if</span> <span class="ident">ring_buffer</span>.<span class="ident">all_write_ends_closed</span>() {
-                    <span class="kw">return</span> <span class="ident">read_size</span>;
+                    <span class="kw">return</span> <span class="ident">already_read</span>;
                 }
                 <span class="ident">drop</span>(<span class="ident">ring_buffer</span>);
                 <span class="ident">suspend_current_and_run_next</span>();
                 <span class="kw">continue</span>;
             }
-            <span class="comment">// read at most loop_read bytes</span>
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">loop_read</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">byte_ref</span>) <span class="op">=</span> <span class="ident">buf_iter</span>.<span class="ident">next</span>() {
                     <span class="kw">unsafe</span> {
                         <span class="kw-2">*</span><span class="ident">byte_ref</span> <span class="op">=</span> <span class="ident">ring_buffer</span>.<span class="ident">read_byte</span>();
                     }
-                    <span class="ident">read_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="ident">already_read</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="kw">if</span> <span class="ident">already_read</span> <span class="op">==</span> <span class="ident">want_to_read</span> {
+                        <span class="kw">return</span> <span class="ident">want_to_read</span>;
+                    }
                 } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="ident">read_size</span>;
+                    <span class="kw">return</span> <span class="ident">already_read</span>;
                 }
             }
         }
     }
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">UserBuffer</span>) -&gt; <span class="ident">usize</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">writable</span>());
+        <span class="kw">let</span> <span class="ident">want_to_write</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf_iter</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">into_iter</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_size</span> <span class="op">=</span> <span class="number">0usize</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">already_write</span> <span class="op">=</span> <span class="number">0usize</span>;
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ring_buffer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">exclusive_access</span>();
             <span class="kw">let</span> <span class="ident">loop_write</span> <span class="op">=</span> <span class="ident">ring_buffer</span>.<span class="ident">available_write</span>();
@@ -322,13 +333,15 @@
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">loop_write</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">byte_ref</span>) <span class="op">=</span> <span class="ident">buf_iter</span>.<span class="ident">next</span>() {
                     <span class="ident">ring_buffer</span>.<span class="ident">write_byte</span>(<span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">byte_ref</span> });
-                    <span class="ident">write_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="ident">already_write</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="kw">if</span> <span class="ident">already_write</span> <span class="op">==</span> <span class="ident">want_to_write</span> {
+                        <span class="kw">return</span> <span class="ident">want_to_write</span>;
+                    }
                 } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="ident">write_size</span>;
+                    <span class="kw">return</span> <span class="ident">already_write</span>;
                 }
             }
         }
     }
-}
-</code></pre></div>
+}</code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
