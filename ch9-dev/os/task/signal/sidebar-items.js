@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SignalFlags",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["SignalFlags",""]]};

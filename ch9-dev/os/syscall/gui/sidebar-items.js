@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["create_desktop",""],["create_terminal",""]],"static":[["DT",""]],"struct":[["DESKTOP",""],["PAD",""]]});

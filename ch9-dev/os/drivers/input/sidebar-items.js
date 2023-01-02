@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["VIRTIO5",""],["VIRTIO6",""]],"struct":[["KEYBOARD_DEVICE",""],["MOUSE_DEVICE",""],["VirtIOINPUT",""]],"trait":[["INPUTDevice",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["VIRTIO5",""],["VIRTIO6",""]],"struct":[["KEYBOARD_DEVICE",""],["MOUSE_DEVICE",""],["VirtIOInputWrapper",""]],"trait":[["InputDevice",""]]};
