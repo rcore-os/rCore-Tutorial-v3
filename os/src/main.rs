@@ -14,7 +14,7 @@ extern crate bitflags;
 
 #[path = "boards/qemu.rs"]
 mod board;
-
+use board::*;
 #[macro_use]
 mod console;
 mod config;
@@ -29,10 +29,15 @@ mod syscall;
 mod task;
 mod timer;
 mod trap;
-//mod start;
-mod riscvregs;
-use riscvregs::registers::*;
-use riscvregs::registers::pmpcfg0::*;
+
+use riscv::register::*;
+// mod riscvreg;
+// use riscvreg::{
+//     mstatus, mepc, satp, medeleg, mideleg, sie, mhartid, tp, clint, 
+//     mscratch, mtvec, mie, sstatus
+// };
+// use riscvregs::registers::*;
+// use riscvregs::registers::pmpcfg0::*;
 //use syscall::create_desktop; //for test
 
 core::arch::global_asm!(include_str!("entry.asm"));
@@ -63,6 +68,41 @@ struct Stack([u8; 4096 * 4 * 1]);
 #[no_mangle]
 static mut STACK0: Stack = Stack([0; 4096 * 4 * 1]);
 
+#[inline]
+pub unsafe fn medeleg_write(medeleg: usize){
+    core::arch::asm!("csrw medeleg, {}",in(reg)medeleg);
+}
+
+pub unsafe fn mideleg_write(mideleg: usize) {
+    core::arch::asm!("csrw mideleg, {}", in(reg)mideleg);
+}
+
+pub enum SIE {
+    SEIE = 1 << 9, // external
+    STIE = 1 << 5, // timer
+    SSIE = 1 << 1, // software
+}
+
+#[inline]
+pub unsafe fn sie_read() -> usize {
+    let ret:usize;
+    core::arch::asm!("csrr {}, sie", out(reg)ret);
+    ret
+}
+
+#[inline]
+pub unsafe fn sie_write(x:usize) {
+    core::arch::asm!("csrw sie, {}", in(reg)x);
+}
+
+/// enable all software interrupts
+/// still need to set SIE bit in sstatus
+pub unsafe fn intr_on() {
+    let mut sie = sie_read();
+    sie |= SIE::SSIE as usize | SIE::STIE as usize | SIE::SEIE as usize;
+    sie_write(sie);
+}
+
 #[no_mangle]
 pub unsafe fn rust_start() -> ! {
     // set MPP mode to Supervisor, for mret
@@ -75,23 +115,21 @@ pub unsafe fn rust_start() -> ! {
     satp::write(0);
 
     // delegate all interrupts and exceptions to supervisor mode.
-    medeleg::set_all();
-    mideleg::set_all();
-    sie::set_sext();
-    sie::set_ssoft();
-    sie::set_stimer();
+    medeleg_write(0xffff);
+    mideleg_write(0xffff);
+    intr_on();
 
     // configure Physical Memory Protection to give supervisor mode
     // access to all of physical memory.
-    pmpaddr0::write(0x3fffffffffffff);
-    pmpcfg0::set_pmp(0, Range::TOR, Permission::RWX, false); // 0 < addr < pmpaddr0
+    //pmpaddr0::write(0x3fffffffffffff);
+    //pmpcfg0::set_pmp(0, Range::TOR, Permission::RWX, false); // 0 < addr < pmpaddr0
 
     // ask for clock interrupts.
-    timerinit();
+    timer_init();
 
     // keep each CPU's hartid in its tp register, for cpuid().
-    let id = mhartid::read();
-    core::arch::asm!("mv tp, {0}", in(reg) id);
+    // let id = mhartid::read();
+    // core::arch::asm!("mv tp, {0}", in(reg) id);
 
     // switch to supervisor mode and jump to main().
     core::arch::asm!("mret");
@@ -102,49 +140,127 @@ pub unsafe fn rust_start() -> ! {
     core::hint::unreachable_unchecked();
 }
 
-// a scratch area per CPU for machine-mode timer interrupts.
-static mut TIMER_SCRATCH: [[u64; 5]; 1] = [[0; 5]; 1];
+use core::convert::Into;
+use core::ptr;
 
-unsafe fn timerinit() {
+// a scratch area per CPU for machine-mode timer interrupts.
+static mut TIMER_SCRATCH: [u64; 5] = [0; 5];
+
+#[inline]
+unsafe fn read_mtime() -> u64 {
+    ptr::read_volatile(Into::<usize>::into(CLINT_MTIME) as *const u64)
+}
+
+unsafe fn write_mtimecmp(value: u64) {
+    let offset = Into::<usize>::into(CLINT_MTIMECMP);
+    ptr::write_volatile(offset as *mut u64, value);
+}
+
+pub unsafe fn add_mtimecmp(interval:u64){
+    let value = read_mtime();
+    write_mtimecmp(value+interval);
+}
+
+pub fn count_mtiecmp() -> usize{
+    let ret:usize;
+    ret = Into::<usize>::into(CLINT) + 0x4000;
+    ret
+}
+
+#[inline]
+pub unsafe fn mtvec_write(x:usize){
+    core::arch::asm!("csrw mtvec, {}",in(reg)x);
+}
+
+use bit_field::BitField;
+
+#[inline]
+unsafe fn mstatus_read() -> usize {
+    let ret:usize;
+    core::arch::asm!("csrr {}, mstatus",out(reg)ret);
+    ret
+}
+
+#[inline]
+unsafe fn mstatus_write(x: usize) {
+    core::arch::asm!("csrw mstatus, {}",in(reg)x);
+}
+
+// enable machine-mode interrupts.
+pub unsafe fn mstatus_enable_interrupt(){
+    let mut mstatus = mstatus_read();
+    mstatus.set_bit(3, true);
+    mstatus_write(mstatus);
+}
+
+
+pub enum MIE {
+    MEIE = 1 << 11, // external
+    MTIE = 1 << 7,  // timer
+    MSIE = 1 << 3  // software
+}
+
+#[inline]
+pub unsafe fn mie_read() -> usize {
+    let ret:usize;
+    core::arch::asm!("csrr {}, mie", out(reg)ret);
+    ret
+}
+
+#[inline]
+pub unsafe fn mie_write(x:usize){
+    core::arch::asm!("csrw mie, {}",in(reg)x);
+}
+
+unsafe fn timer_init() {
     // each CPU has a separate source of timer interrupts
-    let id = mhartid::read();
+    //let id = mhartid::read();
 
     // ask the CLINT for a timer interrupts
     let interval = 1000000u64; // cycles; about 1/10th second in qemu.
-    let mtimecmp = board::clint_mtimecmp(id) as *mut u64;
-    let mtime = board::CLINT_MTIME as *const u64;
-    mtimecmp.write_volatile(mtime.read_volatile() + interval);
+    add_mtimecmp(interval);
+    // let mtimecmp = board::clint_mtimecmp(0) as *mut u64;
+    // let mtime = board::CLINT_MTIME as *const u64;
+    // mtimecmp.write_volatile(mtime.read_volatile() + interval);
 
     // prepare information in scratch[] for timervec.
     // scratch[0..2] : space for timervec to save registers.
     // scratch[3] : address of CLINT MTIMECMP register.
     // scratch[4] : desired interval (in cycles) between timer interrupts.
-    let scratch = &mut TIMER_SCRATCH[id];
-    scratch[3] = mtimecmp as u64;
+    let scratch = &mut TIMER_SCRATCH;
+    scratch[3] = count_mtiecmp() as u64;
     scratch[4] = interval;
     mscratch::write(scratch.as_mut_ptr() as usize);
 
     // set the machine-mode trap handler
-    mtvec::write(board::timervec as usize, mtvec::TrapMode::Direct);
+    mtvec_write(timervec as usize);
+    //mtvec::write(board::timervec as usize, mtvec::TrapMode::Direct);
 
     // enable machine-mode interrupts.
-    mstatus::set_mie();
+    mstatus_enable_interrupt();
+    //mstatus::set_mie();
 
-    // enable machime-mode timer interrupts.
-    mie::set_mtimer();
+    // enable machine-mode timer interrupts.
+    mie_write(mie_read() | MIE::MTIE as usize);
+    //mie::set_mtimer();
 }
 
 
 #[no_mangle]
 pub fn rust_main() -> ! {
-    clear_bss();
+
+    //clear_bss();
+
+    //println!("KERN: begin");
+
     mm::init();
-    println!("KERN: init gpu");
-    let _gpu = GPU_DEVICE.clone();
-    println!("KERN: init keyboard");
-    let _keyboard = KEYBOARD_DEVICE.clone();
-    println!("KERN: init mouse");
-    let _mouse = MOUSE_DEVICE.clone();
+    loop{};
+    //println!("KERN: init gpu");
+    //let _gpu = GPU_DEVICE.clone();
+   // println!("KERN: init keyboard");
+   // let _keyboard = KEYBOARD_DEVICE.clone();
+    //println!("KERN: init mouse");
+    //let _mouse = MOUSE_DEVICE.clone();
     println!("KERN: init trap");
     trap::init();
     //trap::enable_timer_interrupt();

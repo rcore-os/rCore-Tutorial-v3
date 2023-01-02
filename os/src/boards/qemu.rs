@@ -56,10 +56,11 @@ pub fn irq_handler() {
 
 // core local interrupter (CLINT), which contains the timer
 pub const CLINT: usize = 0x2000000;
-pub const fn clint_mtimecmp(hartid: usize) -> usize {
-    CLINT + 0x4000 + 8 * hartid
-}
+// pub const fn clint_mtimecmp(hartid: usize) -> usize {
+//     CLINT + 0x4000 + 8 * hartid
+// }
 pub const CLINT_MTIME: usize = CLINT + 0xBFF8; // Cycles since boot.
+pub const CLINT_MTIMECMP: usize = CLINT + 0x4000;
 
 #[naked]
 #[repr(align(16))] // if miss this alignment, a load access fault will occur.
