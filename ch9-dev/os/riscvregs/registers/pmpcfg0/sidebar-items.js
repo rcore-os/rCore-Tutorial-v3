@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Permission",""],["Range",""]],"fn":[["_read",""],["_write",""],["set_pmp",""]]};

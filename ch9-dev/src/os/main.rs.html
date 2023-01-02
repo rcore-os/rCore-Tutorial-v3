@@ -73,10 +73,96 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">alloc_error_handler</span>)]</span>
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">naked_functions</span>)]</span>
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">fn_align</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers</span>::{<span class="ident">GPU_DEVICE</span>, <span class="ident">KEYBOARD_DEVICE</span>, <span class="ident">MOUSE_DEVICE</span>};
 
@@ -102,7 +188,10 @@
 <span class="kw">mod</span> <span class="ident">task</span>;
 <span class="kw">mod</span> <span class="ident">timer</span>;
 <span class="kw">mod</span> <span class="ident">trap</span>;
-
+<span class="comment">//mod start;</span>
+<span class="kw">mod</span> <span class="ident">riscvregs</span>;
+<span class="kw">use</span> <span class="ident">riscvregs::registers</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">riscvregs::registers::pmpcfg0</span>::<span class="kw-2">*</span>;
 <span class="comment">//use syscall::create_desktop; //for test</span>
 
 <span class="macro">core::arch::global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
@@ -126,6 +215,85 @@
         <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="bool-val">false</span>) };
 }
 
+
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">align</span>(<span class="number">16</span>))]</span>
+<span class="kw">struct</span> <span class="ident">Stack</span>([<span class="ident">u8</span>; <span class="number">4096</span> <span class="op">*</span> <span class="number">4</span> <span class="op">*</span> <span class="number">1</span>]);
+
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">STACK0</span>: <span class="ident">Stack</span> <span class="op">=</span> <span class="ident">Stack</span>([<span class="number">0</span>; <span class="number">4096</span> <span class="op">*</span> <span class="number">4</span> <span class="op">*</span> <span class="number">1</span>]);
+
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">rust_start</span>() -&gt; <span class="op">!</span> {
+    <span class="comment">// set MPP mode to Supervisor, for mret</span>
+    <span class="ident">mstatus::set_mpp</span>(<span class="ident">mstatus::MPP::Supervisor</span>);
+
+    <span class="comment">// set MEPC to main, for mret</span>
+    <span class="ident">mepc::write</span>(<span class="ident">rust_main</span> <span class="kw">as</span> <span class="ident">usize</span>);
+
+    <span class="comment">// disable paging for now.</span>
+    <span class="ident">satp::write</span>(<span class="number">0</span>);
+
+    <span class="comment">// delegate all interrupts and exceptions to supervisor mode.</span>
+    <span class="ident">medeleg::set_all</span>();
+    <span class="ident">mideleg::set_all</span>();
+    <span class="ident">sie::set_sext</span>();
+    <span class="ident">sie::set_ssoft</span>();
+    <span class="ident">sie::set_stimer</span>();
+
+    <span class="comment">// configure Physical Memory Protection to give supervisor mode</span>
+    <span class="comment">// access to all of physical memory.</span>
+    <span class="ident">pmpaddr0::write</span>(<span class="number">0x3fffffffffffff</span>);
+    <span class="ident">pmpcfg0::set_pmp</span>(<span class="number">0</span>, <span class="ident">Range::TOR</span>, <span class="ident">Permission::RWX</span>, <span class="bool-val">false</span>); <span class="comment">// 0 &lt; addr &lt; pmpaddr0</span>
+
+    <span class="comment">// ask for clock interrupts.</span>
+    <span class="ident">timerinit</span>();
+
+    <span class="comment">// keep each CPU&#39;s hartid in its tp register, for cpuid().</span>
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">mhartid::read</span>();
+    <span class="macro">core::arch::asm!</span>(<span class="string">&quot;mv tp, {0}&quot;</span>, <span class="kw">in</span>(<span class="ident">reg</span>) <span class="ident">id</span>);
+
+    <span class="comment">// switch to supervisor mode and jump to main().</span>
+    <span class="macro">core::arch::asm!</span>(<span class="string">&quot;mret&quot;</span>);
+
+    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
+        <span class="kw">fn</span> <span class="ident">rust_main</span>() -&gt; <span class="op">!</span>;
+    }
+    <span class="ident">core::hint::unreachable_unchecked</span>();
+}
+
+<span class="comment">// a scratch area per CPU for machine-mode timer interrupts.</span>
+<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">TIMER_SCRATCH</span>: [[<span class="ident">u64</span>; <span class="number">5</span>]; <span class="number">1</span>] <span class="op">=</span> [[<span class="number">0</span>; <span class="number">5</span>]; <span class="number">1</span>];
+
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">timerinit</span>() {
+    <span class="comment">// each CPU has a separate source of timer interrupts</span>
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">mhartid::read</span>();
+
+    <span class="comment">// ask the CLINT for a timer interrupts</span>
+    <span class="kw">let</span> <span class="ident">interval</span> <span class="op">=</span> <span class="number">1000000u64</span>; <span class="comment">// cycles; about 1/10th second in qemu.</span>
+    <span class="kw">let</span> <span class="ident">mtimecmp</span> <span class="op">=</span> <span class="ident">board::clint_mtimecmp</span>(<span class="ident">id</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u64</span>;
+    <span class="kw">let</span> <span class="ident">mtime</span> <span class="op">=</span> <span class="ident">board::CLINT_MTIME</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u64</span>;
+    <span class="ident">mtimecmp</span>.<span class="ident">write_volatile</span>(<span class="ident">mtime</span>.<span class="ident">read_volatile</span>() <span class="op">+</span> <span class="ident">interval</span>);
+
+    <span class="comment">// prepare information in scratch[] for timervec.</span>
+    <span class="comment">// scratch[0..2] : space for timervec to save registers.</span>
+    <span class="comment">// scratch[3] : address of CLINT MTIMECMP register.</span>
+    <span class="comment">// scratch[4] : desired interval (in cycles) between timer interrupts.</span>
+    <span class="kw">let</span> <span class="ident">scratch</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">TIMER_SCRATCH</span>[<span class="ident">id</span>];
+    <span class="ident">scratch</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">mtimecmp</span> <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="ident">scratch</span>[<span class="number">4</span>] <span class="op">=</span> <span class="ident">interval</span>;
+    <span class="ident">mscratch::write</span>(<span class="ident">scratch</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+
+    <span class="comment">// set the machine-mode trap handler</span>
+    <span class="ident">mtvec::write</span>(<span class="ident">board::timervec</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">mtvec::TrapMode::Direct</span>);
+
+    <span class="comment">// enable machine-mode interrupts.</span>
+    <span class="ident">mstatus::set_mie</span>();
+
+    <span class="comment">// enable machime-mode timer interrupts.</span>
+    <span class="ident">mie::set_mtimer</span>();
+}
+
+
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rust_main</span>() -&gt; <span class="op">!</span> {
     <span class="ident">clear_bss</span>();
@@ -138,11 +306,11 @@
     <span class="kw">let</span> <span class="ident">_mouse</span> <span class="op">=</span> <span class="ident">MOUSE_DEVICE</span>.<span class="ident">clone</span>();
     <span class="macro">println!</span>(<span class="string">&quot;KERN: init trap&quot;</span>);
     <span class="ident">trap::init</span>();
-    <span class="ident">trap::enable_timer_interrupt</span>();
-    <span class="ident">timer::set_next_trigger</span>();
+    <span class="comment">//trap::enable_timer_interrupt();</span>
+    <span class="comment">//timer::set_next_trigger();</span>
     <span class="ident">board::device_init</span>();
     <span class="ident">fs::list_apps</span>();
-    <span class="ident">gui::init_paint</span>();
+    <span class="comment">//gui::init_paint();</span>
     <span class="ident">task::add_initproc</span>();
     <span class="kw-2">*</span><span class="ident">DEV_NON_BLOCKING_ACCESS</span>.<span class="ident">exclusive_access</span>() <span class="op">=</span> <span class="bool-val">true</span>;
     <span class="ident">task::run_tasks</span>();
