@@ -24,7 +24,7 @@ ifeq ($(MODE), release)
 endif
 
 # KERNEL ENTRY
-KERNEL_ENTRY_PA := 0x80200000
+KERNEL_ENTRY_PA := 0x80000000
 
 # Binutils
 OBJDUMP := rust-objdump --arch-name=riscv64
@@ -71,7 +71,21 @@ disasm-vim: kernel
 	@nvim $(DISASM_TMP)
 	@rm $(DISASM_TMP)
 
-run: run-inner
+run: run-inner-none
+
+run-inner-none: build
+	@qemu-system-riscv64 \
+		-M 128m \
+		-machine virt \
+		-bios none \
+		$(GUI_OPTION) \
+		-kernel $(KERNEL_ELF) \
+		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
+        -device virtio-blk-device,drive=x0 \
+#		-device virtio-gpu-device  \
+		-device virtio-keyboard-device  \
+		-device virtio-mouse-device \
+		-serial stdio
 
 run-inner: build
 	@qemu-system-riscv64 \
