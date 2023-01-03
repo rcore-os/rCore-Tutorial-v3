@@ -60,6 +60,13 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Graphics</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">embedded_graphics::pixelcolor::Rgb888</span>;
@@ -90,7 +97,14 @@
             .<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">graphics</span>)
             .<span class="ident">ok</span>();
     }
+    <span class="kw">fn</span> <span class="ident">unpaint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="ident">Rectangle::with_center</span>(<span class="self">self</span>.<span class="ident">latest_pos</span>, <span class="ident">Size::new</span>(<span class="ident">RECT_SIZE</span>, <span class="ident">RECT_SIZE</span>))
+            .<span class="ident">into_styled</span>(<span class="ident">PrimitiveStyle::with_stroke</span>(<span class="ident">Rgb888::BLACK</span>, <span class="number">1</span>))
+            .<span class="ident">draw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">graphics</span>)
+            .<span class="ident">ok</span>();
+    }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_rect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dx</span>: <span class="ident">i32</span>, <span class="ident">dy</span>: <span class="ident">i32</span>) {
+        <span class="self">self</span>.<span class="ident">unpaint</span>();
         <span class="self">self</span>.<span class="ident">latest_pos</span>.<span class="ident">x</span> <span class="op">+</span><span class="op">=</span> <span class="ident">dx</span>;
         <span class="self">self</span>.<span class="ident">latest_pos</span>.<span class="ident">y</span> <span class="op">+</span><span class="op">=</span> <span class="ident">dy</span>;
         <span class="self">self</span>.<span class="ident">paint</span>();
