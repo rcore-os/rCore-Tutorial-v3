@@ -214,6 +214,7 @@ pub unsafe fn mie_write(x:usize){
 }
 
 unsafe fn timer_init() {
+    clear_bss();
     // each CPU has a separate source of timer interrupts
     //let id = mhartid::read();
 
@@ -246,19 +247,19 @@ unsafe fn timer_init() {
     //mie::set_mtimer();
 }
 
-
+use crate::drivers::chardev::CharDevice;
+use crate::drivers::chardev::UART;
 #[no_mangle]
 pub fn rust_main() -> ! {
 
-    clear_bss();
-
-    println!("KERN: begin");
-
+    //clear_bss();
     mm::init();
+    UART.init();
+    println!("KERN: begin");
     //loop{};
-    //println!("KERN: init gpu");
-    //let _gpu = GPU_DEVICE.clone();
-   // println!("KERN: init keyboard");
+    println!("KERN: init gpu");
+    let _gpu = GPU_DEVICE.clone();
+    println!("KERN: init keyboard");
    // let _keyboard = KEYBOARD_DEVICE.clone();
     //println!("KERN: init mouse");
     //let _mouse = MOUSE_DEVICE.clone();
