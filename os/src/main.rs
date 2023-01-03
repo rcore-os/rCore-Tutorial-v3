@@ -121,7 +121,8 @@ pub unsafe fn rust_start() -> ! {
 
     // configure Physical Memory Protection to give supervisor mode
     // access to all of physical memory.
-    //pmpaddr0::write(0x3fffffffffffff);
+    pmpaddr0::write(0x3fffffffffffff);
+    pmpcfg0::write(0xf);
     //pmpcfg0::set_pmp(0, Range::TOR, Permission::RWX, false); // 0 < addr < pmpaddr0
 
     // ask for clock interrupts.
@@ -249,12 +250,12 @@ unsafe fn timer_init() {
 #[no_mangle]
 pub fn rust_main() -> ! {
 
-    //clear_bss();
+    clear_bss();
 
-    //println!("KERN: begin");
+    println!("KERN: begin");
 
     mm::init();
-    loop{};
+    //loop{};
     //println!("KERN: init gpu");
     //let _gpu = GPU_DEVICE.clone();
    // println!("KERN: init keyboard");
