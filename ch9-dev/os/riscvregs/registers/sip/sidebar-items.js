@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":[["SSIP",""]],"fn":[["clear_ssoft",""]]};

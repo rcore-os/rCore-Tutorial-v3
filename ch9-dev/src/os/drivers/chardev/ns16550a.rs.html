@@ -173,6 +173,11 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
 </pre><pre class="rust"><code><span class="doccomment">///! Ref: https://www.lammertbies.nl/comm/info/serial-uart</span>
 <span class="doccomment">///! Ref: ns16550a datasheet: https://datasheetspdf.com/pdf-file/605590/NationalSemiconductor/NS16550A/1</span>
 <span class="doccomment">///! Ref: ns16450 datasheet: https://datasheetspdf.com/pdf-file/1311818/NationalSemiconductor/NS16450/1</span>
@@ -310,7 +315,7 @@
             <span class="ident">ns16550a</span>: <span class="ident">NS16550aRaw::new</span>(<span class="ident">BASE_ADDR</span>),
             <span class="ident">read_buffer</span>: <span class="ident">VecDeque::new</span>(),
         };
-        <span class="ident">inner</span>.<span class="ident">ns16550a</span>.<span class="ident">init</span>();
+        <span class="comment">//inner.ns16550a.init();</span>
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">inner</span>) },
             <span class="ident">condvar</span>: <span class="ident">Condvar::new</span>(),
@@ -319,6 +324,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">BASE_ADDR</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">CharDevice</span> <span class="kw">for</span> <span class="ident">NS16550a</span><span class="op">&lt;</span><span class="ident">BASE_ADDR</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>){
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_access</span>();
+        <span class="ident">inner</span>.<span class="ident">ns16550a</span>.<span class="ident">init</span>();
+        <span class="ident">drop</span>(<span class="ident">inner</span>);
+    }    
     <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_access</span>();

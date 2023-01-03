@@ -183,6 +183,7 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOCK_FREQ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12500000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO</span>: <span class="kw-2">&amp;</span>[(<span class="ident">usize</span>, <span class="ident">usize</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
@@ -241,10 +242,11 @@
 
 <span class="comment">// core local interrupter (CLINT), which contains the timer</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x2000000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">clint_mtimecmp</span>(<span class="ident">hartid</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="ident">CLINT</span> <span class="op">+</span> <span class="number">0x4000</span> <span class="op">+</span> <span class="number">8</span> <span class="op">*</span> <span class="ident">hartid</span>
-}
+<span class="comment">// pub const fn clint_mtimecmp(hartid: usize) -&gt; usize {</span>
+<span class="comment">//     CLINT + 0x4000 + 8 * hartid</span>
+<span class="comment">// }</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT_MTIME</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">CLINT</span> <span class="op">+</span> <span class="number">0xBFF8</span>; <span class="comment">// Cycles since boot.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT_MTIMECMP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">CLINT</span> <span class="op">+</span> <span class="number">0x4000</span>;
 
 <span class="attribute">#[<span class="ident">naked</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">16</span>))]</span> <span class="comment">// if miss this alignment, a load access fault will occur.</span>

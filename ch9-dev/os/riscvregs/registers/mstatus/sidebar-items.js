@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":[["MIE",""],["MPP_MASK",""]],"enum":[["MPP",""]],"fn":[["_read",""],["_write",""],["set_mie",""],["set_mpp",""]]};

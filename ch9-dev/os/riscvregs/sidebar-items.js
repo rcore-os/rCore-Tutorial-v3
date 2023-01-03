@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":[["PGSHIFT",""],["PGSIZE",""]],"fn":[["intr_get",""],["intr_off",""],["intr_on",""],["pgrounddown",""],["pgroundup",""],["sfence_vma",""]],"mod":[["pteflags",""],["registers",""]]};

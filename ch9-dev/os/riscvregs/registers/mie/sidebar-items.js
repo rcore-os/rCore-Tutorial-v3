@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":[["MTIE",""]],"fn":[["set_mtimer",""]]};

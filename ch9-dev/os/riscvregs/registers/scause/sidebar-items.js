@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["Exception",""],["Interrupt",""],["Trap",""]],"fn":[["read",""]],"struct":[["Scause",""]]};
