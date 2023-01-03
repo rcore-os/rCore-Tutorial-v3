@@ -71,7 +71,7 @@ disasm-vim: kernel
 	@nvim $(DISASM_TMP)
 	@rm $(DISASM_TMP)
 
-run: run-inner-none
+run: run-inner
 
 run-inner-none: build
 	@qemu-system-riscv64 \

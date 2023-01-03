@@ -260,9 +260,9 @@ pub fn rust_main() -> ! {
     println!("KERN: init gpu");
     let _gpu = GPU_DEVICE.clone();
     println!("KERN: init keyboard");
-   // let _keyboard = KEYBOARD_DEVICE.clone();
-    //println!("KERN: init mouse");
-    //let _mouse = MOUSE_DEVICE.clone();
+    let _keyboard = KEYBOARD_DEVICE.clone();
+    println!("KERN: init mouse");
+    let _mouse = MOUSE_DEVICE.clone();
     println!("KERN: init trap");
     trap::init();
     //trap::enable_timer_interrupt();
