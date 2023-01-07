@@ -55,29 +55,8 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">gui</span>::{<span class="ident">move_rect</span>, <span class="ident">reset</span>},
-    <span class="ident">sync::UPIntrFreeCell</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">core::any::Any</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOHeader</span>, <span class="ident">VirtIOInput</span>};
@@ -124,21 +103,6 @@
                 <span class="ident">virtio_input_decoder::DecodeType::Key</span>(<span class="ident">key</span>, <span class="ident">r#type</span>) =&gt; {
                     <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">KeyType::Press</span> {
                         <span class="kw">match</span> <span class="ident">key</span> {
-                            <span class="ident">Key::C</span> <span class="op">|</span> <span class="ident">Key::MouseLeft</span> =&gt; {
-                                <span class="ident">reset</span>();
-                            }
-                            <span class="ident">Key::W</span> =&gt; {
-                                <span class="ident">move_rect</span>(<span class="number">0</span>, <span class="op">-</span><span class="number">10</span>);
-                            }
-                            <span class="ident">Key::S</span> =&gt; {
-                                <span class="ident">move_rect</span>(<span class="number">0</span>, <span class="number">10</span>);
-                            }
-                            <span class="ident">Key::A</span> =&gt; {
-                                <span class="ident">move_rect</span>(<span class="op">-</span><span class="number">10</span>, <span class="number">0</span>);
-                            }
-                            <span class="ident">Key::D</span> =&gt; {
-                                <span class="ident">move_rect</span>(<span class="number">10</span>, <span class="number">0</span>);
-                            }
                             <span class="kw">_</span> =&gt; {}
                         }
                     }
