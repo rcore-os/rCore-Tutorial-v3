@@ -368,10 +368,22 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>, <span class="ident">PageTableEntry</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">StepByOne</span>, <span class="ident">VPNRange</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">StepByOne</span>, <span class="ident">VPNRange</span>, <span class="ident">PPNRange</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">MEMORY_END</span>, <span class="ident">MMIO</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
@@ -448,6 +460,10 @@
         }
         <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">push</span>(<span class="ident">map_area</span>);
     }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map_area</span>: <span class="ident">MapArea</span>, <span class="ident">ppn_range</span>: <span class="ident">PPNRange</span>) {
+        <span class="ident">map_area</span>.<span class="ident">map_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>, <span class="ident">ppn_range</span>);
+        <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">push</span>(<span class="ident">map_area</span>);
+    }    
     <span class="doccomment">/// Mention that trampoline is not collected by areas.</span>
     <span class="kw">fn</span> <span class="ident">map_trampoline</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">page_table</span>.<span class="ident">map</span>(
@@ -671,6 +687,14 @@
             <span class="self">self</span>.<span class="ident">map_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>);
         }
     }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>,<span class="ident">ppn_range</span>:<span class="ident">PPNRange</span>) {
+        <span class="kw">for</span> (<span class="ident">vpn</span>,<span class="ident">ppn</span>) <span class="kw">in</span> <span class="ident">core::iter::zip</span>(<span class="self">self</span>.<span class="ident">vpn_range</span>,<span class="ident">ppn_range</span>) {
+            <span class="self">self</span>.<span class="ident">data_frames</span>.<span class="ident">insert</span>(<span class="ident">vpn</span>, <span class="ident">FrameTracker::new_nowrite</span>(<span class="ident">ppn</span>));
+            <span class="kw">let</span> <span class="ident">pte_flags</span> <span class="op">=</span> <span class="ident">PTEFlags::from_bits</span>(<span class="self">self</span>.<span class="ident">map_perm</span>.<span class="ident">bits</span>).<span class="ident">unwrap</span>();
+            <span class="ident">page_table</span>.<span class="ident">map</span>(<span class="ident">vpn</span>, <span class="ident">ppn</span>, <span class="ident">pte_flags</span>);
+        }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>) {
         <span class="kw">for</span> <span class="ident">vpn</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">vpn_range</span> {
             <span class="self">self</span>.<span class="ident">unmap_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>);

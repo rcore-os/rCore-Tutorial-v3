@@ -68,6 +68,18 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_DUP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">24</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
@@ -95,16 +107,24 @@
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_CREATE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1030</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_SIGNAL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1031</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CONDVAR_WAIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1032</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_FRAMEBUFFER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_FRAMEBUFFER_FLUSH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2001</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_EVENT_GET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3000</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_KEY_PRESSED</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3001</span>;
 
 <span class="kw">mod</span> <span class="ident">fs</span>;
 <span class="kw">mod</span> <span class="ident">process</span>;
 <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
+<span class="kw">mod</span> <span class="ident">gui</span>;
+<span class="kw">mod</span> <span class="ident">input</span>;
 
 <span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sync</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">thread</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">gui</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">input</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syscall</span>(<span class="ident">syscall_id</span>: <span class="ident">usize</span>, <span class="ident">args</span>: [<span class="ident">usize</span>; <span class="number">3</span>]) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">syscall_id</span> {
@@ -135,6 +155,10 @@
         <span class="ident">SYSCALL_CONDVAR_CREATE</span> =&gt; <span class="ident">sys_condvar_create</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_CONDVAR_SIGNAL</span> =&gt; <span class="ident">sys_condvar_signal</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_CONDVAR_WAIT</span> =&gt; <span class="ident">sys_condvar_wait</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>]),
+        <span class="ident">SYSCALL_FRAMEBUFFER</span> =&gt; <span class="ident">sys_framebuffer</span>(),
+        <span class="ident">SYSCALL_FRAMEBUFFER_FLUSH</span> =&gt; <span class="ident">sys_framebuffer_flush</span>(),
+        <span class="ident">SYSCALL_EVENT_GET</span> =&gt; <span class="ident">sys_event_get</span>(),
+        <span class="ident">SYSCALL_KEY_PRESSED</span> =&gt; <span class="ident">sys_key_pressed</span>(),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported syscall_id: {}&quot;</span>, <span class="ident">syscall_id</span>),
     }
 }
