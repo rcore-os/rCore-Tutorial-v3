@@ -120,16 +120,13 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-<span id="123">123</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{<span class="ident">Condvar</span>, <span class="ident">UPIntrFreeCell</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::schedule</span>;
-<span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::VecDeque</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">core::any::Any</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOHeader</span>, <span class="ident">VirtIOInput</span>};
-<span class="kw">use</span> <span class="ident">virtio_input_decoder</span>::{<span class="ident">Decoder</span>, <span class="ident">Key</span>, <span class="ident">KeyType</span>};
 
 <span class="kw">const</span> <span class="ident">VIRTIO5</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10005000</span>;
 <span class="kw">const</span> <span class="ident">VIRTIO6</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10006000</span>;
@@ -235,7 +232,8 @@
                     <span class="op">|</span> (<span class="ident">event</span>.<span class="ident">code</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>
                     <span class="op">|</span> (<span class="ident">event</span>.<span class="ident">value</span>) <span class="kw">as</span> <span class="ident">u64</span>;
                 <span class="ident">inner</span>.<span class="ident">events</span>.<span class="ident">push_back</span>(<span class="ident">result</span>);
-                <span class="macro">println!</span>(<span class="string">&quot;[KERN] inputdev_handle_irq: event: {:x}&quot;</span>, <span class="ident">result</span>);
+                <span class="comment">// for test</span>
+                <span class="comment">//println!(&quot;[KERN] inputdev_handle_irq: event: {:x}&quot;, result);</span>
             }
         });
         <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="number">0</span> {

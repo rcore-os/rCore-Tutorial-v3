@@ -78,6 +78,8 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_DUP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">24</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
@@ -108,6 +110,7 @@
 <span class="kw">const</span> <span class="ident">SYSCALL_FRAMEBUFFER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_FRAMEBUFFER_FLUSH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2001</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_EVENT_GET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3000</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_KEY_PRESSED</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3001</span>;
 
 <span class="kw">mod</span> <span class="ident">fs</span>;
 <span class="kw">mod</span> <span class="ident">process</span>;
@@ -155,6 +158,7 @@
         <span class="ident">SYSCALL_FRAMEBUFFER</span> =&gt; <span class="ident">sys_framebuffer</span>(),
         <span class="ident">SYSCALL_FRAMEBUFFER_FLUSH</span> =&gt; <span class="ident">sys_framebuffer_flush</span>(),
         <span class="ident">SYSCALL_EVENT_GET</span> =&gt; <span class="ident">sys_event_get</span>(),
+        <span class="ident">SYSCALL_KEY_PRESSED</span> =&gt; <span class="ident">sys_key_pressed</span>(),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported syscall_id: {}&quot;</span>, <span class="ident">syscall_id</span>),
     }
 }

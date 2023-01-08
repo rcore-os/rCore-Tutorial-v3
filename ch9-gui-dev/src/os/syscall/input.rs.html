@@ -15,6 +15,18 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class="rust"><code><span class="comment">//use crate::drivers::{KEYBOARD_DEVICE,MOUSE_DEVICE,INPUT_CONDVAR,read_input_event};</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers</span>::{<span class="ident">KEYBOARD_DEVICE</span>,<span class="ident">MOUSE_DEVICE</span>};
 
@@ -31,5 +43,17 @@
         <span class="number">0</span>
     }
 
+}
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::chardev::UART</span>;
+
+<span class="doccomment">/// check UART&#39;s read-buffer is empty or not</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_key_pressed</span>()  -&gt; <span class="ident">isize</span> {
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span><span class="op">!</span><span class="ident">UART</span>.<span class="ident">read_buffer_is_empty</span>();
+    <span class="kw">if</span> <span class="ident">res</span> {
+        <span class="number">1</span>
+    } <span class="kw">else</span> {
+        <span class="number">0</span>
+    }    
 }</code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
