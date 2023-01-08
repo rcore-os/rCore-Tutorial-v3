@@ -125,6 +125,9 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -143,6 +146,9 @@
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">bytes_array</span> {
             <span class="kw-2">*</span><span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
         }
+        <span class="self">Self</span> { <span class="ident">ppn</span> }
+    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_nowrite</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">ppn</span> }
     }
 }

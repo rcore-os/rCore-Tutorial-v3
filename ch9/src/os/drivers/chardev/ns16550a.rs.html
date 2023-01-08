@@ -179,6 +179,10 @@
 <span id="179">179</span>
 <span id="180">180</span>
 <span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
 </pre><pre class="rust"><code><span class="doccomment">///! Ref: https://www.lammertbies.nl/comm/info/serial-uart</span>
 <span class="doccomment">///! Ref: ns16550a datasheet: https://datasheetspdf.com/pdf-file/605590/NationalSemiconductor/NS16550A/1</span>
 <span class="doccomment">///! Ref: ns16450 datasheet: https://datasheetspdf.com/pdf-file/1311818/NationalSemiconductor/NS16450/1</span>
@@ -312,7 +316,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">BASE_ADDR</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">NS16550a</span><span class="op">&lt;</span><span class="ident">BASE_ADDR</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">NS16550aInner</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">NS16550aInner</span> {
             <span class="ident">ns16550a</span>: <span class="ident">NS16550aRaw::new</span>(<span class="ident">BASE_ADDR</span>),
             <span class="ident">read_buffer</span>: <span class="ident">VecDeque::new</span>(),
         };
@@ -321,6 +325,10 @@
             <span class="ident">inner</span>: <span class="kw">unsafe</span> { <span class="ident">UPIntrFreeCell::new</span>(<span class="ident">inner</span>) },
             <span class="ident">condvar</span>: <span class="ident">Condvar::new</span>(),
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_buffer_is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_session</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">read_buffer</span>.<span class="ident">is_empty</span>())
     }
 }
 
