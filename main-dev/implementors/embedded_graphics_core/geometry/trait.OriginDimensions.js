@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["os"] = [{"text":"impl OriginDimensions for <a class=\"struct\" href=\"os/gui/graphic/struct.Graphics.html\" title=\"struct os::gui::graphic::Graphics\">Graphics</a>","synthetic":false,"types":["os::gui::graphic::Graphics"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["INIT_X",""],["INIT_Y",""],["RECT_SIZE",""]],"fn":[["init_paint",""],["move_rect",""],["reset",""]],"struct":[["DRAWING_BOARD",""],["DrawingBoard",""]]};
