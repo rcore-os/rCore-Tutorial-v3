@@ -128,6 +128,10 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -137,6 +141,7 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FrameTracker</span> {
     <span class="kw">pub</span> <span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>,
+    <span class="kw">pub</span> <span class="ident">nodrop</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">FrameTracker</span> {
@@ -146,10 +151,10 @@
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">bytes_array</span> {
             <span class="kw-2">*</span><span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
         }
-        <span class="self">Self</span> { <span class="ident">ppn</span> }
+        <span class="self">Self</span> { <span class="ident">ppn</span>, <span class="ident">nodrop</span>: <span class="bool-val">false</span> }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_nowrite</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">ppn</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_noalloc</span>(<span class="ident">ppn</span>: <span class="ident">PhysPageNum</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">ppn</span>, <span class="ident">nodrop</span>: <span class="bool-val">true</span> }
     }
 }
 
@@ -161,6 +166,9 @@
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FrameTracker</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nodrop</span> {
+            <span class="kw">return</span>;
+        }
         <span class="ident">frame_dealloc</span>(<span class="self">self</span>.<span class="ident">ppn</span>);
     }
 }
