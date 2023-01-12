@@ -140,7 +140,7 @@
     <span class="ident">inner</span>: <span class="ident">UPIntrFreeCell</span><span class="op">&lt;</span><span class="ident">VirtIOInputInner</span><span class="op">&gt;</span>,
     <span class="comment">//condvars: BTreeMap&lt;u16, Condvar&gt;,</span>
     <span class="comment">//condvar: Arc::&lt;Condvar&gt; ,</span>
-    <span class="ident">condvar</span>:<span class="ident">Condvar</span>,
+    <span class="ident">condvar</span>: <span class="ident">Condvar</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InputDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
@@ -160,7 +160,7 @@
 <span class="comment">//const QUEUE_SIZE: u16 = 32;</span>
 <span class="comment">// pub fn read_input_event() -&gt; u64 {</span>
 <span class="comment">//     loop {</span>
-        
+
 <span class="comment">//         //let mut inner = self.inner.exclusive_access();</span>
 <span class="comment">//         let kb=KEYBOARD_DEVICE.clone();</span>
 <span class="comment">//         let evs = kb.events();</span>
