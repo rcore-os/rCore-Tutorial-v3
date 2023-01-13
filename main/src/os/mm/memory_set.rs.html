@@ -378,16 +378,10 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PTEFlags</span>, <span class="ident">PageTable</span>, <span class="ident">PageTableEntry</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">VirtPageNum</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">StepByOne</span>, <span class="ident">VPNRange</span>, <span class="ident">PPNRange</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">StepByOne</span>, <span class="ident">VPNRange</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">MEMORY_END</span>, <span class="ident">MMIO</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
@@ -457,17 +451,16 @@
             <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">remove</span>(<span class="ident">idx</span>);
         }
     }
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map_area</span>: <span class="ident">MapArea</span>, <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) {
+    <span class="doccomment">/// Add a new MapArea into this MemorySet.</span>
+    <span class="doccomment">/// Assuming that there are no conflicts in the virtual address</span>
+    <span class="doccomment">/// space.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map_area</span>: <span class="ident">MapArea</span>, <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) {
         <span class="ident">map_area</span>.<span class="ident">map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">data</span> {
             <span class="ident">map_area</span>.<span class="ident">copy_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>, <span class="ident">data</span>);
         }
         <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">push</span>(<span class="ident">map_area</span>);
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map_area</span>: <span class="ident">MapArea</span>, <span class="ident">ppn_range</span>: <span class="ident">PPNRange</span>) {
-        <span class="ident">map_area</span>.<span class="ident">map_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>, <span class="ident">ppn_range</span>);
-        <span class="self">self</span>.<span class="ident">areas</span>.<span class="ident">push</span>(<span class="ident">map_area</span>);
-    }    
     <span class="doccomment">/// Mention that trampoline is not collected by areas.</span>
     <span class="kw">fn</span> <span class="ident">map_trampoline</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">page_table</span>.<span class="ident">map</span>(
@@ -676,8 +669,10 @@
                 <span class="ident">ppn</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">ppn</span>;
                 <span class="self">self</span>.<span class="ident">data_frames</span>.<span class="ident">insert</span>(<span class="ident">vpn</span>, <span class="ident">frame</span>);
             }
-            <span class="ident">MapType::Noalloc</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Noalloc should not be mapped&quot;</span>);
+            <span class="ident">MapType::Linear</span>(<span class="ident">pn_offset</span>) =&gt; {
+                <span class="comment">// check for sv39</span>
+                <span class="macro">assert!</span>(<span class="ident">vpn</span>.<span class="number">0</span> <span class="op">&lt;</span> (<span class="number">1usize</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>));
+                <span class="ident">ppn</span> <span class="op">=</span> <span class="ident">PhysPageNum</span>((<span class="ident">vpn</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">pn_offset</span>) <span class="kw">as</span> <span class="ident">usize</span>);
             }
         }
         <span class="kw">let</span> <span class="ident">pte_flags</span> <span class="op">=</span> <span class="ident">PTEFlags::from_bits</span>(<span class="self">self</span>.<span class="ident">map_perm</span>.<span class="ident">bits</span>).<span class="ident">unwrap</span>();
@@ -694,14 +689,6 @@
             <span class="self">self</span>.<span class="ident">map_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>);
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_noalloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>,<span class="ident">ppn_range</span>:<span class="ident">PPNRange</span>) {
-        <span class="kw">for</span> (<span class="ident">vpn</span>,<span class="ident">ppn</span>) <span class="kw">in</span> <span class="ident">core::iter::zip</span>(<span class="self">self</span>.<span class="ident">vpn_range</span>,<span class="ident">ppn_range</span>) {
-            <span class="self">self</span>.<span class="ident">data_frames</span>.<span class="ident">insert</span>(<span class="ident">vpn</span>, <span class="ident">FrameTracker::new_noalloc</span>(<span class="ident">ppn</span>));
-            <span class="kw">let</span> <span class="ident">pte_flags</span> <span class="op">=</span> <span class="ident">PTEFlags::from_bits</span>(<span class="self">self</span>.<span class="ident">map_perm</span>.<span class="ident">bits</span>).<span class="ident">unwrap</span>();
-            <span class="ident">page_table</span>.<span class="ident">map</span>(<span class="ident">vpn</span>, <span class="ident">ppn</span>, <span class="ident">pte_flags</span>);
-        }
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>) {
         <span class="kw">for</span> <span class="ident">vpn</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">vpn_range</span> {
             <span class="self">self</span>.<span class="ident">unmap_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>);
@@ -735,7 +722,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MapType</span> {
     <span class="ident">Identical</span>,
     <span class="ident">Framed</span>,
-    <span class="ident">Noalloc</span>,
+    <span class="doccomment">/// offset of page num</span>
+    <span class="ident">Linear</span>(<span class="ident">isize</span>),
 }
 
 <span class="macro">bitflags!</span> {
