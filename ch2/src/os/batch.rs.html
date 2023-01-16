@@ -147,6 +147,11 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="doccomment">//! batch subsystem</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
@@ -222,8 +227,6 @@
             <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
         }
         <span class="macro">println!</span>(<span class="string">&quot;[kernel] Loading app_{}&quot;</span>, <span class="ident">app_id</span>);
-        <span class="comment">// clear icache</span>
-        <span class="macro">asm!</span>(<span class="string">&quot;fence.i&quot;</span>);
         <span class="comment">// clear app area</span>
         <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">APP_BASE_ADDRESS</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">APP_SIZE_LIMIT</span>).<span class="ident">fill</span>(<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">app_src</span> <span class="op">=</span> <span class="ident">core::slice::from_raw_parts</span>(
@@ -232,6 +235,13 @@
         );
         <span class="kw">let</span> <span class="ident">app_dst</span> <span class="op">=</span> <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">APP_BASE_ADDRESS</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">app_src</span>.<span class="ident">len</span>());
         <span class="ident">app_dst</span>.<span class="ident">copy_from_slice</span>(<span class="ident">app_src</span>);
+        <span class="comment">// Memory fence about fetching the instruction memory</span>
+        <span class="comment">// It is guaranteed that a subsequent instruction fetch must</span>
+        <span class="comment">// observes all previous writes to the instruction memory.</span>
+        <span class="comment">// Therefore, fence.i must be executed after we have loaded</span>
+        <span class="comment">// the code of the next app into the instruction memory.</span>
+        <span class="comment">// See also: riscv non-priv spec chapter 3, &#39;Zifencei&#39; extension.</span>
+        <span class="macro">asm!</span>(<span class="string">&quot;fence.i&quot;</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
