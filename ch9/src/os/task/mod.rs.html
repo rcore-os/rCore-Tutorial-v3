@@ -206,7 +206,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_current_task</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">TaskContext</span> {
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">take_current_task</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">task_inner</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">inner_exclusive_access</span>();
-    <span class="ident">task_inner</span>.<span class="ident">task_status</span> <span class="op">=</span> <span class="ident">TaskStatus::Blocking</span>;
+    <span class="ident">task_inner</span>.<span class="ident">task_status</span> <span class="op">=</span> <span class="ident">TaskStatus::Blocked</span>;
     <span class="kw-2">&amp;mut</span> <span class="ident">task_inner</span>.<span class="ident">task_cx</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">TaskContext</span>
 }
 
