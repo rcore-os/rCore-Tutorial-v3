@@ -88,7 +88,7 @@
 <span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::TaskControlBlock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">add_task</span>, <span class="ident">current_task</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">wakeup_task</span>, <span class="ident">current_task</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">block_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">sync::Arc</span>};
 
@@ -168,7 +168,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutex_inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_access</span>();
         <span class="macro">assert!</span>(<span class="ident">mutex_inner</span>.<span class="ident">locked</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waking_task</span>) <span class="op">=</span> <span class="ident">mutex_inner</span>.<span class="ident">wait_queue</span>.<span class="ident">pop_front</span>() {
-            <span class="ident">add_task</span>(<span class="ident">waking_task</span>);
+            <span class="ident">wakeup_task</span>(<span class="ident">waking_task</span>);
         } <span class="kw">else</span> {
             <span class="ident">mutex_inner</span>.<span class="ident">locked</span> <span class="op">=</span> <span class="bool-val">false</span>;
         }
