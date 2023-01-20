@@ -185,6 +185,9 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">translated_ref</span>, <span class="ident">translated_refmut</span>, <span class="ident">translated_str</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{
@@ -331,7 +334,10 @@
         <span class="comment">// restore the trap context</span>
         <span class="kw">let</span> <span class="ident">trap_ctx</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">get_trap_cx</span>();
         <span class="kw-2">*</span><span class="ident">trap_ctx</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">trap_ctx_backup</span>.<span class="ident">unwrap</span>();
-        <span class="number">0</span>
+        <span class="comment">// Here we return the value of a0 in the trap_ctx,</span>
+        <span class="comment">// otherwise it will be overwritten after we trap</span>
+        <span class="comment">// back to the original execution of the application.</span>
+        <span class="ident">trap_ctx</span>.<span class="ident">x</span>[<span class="number">10</span>] <span class="kw">as</span> <span class="ident">isize</span>
     } <span class="kw">else</span> {
         <span class="op">-</span><span class="number">1</span>
     }
