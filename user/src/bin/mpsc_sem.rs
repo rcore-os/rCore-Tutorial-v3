@@ -14,7 +14,7 @@ use user_lib::{thread_create, waittid};
 
 const SEM_MUTEX: usize = 0;
 const SEM_EMPTY: usize = 1;
-const SEM_EXISTED: usize = 2;
+const SEM_AVAIL: usize = 2;
 const BUFFER_SIZE: usize = 8;
 static mut BUFFER: [usize; BUFFER_SIZE] = [0; BUFFER_SIZE];
 static mut FRONT: usize = 0;
@@ -27,20 +27,20 @@ unsafe fn producer(id: *const usize) -> ! {
     for _ in 0..NUMBER_PER_PRODUCER {
         semaphore_down(SEM_EMPTY);
         semaphore_down(SEM_MUTEX);
-        BUFFER[FRONT] = id;
-        FRONT = (FRONT + 1) % BUFFER_SIZE;
+        BUFFER[TAIL] = id;
+        TAIL = (TAIL + 1) % BUFFER_SIZE;
         semaphore_up(SEM_MUTEX);
-        semaphore_up(SEM_EXISTED);
+        semaphore_up(SEM_AVAIL);
     }
     exit(0)
 }
 
 unsafe fn consumer() -> ! {
     for _ in 0..PRODUCER_COUNT * NUMBER_PER_PRODUCER {
-        semaphore_down(SEM_EXISTED);
+        semaphore_down(SEM_AVAIL);
         semaphore_down(SEM_MUTEX);
-        print!("{} ", BUFFER[TAIL]);
-        TAIL = (TAIL + 1) % BUFFER_SIZE;
+        print!("{} ", BUFFER[FRONT]);
+        FRONT = (FRONT + 1) % BUFFER_SIZE;
         semaphore_up(SEM_MUTEX);
         semaphore_up(SEM_EMPTY);
     }
@@ -53,7 +53,7 @@ pub fn main() -> i32 {
     // create semaphores
     assert_eq!(semaphore_create(1) as usize, SEM_MUTEX);
     assert_eq!(semaphore_create(BUFFER_SIZE) as usize, SEM_EMPTY);
-    assert_eq!(semaphore_create(0) as usize, SEM_EXISTED);
+    assert_eq!(semaphore_create(0) as usize, SEM_AVAIL);
     // create threads
     let ids: Vec<_> = (0..PRODUCER_COUNT).collect();
     let mut threads = Vec::new();
