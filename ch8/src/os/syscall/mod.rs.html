@@ -132,7 +132,7 @@
         <span class="ident">SYSCALL_SEMAPHORE_CREATE</span> =&gt; <span class="ident">sys_semaphore_create</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_SEMAPHORE_UP</span> =&gt; <span class="ident">sys_semaphore_up</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_SEMAPHORE_DOWN</span> =&gt; <span class="ident">sys_semaphore_down</span>(<span class="ident">args</span>[<span class="number">0</span>]),
-        <span class="ident">SYSCALL_CONDVAR_CREATE</span> =&gt; <span class="ident">sys_condvar_create</span>(<span class="ident">args</span>[<span class="number">0</span>]),
+        <span class="ident">SYSCALL_CONDVAR_CREATE</span> =&gt; <span class="ident">sys_condvar_create</span>(),
         <span class="ident">SYSCALL_CONDVAR_SIGNAL</span> =&gt; <span class="ident">sys_condvar_signal</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_CONDVAR_WAIT</span> =&gt; <span class="ident">sys_condvar_wait</span>(<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>]),
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported syscall_id: {}&quot;</span>, <span class="ident">syscall_id</span>),
