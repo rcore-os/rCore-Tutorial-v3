@@ -28,7 +28,7 @@ impl Barrier {
     }
     pub fn block(&self) {
         mutex_lock(self.mutex_id);
-        let mut count = self.count.get();
+        let count = self.count.get();
         // SAFETY: Here, the accesses of the count is in the
         // critical section protected by the mutex.
         unsafe { *count = *count + 1; } 

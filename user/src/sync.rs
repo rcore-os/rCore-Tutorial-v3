@@ -22,7 +22,7 @@ pub fn semaphore_down(sem_id: usize) {
     sys_semaphore_down(sem_id);
 }
 pub fn condvar_create() -> isize {
-    sys_condvar_create(0)
+    sys_condvar_create()
 }
 pub fn condvar_signal(condvar_id: usize) {
     sys_condvar_signal(condvar_id);
