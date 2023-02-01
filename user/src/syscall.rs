@@ -145,8 +145,8 @@ pub fn sys_semaphore_down(sem_id: usize) -> isize {
     syscall(SYSCALL_SEMAPHORE_DOWN, [sem_id, 0, 0])
 }
 
-pub fn sys_condvar_create(_arg: usize) -> isize {
-    syscall(SYSCALL_CONDVAR_CREATE, [_arg, 0, 0])
+pub fn sys_condvar_create() -> isize {
+    syscall(SYSCALL_CONDVAR_CREATE, [0, 0, 0])
 }
 
 pub fn sys_condvar_signal(condvar_id: usize) -> isize {

@@ -35,8 +35,8 @@ unsafe fn second() -> ! {
         println!("Second: A is {}", A);
         condvar_wait(CONDVAR_ID, MUTEX_ID);
     }
-    mutex_unlock(MUTEX_ID);
     println!("A is {}, Second can work now", A);
+    mutex_unlock(MUTEX_ID);
     exit(0)
 }
 

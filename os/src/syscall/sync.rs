@@ -93,7 +93,7 @@ pub fn sys_semaphore_down(sem_id: usize) -> isize {
     0
 }
 
-pub fn sys_condvar_create(_arg: usize) -> isize {
+pub fn sys_condvar_create() -> isize {
     let process = current_process();
     let mut process_inner = process.inner_exclusive_access();
     let id = if let Some(id) = process_inner
