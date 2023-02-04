@@ -126,7 +126,7 @@ impl TaskManager {
         inner.tasks[inner.current_task].get_trap_cx()
     }
 
-    /// Change the current 'Running' task's program break 
+    /// Change the current 'Running' task's program break
     pub fn change_current_program_brk(&self, size: i32) -> Option<usize> {
         let mut inner = self.inner.exclusive_access();
         let cur = inner.current_task;
@@ -200,7 +200,7 @@ pub fn current_trap_cx() -> &'static mut TrapContext {
     TASK_MANAGER.get_current_trap_cx()
 }
 
- /// Change the current 'Running' task's program break 
- pub fn change_program_brk(size: i32) -> Option<usize> {
+/// Change the current 'Running' task's program break
+pub fn change_program_brk(size: i32) -> Option<usize> {
     TASK_MANAGER.change_current_program_brk(size)
- }
+}

@@ -241,27 +241,27 @@ impl MemorySet {
         self.page_table.translate(vpn)
     }
     #[allow(unused)]
-    pub fn shrink_to(&mut self, start: VirtAddr, end: VirtAddr, new_end: VirtAddr) -> bool {
+    pub fn shrink_to(&mut self, start: VirtAddr, new_end: VirtAddr) -> bool {
         if let Some(area) = self
             .areas
             .iter_mut()
-            .find(|area| area.vpn_range.get_start() == start.floor()
-            && area.vpn_range.get_end() == end.ceil()) {
-                area.shrink_to(&mut self.page_table, new_end.ceil());
-                true
+            .find(|area| area.vpn_range.get_start() == start.floor())
+        {
+            area.shrink_to(&mut self.page_table, new_end.ceil());
+            true
         } else {
             false
         }
     }
     #[allow(unused)]
-    pub fn append_to(&mut self, start: VirtAddr, end: VirtAddr, new_end: VirtAddr) -> bool {
+    pub fn append_to(&mut self, start: VirtAddr, new_end: VirtAddr) -> bool {
         if let Some(area) = self
             .areas
             .iter_mut()
-            .find(|area| area.vpn_range.get_start() == start.floor()
-            && area.vpn_range.get_end() == end.ceil()) {
-                area.append_to(&mut self.page_table, new_end.ceil());
-                true
+            .find(|area| area.vpn_range.get_start() == start.floor())
+        {
+            area.append_to(&mut self.page_table, new_end.ceil());
+            true
         } else {
             false
         }

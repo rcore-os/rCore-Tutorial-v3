@@ -42,6 +42,5 @@ fn main() -> i32 {
     for pos in 0..PAGE_SIZE {
         new_page[pos] = 2;
     }
-    println!("Test sbrk OK!");
     0
 }

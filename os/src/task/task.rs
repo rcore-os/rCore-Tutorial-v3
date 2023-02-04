@@ -62,12 +62,14 @@ impl TaskControlBlock {
         let old_break = self.program_brk;
         let new_brk = self.program_brk as isize + size as isize;
         if new_brk < self.heap_bottom as isize {
-            return None
+            return None;
         }
         let result = if size < 0 {
-            self.memory_set.shrink_to(VirtAddr(self.heap_bottom), VirtAddr(self.program_brk), VirtAddr(new_brk as usize))
+            self.memory_set
+                .shrink_to(VirtAddr(self.heap_bottom), VirtAddr(new_brk as usize))
         } else {
-            self.memory_set.append_to(VirtAddr(self.heap_bottom), VirtAddr(self.program_brk), VirtAddr(new_brk as usize))
+            self.memory_set
+                .append_to(VirtAddr(self.heap_bottom), VirtAddr(new_brk as usize))
         };
         if result {
             self.program_brk = new_brk as usize;
