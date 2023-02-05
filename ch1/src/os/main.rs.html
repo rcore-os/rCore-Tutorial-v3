@@ -65,6 +65,18 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The operating system and app also starts in this module. Kernel code starts</span>
@@ -81,10 +93,12 @@
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">panic_info_message</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::global_asm</span>;
+<span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">console</span>;
 <span class="kw">mod</span> <span class="ident">lang_items</span>;
+<span class="kw">mod</span> <span class="ident">logging</span>;
 <span class="kw">mod</span> <span class="ident">sbi</span>;
 
 <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/qemu.rs&quot;</span>]</span>
@@ -117,20 +131,30 @@
         <span class="kw">fn</span> <span class="ident">boot_stack_top</span>(); <span class="comment">// stack top</span>
     }
     <span class="ident">clear_bss</span>();
-    <span class="macro">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;.text [{:#x}, {:#x})&quot;</span>, <span class="ident">stext</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">etext</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;.rodata [{:#x}, {:#x})&quot;</span>, <span class="ident">srodata</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">erodata</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;.data [{:#x}, {:#x})&quot;</span>, <span class="ident">sdata</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">edata</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="macro">println!</span>(
-        <span class="string">&quot;boot_stack top=bottom={:#x}, lower_bound={:#x}&quot;</span>,
+    <span class="ident">logging::init</span>();
+    <span class="macro">println!</span>(<span class="string">&quot;[kernel] Hello, world!&quot;</span>);
+    <span class="macro">trace!</span>(
+        <span class="string">&quot;[kernel] .text [{:#x}, {:#x})&quot;</span>,
+        <span class="ident">stext</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="ident">etext</span> <span class="kw">as</span> <span class="ident">usize</span>
+    );
+    <span class="macro">debug!</span>(
+        <span class="string">&quot;[kernel] .rodata [{:#x}, {:#x})&quot;</span>,
+        <span class="ident">srodata</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">erodata</span> <span class="kw">as</span> <span class="ident">usize</span>
+    );
+    <span class="macro">info!</span>(
+        <span class="string">&quot;[kernel] .data [{:#x}, {:#x})&quot;</span>,
+        <span class="ident">sdata</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">edata</span> <span class="kw">as</span> <span class="ident">usize</span>
+    );
+    <span class="macro">warn!</span>(
+        <span class="string">&quot;[kernel] boot_stack top=bottom={:#x}, lower_bound={:#x}&quot;</span>,
         <span class="ident">boot_stack_top</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">boot_stack_lower_bound</span> <span class="kw">as</span> <span class="ident">usize</span>
     );
-    <span class="macro">println!</span>(<span class="string">&quot;.bss [{:#x}, {:#x})&quot;</span>, <span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>);
+    <span class="macro">error!</span>(<span class="string">&quot;[kernel] .bss [{:#x}, {:#x})&quot;</span>, <span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
     <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>(); <span class="comment">// CI autotest success</span>
                                                    <span class="comment">//crate::board::QEMU_EXIT_HANDLE.exit_failure(); // CI autoest failed</span>
-
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
