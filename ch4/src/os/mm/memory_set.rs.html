@@ -353,6 +353,56 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of [`MapArea`] and [`MemorySet`].</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">frame_alloc</span>, <span class="ident">FrameTracker</span>};
@@ -559,6 +609,16 @@
             ),
             <span class="prelude-val">None</span>,
         );
+        <span class="comment">// used in sbrk</span>
+        <span class="ident">memory_set</span>.<span class="ident">push</span>(
+            <span class="ident">MapArea::new</span>(
+                <span class="ident">user_stack_top</span>.<span class="ident">into</span>(),
+                <span class="ident">user_stack_top</span>.<span class="ident">into</span>(),
+                <span class="ident">MapType::Framed</span>,
+                <span class="ident">MapPermission::R</span> <span class="op">|</span> <span class="ident">MapPermission::W</span> <span class="op">|</span> <span class="ident">MapPermission::U</span>,
+            ),
+            <span class="prelude-val">None</span>,
+        );
         <span class="comment">// map TrapContext</span>
         <span class="ident">memory_set</span>.<span class="ident">push</span>(
             <span class="ident">MapArea::new</span>(
@@ -584,6 +644,32 @@
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">vpn</span>: <span class="ident">VirtPageNum</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PageTableEntry</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">page_table</span>.<span class="ident">translate</span>(<span class="ident">vpn</span>)
+    }
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">VirtAddr</span>, <span class="ident">new_end</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">area</span>) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">areas</span>
+            .<span class="ident">iter_mut</span>()
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">area</span><span class="op">|</span> <span class="ident">area</span>.<span class="ident">vpn_range</span>.<span class="ident">get_start</span>() <span class="op">==</span> <span class="ident">start</span>.<span class="ident">floor</span>())
+        {
+            <span class="ident">area</span>.<span class="ident">shrink_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>, <span class="ident">new_end</span>.<span class="ident">ceil</span>());
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        }
+    }
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">VirtAddr</span>, <span class="ident">new_end</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">area</span>) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">areas</span>
+            .<span class="ident">iter_mut</span>()
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">area</span><span class="op">|</span> <span class="ident">area</span>.<span class="ident">vpn_range</span>.<span class="ident">get_start</span>() <span class="op">==</span> <span class="ident">start</span>.<span class="ident">floor</span>())
+        {
+            <span class="ident">area</span>.<span class="ident">append_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">page_table</span>, <span class="ident">new_end</span>.<span class="ident">ceil</span>());
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        }
     }
 }
 
@@ -643,6 +729,20 @@
         <span class="kw">for</span> <span class="ident">vpn</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">vpn_range</span> {
             <span class="self">self</span>.<span class="ident">unmap_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>);
         }
+    }
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>, <span class="ident">new_end</span>: <span class="ident">VirtPageNum</span>) {
+        <span class="kw">for</span> <span class="ident">vpn</span> <span class="kw">in</span> <span class="ident">VPNRange::new</span>(<span class="ident">new_end</span>, <span class="self">self</span>.<span class="ident">vpn_range</span>.<span class="ident">get_end</span>()) {
+            <span class="self">self</span>.<span class="ident">unmap_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>)
+        }
+        <span class="self">self</span>.<span class="ident">vpn_range</span> <span class="op">=</span> <span class="ident">VPNRange::new</span>(<span class="self">self</span>.<span class="ident">vpn_range</span>.<span class="ident">get_start</span>(), <span class="ident">new_end</span>);
+    }
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">page_table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PageTable</span>, <span class="ident">new_end</span>: <span class="ident">VirtPageNum</span>) {
+        <span class="kw">for</span> <span class="ident">vpn</span> <span class="kw">in</span> <span class="ident">VPNRange::new</span>(<span class="self">self</span>.<span class="ident">vpn_range</span>.<span class="ident">get_end</span>(), <span class="ident">new_end</span>) {
+            <span class="self">self</span>.<span class="ident">map_one</span>(<span class="ident">page_table</span>, <span class="ident">vpn</span>)
+        }
+        <span class="self">self</span>.<span class="ident">vpn_range</span> <span class="op">=</span> <span class="ident">VPNRange::new</span>(<span class="self">self</span>.<span class="ident">vpn_range</span>.<span class="ident">get_start</span>(), <span class="ident">new_end</span>);
     }
     <span class="doccomment">/// data: start-aligned but maybe with shorter length</span>
     <span class="doccomment">/// assume that all frames were cleared before</span>

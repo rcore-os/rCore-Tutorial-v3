@@ -192,6 +192,18 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Task management implementation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Everything about task management, like starting and switching tasks is</span>
@@ -320,6 +332,13 @@
         <span class="ident">inner</span>.<span class="ident">tasks</span>[<span class="ident">inner</span>.<span class="ident">current_task</span>].<span class="ident">get_trap_cx</span>()
     }
 
+    <span class="doccomment">/// Change the current &#39;Running&#39; task&#39;s program break</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change_current_program_brk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exclusive_access</span>();
+        <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">current_task</span>;
+        <span class="ident">inner</span>.<span class="ident">tasks</span>[<span class="ident">cur</span>].<span class="ident">change_program_brk</span>(<span class="ident">size</span>)
+    }
+
     <span class="doccomment">/// Switch current `Running` task to the task we have found,</span>
     <span class="doccomment">/// or there is no `Ready` task and we can exit with all applications completed</span>
     <span class="kw">fn</span> <span class="ident">run_next_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -385,6 +404,11 @@
 <span class="doccomment">/// Get the current &#39;Running&#39; task&#39;s trap contexts.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_trap_cx</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">TrapContext</span> {
     <span class="ident">TASK_MANAGER</span>.<span class="ident">get_current_trap_cx</span>()
+}
+
+<span class="doccomment">/// Change the current &#39;Running&#39; task&#39;s program break</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change_program_brk</span>(<span class="ident">size</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="ident">TASK_MANAGER</span>.<span class="ident">change_current_program_brk</span>(<span class="ident">size</span>)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
