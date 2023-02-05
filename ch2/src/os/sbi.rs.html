@@ -40,10 +40,6 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SBI call wrappers</span>
 
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
@@ -81,10 +77,6 @@
     <span class="ident">sbi_call</span>(<span class="ident">SBI_CONSOLE_PUTCHAR</span>, <span class="ident">c</span>, <span class="number">0</span>, <span class="number">0</span>);
 }
 
-<span class="doccomment">/// use sbi call to getchar from console (qemu uart handler)</span>
-<span class="comment">// pub fn console_getchar() -&gt; usize {</span>
-<span class="comment">//     sbi_call(SBI_CONSOLE_GETCHAR, 0, 0, 0)</span>
-<span class="comment">// }</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
 <span class="doccomment">/// use sbi call to shutdown the kernel</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="op">!</span> {
