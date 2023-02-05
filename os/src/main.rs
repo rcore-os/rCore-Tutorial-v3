@@ -14,10 +14,12 @@
 #![feature(panic_info_message)]
 
 use core::arch::global_asm;
+use log::*;
 
 #[macro_use]
 mod console;
 mod lang_items;
+mod logging;
 mod sbi;
 
 #[path = "boards/qemu.rs"]
@@ -50,15 +52,16 @@ pub fn rust_main() -> ! {
         fn boot_stack_top(); // stack top
     }
     clear_bss();
+    logging::init();
     println!("Hello, world!");
-    println!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
-    println!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
-    println!(".data [{:#x}, {:#x})", sdata as usize, edata as usize);
-    println!(
+    trace!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
+    debug!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
+    info!(".data [{:#x}, {:#x})", sdata as usize, edata as usize);
+    warn!(
         "boot_stack top=bottom={:#x}, lower_bound={:#x}",
         boot_stack_top as usize, boot_stack_lower_bound as usize
     );
-    println!(".bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
+    error!(".bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
 
     use crate::board::QEMUExit;
     crate::board::QEMU_EXIT_HANDLE.exit_success(); // CI autotest success
