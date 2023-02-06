@@ -5,8 +5,8 @@
 #![feature(naked_functions)]
 #![feature(fn_align)]
 
+//use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
 use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE};
-
 extern crate alloc;
 
 #[macro_use]
@@ -20,7 +20,6 @@ mod console;
 mod config;
 mod drivers;
 mod fs;
-mod gui;
 mod lang_items;
 mod mm;
 mod sbi;
@@ -256,8 +255,6 @@ pub fn rust_main() -> ! {
     //clear_bss();
     mm::init();
     UART.init();
-    println!("KERN: begin");
-    //loop{};
     println!("KERN: init gpu");
     let _gpu = GPU_DEVICE.clone();
     println!("KERN: init keyboard");
@@ -270,7 +267,6 @@ pub fn rust_main() -> ! {
     //timer::set_next_trigger();
     board::device_init();
     fs::list_apps();
-    //gui::init_paint();
     task::add_initproc();
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
     task::run_tasks();

@@ -131,7 +131,7 @@ pub struct NS16550a<const BASE_ADDR: usize> {
 
 impl<const BASE_ADDR: usize> NS16550a<BASE_ADDR> {
     pub fn new() -> Self {
-        let mut inner = NS16550aInner {
+        let inner = NS16550aInner {
             ns16550a: NS16550aRaw::new(BASE_ADDR),
             read_buffer: VecDeque::new(),
         };
@@ -141,14 +141,20 @@ impl<const BASE_ADDR: usize> NS16550a<BASE_ADDR> {
             condvar: Condvar::new(),
         }
     }
+
+    pub fn read_buffer_is_empty(&self) -> bool {
+        self.inner
+            .exclusive_session(|inner| inner.read_buffer.is_empty())
+    }
 }
 
 impl<const BASE_ADDR: usize> CharDevice for NS16550a<BASE_ADDR> {
-    fn init(&self){
+    fn init(&self) {
         let mut inner = self.inner.exclusive_access();
         inner.ns16550a.init();
         drop(inner);
-    }    
+    }
+
     fn read(&self) -> u8 {
         loop {
             let mut inner = self.inner.exclusive_access();
