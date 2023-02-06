@@ -72,6 +72,9 @@ bitflags! {
 pub fn dup(fd: usize) -> isize {
     sys_dup(fd)
 }
+pub fn connect(ip: u32, sport: u16, dport: u16) -> isize {
+    sys_connect(ip, sport, dport)
+}
 pub fn open(path: &str, flags: OpenFlags) -> isize {
     sys_open(path, flags.bits)
 }

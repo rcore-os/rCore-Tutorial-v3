@@ -1,4 +1,5 @@
 const SYSCALL_DUP: usize = 24;
+const SYSCALL_CONNECT: usize = 29;
 const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
@@ -42,6 +43,10 @@ fn syscall(id: usize, args: [usize; 3]) -> isize {
 
 pub fn sys_dup(fd: usize) -> isize {
     syscall(SYSCALL_DUP, [fd, 0, 0])
+}
+
+pub fn sys_connect(dest: u32, sport: u16, dport: u16) -> isize {
+    syscall(SYSCALL_CONNECT, [dest as usize, sport as usize, dport as usize])
 }
 
 pub fn sys_open(path: &str, flags: u32) -> isize {

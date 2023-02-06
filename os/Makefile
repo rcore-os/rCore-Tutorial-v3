@@ -85,6 +85,8 @@ run-inner-none: build
 #		-device virtio-gpu-device  \
 		-device virtio-keyboard-device  \
 		-device virtio-mouse-device \
+		-device virtio-net-device,netdev=net0 \
+		-netdev user,id=net0,hostfwd=udp::6200-:2000 \
 		-serial stdio
 
 run-inner: build
@@ -99,6 +101,8 @@ run-inner: build
 		-device virtio-gpu-device  \
 		-device virtio-keyboard-device  \
 		-device virtio-mouse-device \
+		-device virtio-net-device,netdev=net0 \
+		-netdev user,id=net0,hostfwd=udp::6200-:2000 \
 		-serial stdio
 
 fdt:

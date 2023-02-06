@@ -29,6 +29,7 @@ mod syscall;
 mod task;
 mod timer;
 mod trap;
+mod net;
 
 use riscv::register::*;
 // mod riscvreg;
