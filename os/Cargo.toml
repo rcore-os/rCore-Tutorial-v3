@@ -14,6 +14,7 @@ bitflags = "1.2.1"
 xmas-elf = "0.7.0"
 volatile = "0.3"
 virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers", rev = "4ee80e5" }
+lose-net-stack = { git = "https://github.com/yfblock/lose-net-stack", rev = "3f467dd" }
 easy-fs = { path = "../easy-fs" }
 embedded-graphics = "0.7.1"
 tinybmp = "0.3.1"
