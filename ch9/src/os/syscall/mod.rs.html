@@ -80,7 +80,12 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">SYSCALL_DUP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">24</span>;
+<span class="kw">const</span> <span class="ident">SYSCALL_CONNECT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">29</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_OPEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">56</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_CLOSE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">57</span>;
 <span class="kw">const</span> <span class="ident">SYSCALL_PIPE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">59</span>;
@@ -118,6 +123,7 @@
 <span class="kw">mod</span> <span class="ident">process</span>;
 <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
+<span class="kw">mod</span> <span class="ident">net</span>;
 
 <span class="kw">use</span> <span class="ident">fs</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">gui</span>::<span class="kw-2">*</span>;
@@ -125,10 +131,12 @@
 <span class="kw">use</span> <span class="ident">process</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">sync</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">thread</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">net</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syscall</span>(<span class="ident">syscall_id</span>: <span class="ident">usize</span>, <span class="ident">args</span>: [<span class="ident">usize</span>; <span class="number">3</span>]) -&gt; <span class="ident">isize</span> {
     <span class="kw">match</span> <span class="ident">syscall_id</span> {
         <span class="ident">SYSCALL_DUP</span> =&gt; <span class="ident">sys_dup</span>(<span class="ident">args</span>[<span class="number">0</span>]),
+        <span class="ident">SYSCALL_CONNECT</span> =&gt; <span class="ident">sys_connect</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">args</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="kw">_</span>),
         <span class="ident">SYSCALL_OPEN</span> =&gt; <span class="ident">sys_open</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">args</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>),
         <span class="ident">SYSCALL_CLOSE</span> =&gt; <span class="ident">sys_close</span>(<span class="ident">args</span>[<span class="number">0</span>]),
         <span class="ident">SYSCALL_PIPE</span> =&gt; <span class="ident">sys_pipe</span>(<span class="ident">args</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>),
