@@ -132,11 +132,63 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOCK_FREQ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12500000</span>;
 
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO</span>: <span class="kw-2">&amp;</span>[(<span class="ident">usize</span>, <span class="ident">usize</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
     (<span class="number">0x0010_0000</span>, <span class="number">0x00_2000</span>), <span class="comment">// VIRT_TEST/RTC  in virt machine</span>
-    (<span class="number">0x2000000</span>, <span class="number">0x10000</span>),
+    (<span class="number">0x2000000</span>, <span class="number">0x10000</span>), <span class="comment">// core local interrupter (CLINT)</span>
     (<span class="number">0xc000000</span>, <span class="number">0x210000</span>), <span class="comment">// VIRT_PLIC in virt machine</span>
     (<span class="number">0x10000000</span>, <span class="number">0x9000</span>),  <span class="comment">// VIRT_UART0 with GPU  in virt machine</span>
 ];
@@ -186,6 +238,58 @@
     }
     <span class="ident">plic</span>.<span class="ident">complete</span>(<span class="number">0</span>, <span class="ident">IntrTargetPriority::Supervisor</span>, <span class="ident">intr_src_id</span>);
 }
+
+
+<span class="comment">// core local interrupter (CLINT), which contains the timer</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x2000000</span>;
+<span class="comment">// pub const fn clint_mtimecmp(hartid: usize) -&gt; usize {</span>
+<span class="comment">//     CLINT + 0x4000 + 8 * hartid</span>
+<span class="comment">// }</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT_MTIME</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">CLINT</span> <span class="op">+</span> <span class="number">0xBFF8</span>; <span class="comment">// Cycles since boot.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLINT_MTIMECMP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">CLINT</span> <span class="op">+</span> <span class="number">0x4000</span>;
+
+<span class="attribute">#[<span class="ident">naked</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">16</span>))]</span> <span class="comment">// if miss this alignment, a load access fault will occur.</span>
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">timervec</span>() -&gt; <span class="op">!</span> {
+    <span class="comment">// start.rs has set up the memory that mscratch points to:</span>
+    <span class="comment">// scratch[0,8,16] : register save area.</span>
+    <span class="comment">// scratch[24] : address of CLINT&#39;s MTIMECMP register.</span>
+    <span class="comment">// scratch[32] : desired interval between interrupts.</span>
+
+    <span class="comment">// Now, mscrach has a pointer to an additional scratch space.</span>
+    <span class="comment">// to aboid overwriting the contents of the integer registers,</span>
+    <span class="comment">// the prologue of an interrupts handler usually begins by swapping</span>
+    <span class="comment">// an integer register(say a0) with mscratch CSR.</span>
+    <span class="comment">// The interrupt handler stores the integer registers</span>
+    <span class="comment">// used for processing in this scratch space.</span>
+    <span class="comment">// a0 saved in mscrach, a1 ~ a3 saved in scratch space.</span>
+    <span class="comment">//loop {}</span>
+    <span class="macro">asm!</span>(
+        <span class="string">&quot;csrrw a0, mscratch, a0&quot;</span>,
+        <span class="string">&quot;sd a1, 0(a0)&quot;</span>,
+        <span class="string">&quot;sd a2, 8(a0)&quot;</span>,
+        <span class="string">&quot;sd a3, 16(a0)&quot;</span>,
+        <span class="comment">// schedule the next timer interrupt</span>
+        <span class="comment">// by adding interval to mtimecmp.</span>
+        <span class="string">&quot;ld a1, 24(a0)&quot;</span>, <span class="comment">// CLINT_MTIMECMP(hartid) contents</span>
+        <span class="string">&quot;ld a2, 32(a0)&quot;</span>, <span class="comment">// interval</span>
+        <span class="string">&quot;ld a3, 0(a1)&quot;</span>,
+        <span class="string">&quot;add a3, a3, a2&quot;</span>,
+        <span class="string">&quot;sd a3, 0(a1)&quot;</span>,
+        <span class="comment">// raise a supervisor software interrupt.</span>
+        <span class="string">&quot;li a1, 2&quot;</span>,
+        <span class="string">&quot;csrw sip, a1&quot;</span>,
+        <span class="comment">// restore and return</span>
+        <span class="string">&quot;ld a3, 16(a0)&quot;</span>,
+        <span class="string">&quot;ld a2, 8(a0)&quot;</span>,
+        <span class="string">&quot;ld a1, 0(a0)&quot;</span>,
+        <span class="string">&quot;csrrw a0, mscratch, a0&quot;</span>,
+        <span class="string">&quot;mret&quot;</span>,
+        <span class="ident">options</span>(<span class="ident">noreturn</span>)
+    );
+}
+
 
 <span class="comment">//ref:: https://github.com/andre-richter/qemu-exit</span>
 <span class="kw">use</span> <span class="ident">core::arch::asm</span>;
