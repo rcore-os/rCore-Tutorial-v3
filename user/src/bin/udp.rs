@@ -2,12 +2,13 @@
 #![no_main]
 
 use alloc::string::String;
-use user_lib::{connect, write, read};
 
 #[macro_use]
 extern crate user_lib;
 #[macro_use]
 extern crate alloc;
+
+use user_lib::{connect, write, read};
 
 #[no_mangle]
 pub fn main() -> i32 {

@@ -12,6 +12,7 @@ mod file;
 mod task;
 mod sync;
 mod io;
+mod net;
 
 extern crate alloc;
 #[macro_use]
@@ -24,6 +25,7 @@ pub use file::*;
 pub use task::*;
 pub use sync::*;
 pub use io::*;
+pub use net::*;
 
 const USER_HEAP_SIZE: usize = 32768;
 
