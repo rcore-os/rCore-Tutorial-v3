@@ -11,7 +11,7 @@ use core::arch::{asm, global_asm};
 use riscv::register::{
     mtvec::TrapMode,
     scause::{self, Exception, Interrupt, Trap},
-    sie, sscratch, sstatus, stval, stvec,
+    sie, sscratch, sstatus, stval, stvec,sip
 };
 
 global_asm!(include_str!("trap.S"));
@@ -95,10 +95,20 @@ pub fn trap_handler() -> ! {
         Trap::Exception(Exception::IllegalInstruction) => {
             current_add_signal(SignalFlags::SIGILL);
         }
-        Trap::Interrupt(Interrupt::SupervisorTimer) => {
-            set_next_trigger();
+        // Trap::Interrupt(Interrupt::SupervisorTimer) => {
+        //     set_next_trigger();
+        //     check_timer();
+        //     suspend_current_and_run_next();
+        // }
+        Trap::Interrupt(Interrupt::SupervisorSoft) => {
+            //set_next_trigger();
+            const SSIP: usize = 1 << 1;
+            unsafe {
+                asm!("csrc sip, {}", in(reg) SSIP);
+            }
+            //println!("TRAP: ssoft in Kern");
             check_timer();
-            suspend_current_and_run_next();
+            // do not schedule now
         }
         Trap::Interrupt(Interrupt::SupervisorExternal) => {
             crate::board::irq_handler();
@@ -151,8 +161,18 @@ pub fn trap_from_kernel(_trap_cx: &TrapContext) {
         Trap::Interrupt(Interrupt::SupervisorExternal) => {
             crate::board::irq_handler();
         }
-        Trap::Interrupt(Interrupt::SupervisorTimer) => {
-            set_next_trigger();
+        // Trap::Interrupt(Interrupt::SupervisorTimer) => {
+        //     //set_next_trigger();
+        //     check_timer();
+        //     // do not schedule now
+        // }
+        Trap::Interrupt(Interrupt::SupervisorSoft) => {
+            //set_next_trigger();
+            const SSIP: usize = 1 << 1;
+            unsafe {
+                asm!("csrc sip, {}", in(reg) SSIP);
+            }
+            //println!("TRAP: ssoft in Kern");
             check_timer();
             // do not schedule now
         }

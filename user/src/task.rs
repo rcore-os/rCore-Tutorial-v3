@@ -18,6 +18,9 @@ pub fn fork() -> isize {
 pub fn exec(path: &str, args: &[*const u8]) -> isize {
     sys_exec(path, args)
 }
+pub fn connect(raddr: u32, lport: u16, rport: u16) -> isize {
+    sys_connect(raddr, lport, rport)
+}
 pub fn wait(exit_code: &mut i32) -> isize {
     loop {
         match sys_waitpid(-1, exit_code as *mut _) {
