@@ -66,13 +66,13 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">core::any::Any</span>;
 <span class="kw">use</span> <span class="ident">embedded_graphics::pixelcolor::Rgb888</span>;
 <span class="kw">use</span> <span class="ident">tinybmp::Bmp</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">VirtIOGpu</span>, <span class="ident">VirtIOHeader</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">const</span> <span class="ident">VIRTIO7</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10007000</span>;
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GpuDevice</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Any</span> {
     <span class="kw">fn</span> <span class="ident">update_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
