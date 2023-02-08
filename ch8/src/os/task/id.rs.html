@@ -223,6 +223,7 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ProcessControlBlock</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">KERNEL_STACK_SIZE</span>, <span class="ident">PAGE_SIZE</span>, <span class="ident">TRAMPOLINE</span>, <span class="ident">TRAP_CONTEXT_BASE</span>, <span class="ident">USER_STACK_SIZE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{<span class="ident">MapPermission</span>, <span class="ident">PhysPageNum</span>, <span class="ident">VirtAddr</span>, <span class="ident">KERNEL_SPACE</span>};
@@ -312,6 +313,7 @@
         <span class="ident">KERNEL_SPACE</span>
             .<span class="ident">exclusive_access</span>()
             .<span class="ident">remove_area_with_start_vpn</span>(<span class="ident">kernel_stack_bottom_va</span>.<span class="ident">into</span>());
+        <span class="ident">KSTACK_ALLOCATOR</span>.<span class="ident">exclusive_access</span>().<span class="ident">dealloc</span>(<span class="self">self</span>.<span class="number">0</span>);
     }
 }
 
