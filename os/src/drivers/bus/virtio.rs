@@ -1,9 +1,9 @@
-use alloc::vec::Vec;
 use crate::mm::{
     frame_alloc, frame_dealloc, kernel_token, FrameTracker, PageTable, PhysAddr, PhysPageNum,
-    StepByOne, VirtAddr,
+    StepByOne, VirtAddr, frame_alloc_more,
 };
 use crate::sync::UPIntrFreeCell;
+use alloc::vec::Vec;
 use lazy_static::*;
 use virtio_drivers::Hal;
 
@@ -16,15 +16,9 @@ pub struct VirtioHal;
 
 impl Hal for VirtioHal {
     fn dma_alloc(pages: usize) -> usize {
-        let mut ppn_base = PhysPageNum(0);
-        for i in 0..pages {
-            let frame = frame_alloc().unwrap();
-            if i == 0 {
-                ppn_base = frame.ppn;
-            }
-            assert_eq!(frame.ppn.0, ppn_base.0 + i);
-            QUEUE_FRAMES.exclusive_access().push(frame);
-        }
+        let trakcers = frame_alloc_more(pages);
+        let ppn_base = trakcers.as_ref().unwrap().last().unwrap().ppn;
+        QUEUE_FRAMES.exclusive_access().append(&mut trakcers.unwrap());
         let pa: PhysAddr = ppn_base.into();
         pa.0
     }

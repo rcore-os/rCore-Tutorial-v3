@@ -85,9 +85,9 @@ fn easy_fs_pack() -> std::io::Result<()> {
         inode.write_at(0, all_data.as_slice());
     }
     // list apps
-    for app in root_inode.ls() {
-        println!("{}", app);
-    }
+    // for app in root_inode.ls() {
+    //     println!("{}", app);
+    // }
     Ok(())
 }
 

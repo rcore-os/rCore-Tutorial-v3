@@ -1,63 +1,34 @@
-use alloc::{string::ToString, sync::Arc, vec::Vec};
-use embedded_graphics::{
-    prelude::{Point, Size},
-    primitives::arc,
-};
+use crate::drivers::GPU_DEVICE;
+use crate::mm::{MapArea, MapPermission, MapType, PhysAddr, VirtAddr};
+use crate::task::current_process;
 
-use crate::{
-    fs::ROOT_INODE,
-    gui::{Button, Component, IconController, ImageComp, Panel, Terminal},
-    sync::UPIntrFreeCell,
-};
+const FB_VADDR: usize = 0x10000000;
 
-use crate::board::{VIRTGPU_XRES, VIRTGPU_YRES};
+pub fn sys_framebuffer() -> isize {
+    let fb = GPU_DEVICE.get_framebuffer();
+    let len = fb.len();
+    // println!("[kernel] FrameBuffer: addr 0x{:X}, len {}", fb.as_ptr() as usize , len);
+    let fb_start_pa = PhysAddr::from(fb.as_ptr() as usize);
+    assert!(fb_start_pa.aligned());
+    let fb_start_ppn = fb_start_pa.floor();
+    let fb_start_vpn = VirtAddr::from(FB_VADDR).floor();
+    let pn_offset = fb_start_ppn.0 as isize - fb_start_vpn.0 as isize;
 
-static DT: &[u8] = include_bytes!("../assert/desktop.bmp");
-
-lazy_static::lazy_static!(
-    pub static ref DESKTOP:UPIntrFreeCell<Arc<dyn Component>> = unsafe {
-        UPIntrFreeCell::new(Arc::new(Panel::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES), Point::new(0, 0))))
-    };
-    pub static ref PAD:UPIntrFreeCell<Option<Arc<Terminal>>> = unsafe {
-        UPIntrFreeCell::new(None)
-    };
-);
-
-pub fn create_desktop() -> isize {
-    let mut p: Arc<dyn Component + 'static> =
-        Arc::new(Panel::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES), Point::new(0, 0)));
-    let image = ImageComp::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES), Point::new(0, 0), DT, Some(p.clone()));
-    let icon = IconController::new(ROOT_INODE.ls(), Some(p.clone()));
-    p.add(Arc::new(image));
-    p.add(Arc::new(icon));
-    let mut desktop = DESKTOP.exclusive_access();
-    *desktop = p;
-    desktop.paint();
-    drop(desktop);
-    create_terminal();
-    1
+    let current_process = current_process();
+    let mut inner = current_process.inner_exclusive_access();
+    inner.memory_set.push(
+        MapArea::new(
+            (FB_VADDR as usize).into(),
+            (FB_VADDR + len as usize).into(),
+            MapType::Linear(pn_offset),
+            MapPermission::R | MapPermission::W | MapPermission::U,
+        ),
+        None,
+    );
+    FB_VADDR as isize
 }
 
-pub fn create_terminal() {
-    let desktop = DESKTOP.exclusive_access();
-    let arc_t = Arc::new(Terminal::new(
-        Size::new(400, 400),
-        Point::new(200, 100),
-        Some(desktop.clone()),
-        Some("demo.txt".to_string()),
-        "".to_string(),
-    ));
-    let text = Panel::new(Size::new(400, 400), Point::new(200, 100));
-    let button = Button::new(
-        Size::new(20, 20),
-        Point::new(370, 10),
-        Some(arc_t.clone()),
-        "X".to_string(),
-    );
-    arc_t.add(Arc::new(text));
-    arc_t.add(Arc::new(button));
-    arc_t.paint();
-    desktop.add(arc_t.clone());
-    let mut pad = PAD.exclusive_access();
-    *pad = Some(arc_t);
+pub fn sys_framebuffer_flush() -> isize {
+    GPU_DEVICE.flush();
+    0
 }

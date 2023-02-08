@@ -1,4 +1,5 @@
 const SYSCALL_DUP: usize = 24;
+const SYSCALL_CONNECT: usize = 29;
 const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
@@ -25,6 +26,10 @@ const SYSCALL_SEMAPHORE_DOWN: usize = 1022;
 const SYSCALL_CONDVAR_CREATE: usize = 1030;
 const SYSCALL_CONDVAR_SIGNAL: usize = 1031;
 const SYSCALL_CONDVAR_WAIT: usize = 1032;
+const SYSCALL_FRAMEBUFFER: usize = 2000;
+const SYSCALL_FRAMEBUFFER_FLUSH: usize = 2001;
+const SYSCALL_EVENT_GET: usize = 3000;
+const SYSCALL_KEY_PRESSED: usize = 3001;
 
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let mut ret: isize;
@@ -42,6 +47,10 @@ fn syscall(id: usize, args: [usize; 3]) -> isize {
 
 pub fn sys_dup(fd: usize) -> isize {
     syscall(SYSCALL_DUP, [fd, 0, 0])
+}
+
+pub fn sys_connect(dest: u32, sport: u16, dport: u16) -> isize {
+    syscall(SYSCALL_CONNECT, [dest as usize, sport as usize, dport as usize])
 }
 
 pub fn sys_open(path: &str, flags: u32) -> isize {
@@ -143,8 +152,8 @@ pub fn sys_semaphore_down(sem_id: usize) -> isize {
     syscall(SYSCALL_SEMAPHORE_DOWN, [sem_id, 0, 0])
 }
 
-pub fn sys_condvar_create(_arg: usize) -> isize {
-    syscall(SYSCALL_CONDVAR_CREATE, [_arg, 0, 0])
+pub fn sys_condvar_create() -> isize {
+    syscall(SYSCALL_CONDVAR_CREATE, [0, 0, 0])
 }
 
 pub fn sys_condvar_signal(condvar_id: usize) -> isize {
@@ -154,6 +163,20 @@ pub fn sys_condvar_signal(condvar_id: usize) -> isize {
 pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
     syscall(SYSCALL_CONDVAR_WAIT, [condvar_id, mutex_id, 0])
 }
-pub fn sys_create_desktop() -> isize {
-    syscall(2000, [0, 0, 0])
+
+
+pub fn sys_framebuffer() -> isize {
+    syscall(SYSCALL_FRAMEBUFFER, [0, 0, 0])
+}
+
+pub fn sys_framebuffer_flush() -> isize {
+    syscall(SYSCALL_FRAMEBUFFER_FLUSH, [0, 0, 0])
+}
+
+pub fn sys_event_get() -> isize {
+    syscall(SYSCALL_EVENT_GET, [0, 0, 0])
+}
+
+pub fn sys_key_pressed() -> isize {
+    syscall(SYSCALL_KEY_PRESSED, [0, 0, 0])
 }
