@@ -87,6 +87,7 @@ impl Drop for KernelStack {
         KERNEL_SPACE
             .exclusive_access()
             .remove_area_with_start_vpn(kernel_stack_bottom_va.into());
+        KSTACK_ALLOCATOR.exclusive_access().dealloc(self.0);
     }
 }
 
