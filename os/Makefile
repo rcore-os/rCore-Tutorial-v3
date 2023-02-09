@@ -31,7 +31,7 @@ OBJDUMP := rust-objdump --arch-name=riscv64
 OBJCOPY := rust-objcopy --binary-architecture=riscv64
 
 # Disassembly
-DISASM ?= -d
+DISASM ?= -X
 
 # Run usertests or usershell
 TEST ?=
