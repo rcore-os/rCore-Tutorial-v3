@@ -30,8 +30,8 @@ pub fn device_init() {
     let machine = IntrTargetPriority::Machine;
     plic.set_threshold(hart_id, supervisor, 0);
     plic.set_threshold(hart_id, machine, 1);
-    //irq nums: 5 keyboard, 6 mouse, 8 block, 10 uart
-    for intr_src_id in [5usize, 6, 8, 10] {
+    //irq nums: 5 keyboard, 6 mouse, 8 block, 10 uart, 11 rtc
+    for intr_src_id in [5usize, 6, 8, 10, 11] {
         plic.enable(hart_id, supervisor, intr_src_id);
         plic.set_priority(intr_src_id, 1);
     }
@@ -48,6 +48,7 @@ pub fn irq_handler() {
         6 => MOUSE_DEVICE.handle_irq(),
         8 => BLOCK_DEVICE.handle_irq(),
         10 => UART.handle_irq(),
+        11 => RTC.handle_irq(),
         _ => panic!("unsupported IRQ {}", intr_src_id),
     }
     plic.complete(0, IntrTargetPriority::Supervisor, intr_src_id);
@@ -107,6 +108,7 @@ pub unsafe extern "C" fn timervec() -> ! {
 
 //ref:: https://github.com/andre-richter/qemu-exit
 use core::arch::asm;
+use crate::drivers::rtc::RTC;
 
 const EXIT_SUCCESS: u32 = 0x5555; // Equals `exit(0)`. qemu successful exit
 

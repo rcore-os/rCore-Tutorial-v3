@@ -5,6 +5,7 @@
 #![feature(naked_functions)]
 #![feature(fn_align)]
 
+use alloc::string::ToString;
 use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE};
 
 extern crate alloc;
@@ -249,6 +250,8 @@ unsafe fn timer_init() {
 
 use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
+use crate::drivers::rtc::{enable_rtc_irq, get_rtc_time, set_rtc_alarm_with_next_second};
+
 #[no_mangle]
 pub fn rust_main() -> ! {
 
@@ -268,6 +271,7 @@ pub fn rust_main() -> ! {
     //trap::enable_timer_interrupt();
     //timer::set_next_trigger();
     board::device_init();
+    println!("-----------Time:{}-----------", get_rtc_time().to_string());
     fs::list_apps();
     //gui::init_paint();
     task::add_initproc();

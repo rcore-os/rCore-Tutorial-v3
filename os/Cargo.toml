@@ -19,6 +19,6 @@ easy-fs = { path = "../easy-fs" }
 virtio-input-decoder = "0.1.4"
 embedded-graphics = "0.7.1"
 tinybmp = "0.3.1"
-
+time = { version = "0.3.7" ,default-features = false,features = ["macros"] }
 [profile.release]
 debug = true
