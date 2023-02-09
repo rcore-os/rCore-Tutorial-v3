@@ -15,23 +15,17 @@ fn panic(info: &PanicInfo) -> ! {
     } else {
         println!("[kernel] Panicked: {}", info.message().unwrap());
     }
-    unsafe {
-        backtrace();
-    }
+    backtrace();
     shutdown(255)
 }
 
-unsafe fn backtrace() {
-    let mut fp: usize;
-    let stop = current_kstack_top();
-    asm!("mv {}, s0", out(reg) fp);
+#[no_mangle]
+fn backtrace() {
     println!("---START BACKTRACE---");
-    for i in 0..10 {
-        if fp == stop {
-            break;
-        }
-        println!("#{}:ra={:#x}", i, *((fp - 8) as *const usize));
-        fp = *((fp - 16) as *const usize);
-    }
+    let info = crate::trace::init_kernel_trace();
+    let func_info = unsafe { trace_lib::my_trace(info) };
+    func_info.iter().for_each(|x| {
+        println!("{}", x);
+    });
     println!("---END   BACKTRACE---");
 }

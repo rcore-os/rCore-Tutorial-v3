@@ -31,12 +31,12 @@ OBJDUMP := rust-objdump --arch-name=riscv64
 OBJCOPY := rust-objcopy --binary-architecture=riscv64
 
 # Disassembly
-DISASM ?= -x
+DISASM ?= -X
 
 # Run usertests or usershell
 TEST ?=
 
-build: env $(KERNEL_BIN) fs-img 
+build: env stack_trace $(KERNEL_BIN) fs-img
 
 env:
 	(rustup target list | grep "riscv64gc-unknown-none-elf (installed)") || rustup target add $(TARGET)
@@ -53,10 +53,16 @@ fs-img: $(APPS)
 	@cd ../easy-fs-fuse && cargo run --release -- -s ../user/src/bin/ -t ../user/target/riscv64gc-unknown-none-elf/release/
 
 $(APPS):
+stack_trace:
+	@# install trace_exe to generate elf symbol info
+	@cargo install --git  https://github.com/os-module/elfinfo
 
 kernel:
 	@echo Platform: $(BOARD)
+	@touch src/trace/kernel_symbol.S && rm src/trace/kernel_symbol.S
 	@cp src/linker-$(BOARD).ld src/linker.ld
+	@cargo build --release
+	@(nm -n ${KERNEL_ELF} | trace_exe > src/trace/kernel_symbol.S)
 	@cargo build --release
 	@rm src/linker.ld
 
