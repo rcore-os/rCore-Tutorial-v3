@@ -5,6 +5,7 @@
 #![feature(naked_functions)]
 #![feature(fn_align)]
 
+use core::arch::global_asm;
 //use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
 use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE};
 extern crate alloc;
@@ -29,6 +30,7 @@ mod task;
 mod timer;
 mod trap;
 mod net;
+mod trace;
 
 use riscv::register::*;
 // mod riscvreg;
@@ -251,6 +253,7 @@ use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
 #[no_mangle]
 pub fn rust_main() -> ! {
+    // global_asm!(include_str!("kernel_symbol.S"));
 
     //clear_bss();
     mm::init();
@@ -271,4 +274,21 @@ pub fn rust_main() -> ! {
     *DEV_NON_BLOCKING_ACCESS.exclusive_access() = true;
     task::run_tasks();
     panic!("Unreachable in rust_main!");
+}
+
+#[no_mangle]
+fn test_tp(){
+    let a = 33;
+    let b = 22;
+    let max = core::cmp::max(a,b);
+    // println!("max is {}",max);
+    test_tp_tp(max);
+}
+
+
+#[no_mangle]
+fn test_tp_tp(max:i32){
+    let a = 33;
+    let max = core::cmp::max(a,max);
+    println!("test tp tp {}",max);
 }
