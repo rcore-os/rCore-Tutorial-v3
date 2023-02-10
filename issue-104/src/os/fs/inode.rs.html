@@ -137,6 +137,8 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::File</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::BLOCK_DEVICE</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm::UserBuffer</span>;
@@ -222,9 +224,11 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_file</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flags</span>: <span class="ident">OpenFlags</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">OSInode</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="macro">println!</span>(<span class="string">&quot;open_file :1&quot;</span>);
     <span class="kw">let</span> (<span class="ident">readable</span>, <span class="ident">writable</span>) <span class="op">=</span> <span class="ident">flags</span>.<span class="ident">read_write</span>();
     <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">OpenFlags::CREATE</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inode</span>) <span class="op">=</span> <span class="ident">ROOT_INODE</span>.<span class="ident">find</span>(<span class="ident">name</span>) {
+            <span class="macro">println!</span>(<span class="string">&quot;open_file :2&quot;</span>);
             <span class="comment">// clear size</span>
             <span class="ident">inode</span>.<span class="ident">clear</span>();
             <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">OSInode::new</span>(<span class="ident">readable</span>, <span class="ident">writable</span>, <span class="ident">inode</span>)))
