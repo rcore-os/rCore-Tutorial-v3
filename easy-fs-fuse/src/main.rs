@@ -153,3 +153,16 @@ fn efs_test() -> std::io::Result<()> {
 
     Ok(())
 }
+
+// extern "C" {
+//     fn swap_and_disable_intr() -> bool;
+//     fn enable_intr();
+// }
+
+#[no_mangle]
+extern "C" fn swap_and_disable_intr() -> bool {
+    false
+}
+
+#[no_mangle]
+extern "C" fn enable_intr() {}

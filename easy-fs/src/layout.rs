@@ -126,19 +126,19 @@ impl DiskInode {
             self.direct[inner_id]
         } else if inner_id < INDIRECT1_BOUND {
             get_block_cache(self.indirect1 as usize, Arc::clone(block_device))
-                .lock()
+                .exclusive_access()
                 .read(0, |indirect_block: &IndirectBlock| {
                     indirect_block[inner_id - INODE_DIRECT_COUNT]
                 })
         } else {
             let last = inner_id - INDIRECT1_BOUND;
             let indirect1 = get_block_cache(self.indirect2 as usize, Arc::clone(block_device))
-                .lock()
+                .exclusive_access()
                 .read(0, |indirect2: &IndirectBlock| {
                     indirect2[last / INODE_INDIRECT1_COUNT]
                 });
             get_block_cache(indirect1 as usize, Arc::clone(block_device))
-                .lock()
+                .exclusive_access()
                 .read(0, |indirect1: &IndirectBlock| {
                     indirect1[last % INODE_INDIRECT1_COUNT]
                 })
@@ -171,7 +171,7 @@ impl DiskInode {
         }
         // fill indirect1
         get_block_cache(self.indirect1 as usize, Arc::clone(block_device))
-            .lock()
+            .exclusive_access()
             .modify(0, |indirect1: &mut IndirectBlock| {
                 while current_blocks < total_blocks.min(INODE_INDIRECT1_COUNT as u32) {
                     indirect1[current_blocks as usize] = new_blocks.next().unwrap();
@@ -195,7 +195,7 @@ impl DiskInode {
         let b1 = total_blocks as usize % INODE_INDIRECT1_COUNT;
         // alloc low-level indirect1
         get_block_cache(self.indirect2 as usize, Arc::clone(block_device))
-            .lock()
+            .exclusive_access()
             .modify(0, |indirect2: &mut IndirectBlock| {
                 while (a0 < a1) || (a0 == a1 && b0 < b1) {
                     if b0 == 0 {
@@ -203,7 +203,7 @@ impl DiskInode {
                     }
                     // fill current
                     get_block_cache(indirect2[a0] as usize, Arc::clone(block_device))
-                        .lock()
+                        .exclusive_access()
                         .modify(0, |indirect1: &mut IndirectBlock| {
                             indirect1[b0] = new_blocks.next().unwrap();
                         });
@@ -241,7 +241,7 @@ impl DiskInode {
         }
         // indirect1
         get_block_cache(self.indirect1 as usize, Arc::clone(block_device))
-            .lock()
+            .exclusive_access()
             .modify(0, |indirect1: &mut IndirectBlock| {
                 while current_blocks < data_blocks.min(INODE_INDIRECT1_COUNT) {
                     v.push(indirect1[current_blocks]);
@@ -262,13 +262,13 @@ impl DiskInode {
         let a1 = data_blocks / INODE_INDIRECT1_COUNT;
         let b1 = data_blocks % INODE_INDIRECT1_COUNT;
         get_block_cache(self.indirect2 as usize, Arc::clone(block_device))
-            .lock()
+            .exclusive_access()
             .modify(0, |indirect2: &mut IndirectBlock| {
                 // full indirect1 blocks
                 for entry in indirect2.iter_mut().take(a1) {
                     v.push(*entry);
                     get_block_cache(*entry as usize, Arc::clone(block_device))
-                        .lock()
+                        .exclusive_access()
                         .modify(0, |indirect1: &mut IndirectBlock| {
                             for entry in indirect1.iter() {
                                 v.push(*entry);
@@ -279,7 +279,7 @@ impl DiskInode {
                 if b1 > 0 {
                     v.push(indirect2[a1]);
                     get_block_cache(indirect2[a1] as usize, Arc::clone(block_device))
-                        .lock()
+                        .exclusive_access()
                         .modify(0, |indirect1: &mut IndirectBlock| {
                             for entry in indirect1.iter().take(b1) {
                                 v.push(*entry);
@@ -315,7 +315,7 @@ impl DiskInode {
                 self.get_block_id(start_block as u32, block_device) as usize,
                 Arc::clone(block_device),
             )
-            .lock()
+            .exclusive_access()
             .read(0, |data_block: &DataBlock| {
                 let src = &data_block[start % BLOCK_SZ..start % BLOCK_SZ + block_read_size];
                 dst.copy_from_slice(src);
@@ -352,7 +352,7 @@ impl DiskInode {
                 self.get_block_id(start_block as u32, block_device) as usize,
                 Arc::clone(block_device),
             )
-            .lock()
+            .exclusive_access()
             .modify(0, |data_block: &mut DataBlock| {
                 let src = &buf[write_size..write_size + block_write_size];
                 let dst = &mut data_block[start % BLOCK_SZ..start % BLOCK_SZ + block_write_size];

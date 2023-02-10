@@ -5,12 +5,12 @@ use super::{
 use alloc::string::String;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use spin::{Mutex, MutexGuard};
+use ksync::{UPIntrFreeCell, UPIntrRefMut};
 
 pub struct Inode {
     block_id: usize,
     block_offset: usize,
-    fs: Arc<Mutex<EasyFileSystem>>,
+    fs: Arc<UPIntrFreeCell<EasyFileSystem>>,
     block_device: Arc<dyn BlockDevice>,
 }
 
@@ -19,7 +19,7 @@ impl Inode {
     pub fn new(
         block_id: u32,
         block_offset: usize,
-        fs: Arc<Mutex<EasyFileSystem>>,
+        fs: Arc<UPIntrFreeCell<EasyFileSystem>>,
         block_device: Arc<dyn BlockDevice>,
     ) -> Self {
         Self {
@@ -32,13 +32,13 @@ impl Inode {
 
     fn read_disk_inode<V>(&self, f: impl FnOnce(&DiskInode) -> V) -> V {
         get_block_cache(self.block_id, Arc::clone(&self.block_device))
-            .lock()
+            .exclusive_access()
             .read(self.block_offset, f)
     }
 
     fn modify_disk_inode<V>(&self, f: impl FnOnce(&mut DiskInode) -> V) -> V {
         get_block_cache(self.block_id, Arc::clone(&self.block_device))
-            .lock()
+            .exclusive_access()
             .modify(self.block_offset, f)
     }
 
@@ -60,7 +60,7 @@ impl Inode {
     }
 
     pub fn find(&self, name: &str) -> Option<Arc<Inode>> {
-        let fs = self.fs.lock();
+        let fs = self.fs.exclusive_access();
         self.read_disk_inode(|disk_inode| {
             self.find_inode_id(name, disk_inode).map(|inode_id| {
                 let (block_id, block_offset) = fs.get_disk_inode_pos(inode_id);
@@ -78,7 +78,7 @@ impl Inode {
         &self,
         new_size: u32,
         disk_inode: &mut DiskInode,
-        fs: &mut MutexGuard<EasyFileSystem>,
+        fs: &mut UPIntrRefMut<EasyFileSystem>,
     ) {
         if new_size < disk_inode.size {
             return;
@@ -92,7 +92,7 @@ impl Inode {
     }
 
     pub fn create(&self, name: &str) -> Option<Arc<Inode>> {
-        let mut fs = self.fs.lock();
+        let mut fs = self.fs.exclusive_access();
         let op = |root_inode: &mut DiskInode| {
             // assert it is a directory
             assert!(root_inode.is_dir());
@@ -108,7 +108,7 @@ impl Inode {
         // initialize inode
         let (new_inode_block_id, new_inode_block_offset) = fs.get_disk_inode_pos(new_inode_id);
         get_block_cache(new_inode_block_id as usize, Arc::clone(&self.block_device))
-            .lock()
+            .exclusive_access()
             .modify(new_inode_block_offset, |new_inode: &mut DiskInode| {
                 new_inode.initialize(DiskInodeType::File);
             });
@@ -140,7 +140,7 @@ impl Inode {
     }
 
     pub fn ls(&self) -> Vec<String> {
-        let _fs = self.fs.lock();
+        let _fs = self.fs.exclusive_access();
         self.read_disk_inode(|disk_inode| {
             let file_count = (disk_inode.size as usize) / DIRENT_SZ;
             let mut v: Vec<String> = Vec::new();
@@ -157,12 +157,12 @@ impl Inode {
     }
 
     pub fn read_at(&self, offset: usize, buf: &mut [u8]) -> usize {
-        let _fs = self.fs.lock();
+        let _fs = self.fs.exclusive_access();
         self.read_disk_inode(|disk_inode| disk_inode.read_at(offset, buf, &self.block_device))
     }
 
     pub fn write_at(&self, offset: usize, buf: &[u8]) -> usize {
-        let mut fs = self.fs.lock();
+        let mut fs = self.fs.exclusive_access();
         let size = self.modify_disk_inode(|disk_inode| {
             self.increase_size((offset + buf.len()) as u32, disk_inode, &mut fs);
             disk_inode.write_at(offset, buf, &self.block_device)
@@ -172,7 +172,7 @@ impl Inode {
     }
 
     pub fn clear(&self) {
-        let mut fs = self.fs.lock();
+        let mut fs = self.fs.exclusive_access();
         self.modify_disk_inode(|disk_inode| {
             let size = disk_inode.size;
             let data_blocks_dealloc = disk_inode.clear_size(&self.block_device);

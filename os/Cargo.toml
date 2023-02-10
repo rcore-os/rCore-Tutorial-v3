@@ -18,6 +18,7 @@ lose-net-stack = { git = "https://github.com/yfblock/lose-net-stack", rev = "3f4
 easy-fs = { path = "../easy-fs" }
 embedded-graphics = "0.7.1"
 tinybmp = "0.3.1"
+ksync = { path = "../ksync" }
 
 [profile.release]
 debug = true

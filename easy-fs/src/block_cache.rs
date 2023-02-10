@@ -4,7 +4,7 @@ use alloc::sync::Arc;
 use alloc::vec;
 use alloc::vec::Vec;
 use lazy_static::*;
-use spin::Mutex;
+use ksync::UPIntrFreeCell;
 
 pub struct BlockCache {
     cache: Vec<u8>,
@@ -77,7 +77,7 @@ impl Drop for BlockCache {
 const BLOCK_CACHE_SIZE: usize = 16;
 
 pub struct BlockCacheManager {
-    queue: VecDeque<(usize, Arc<Mutex<BlockCache>>)>,
+    queue: VecDeque<(usize, Arc<UPIntrFreeCell<BlockCache>>)>,
 }
 
 impl BlockCacheManager {
@@ -91,7 +91,7 @@ impl BlockCacheManager {
         &mut self,
         block_id: usize,
         block_device: Arc<dyn BlockDevice>,
-    ) -> Arc<Mutex<BlockCache>> {
+    ) -> Arc<UPIntrFreeCell<BlockCache>> {
         if let Some(pair) = self.queue.iter().find(|pair| pair.0 == block_id) {
             Arc::clone(&pair.1)
         } else {
@@ -110,10 +110,10 @@ impl BlockCacheManager {
                 }
             }
             // load block into mem and push back
-            let block_cache = Arc::new(Mutex::new(BlockCache::new(
+            let block_cache = Arc::new(unsafe { UPIntrFreeCell::new(BlockCache::new(
                 block_id,
                 Arc::clone(&block_device),
-            )));
+            ))});
             self.queue.push_back((block_id, Arc::clone(&block_cache)));
             block_cache
         }
@@ -121,22 +121,22 @@ impl BlockCacheManager {
 }
 
 lazy_static! {
-    pub static ref BLOCK_CACHE_MANAGER: Mutex<BlockCacheManager> =
-        Mutex::new(BlockCacheManager::new());
+    pub static ref BLOCK_CACHE_MANAGER: UPIntrFreeCell<BlockCacheManager> =
+        unsafe { UPIntrFreeCell::new(BlockCacheManager::new()) };
 }
 
 pub fn get_block_cache(
     block_id: usize,
     block_device: Arc<dyn BlockDevice>,
-) -> Arc<Mutex<BlockCache>> {
+) -> Arc<UPIntrFreeCell<BlockCache>> {
     BLOCK_CACHE_MANAGER
-        .lock()
+        .exclusive_access()
         .get_block_cache(block_id, block_device)
 }
 
 pub fn block_cache_sync_all() {
-    let manager = BLOCK_CACHE_MANAGER.lock();
+    let manager = BLOCK_CACHE_MANAGER.exclusive_access();
     for (_, cache) in manager.queue.iter() {
-        cache.lock().sync();
+        cache.exclusive_access().sync();
     }
 }
