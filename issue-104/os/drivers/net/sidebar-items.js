@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["VIRTIO8",""]],"struct":[["NET_DEVICE",""],["VirtIONetWrapper",""]],"trait":[["NetDevice",""]]};
