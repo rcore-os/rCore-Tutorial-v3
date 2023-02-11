@@ -28,7 +28,7 @@ pub fn sys_read(fd: usize, buf: *const u8, len: usize) -> isize {
             let mut c: usize;
             loop {
                 c = console_getchar();
-                if c == 0 {
+                if c == usize::MAX {
                     suspend_current_and_run_next();
                     continue;
                 } else {
