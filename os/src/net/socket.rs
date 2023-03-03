@@ -5,19 +5,47 @@ use lose_net_stack::IPv4;
 
 use crate::sync::UPIntrFreeCell;
 
-
 // TODO: specify the protocol, TCP or UDP
 pub struct Socket {
     pub raddr: IPv4,                // remote address
     pub lport: u16,                 // local port
     pub rport: u16,                 // rempote port
-    pub buffers: VecDeque<Vec<u8>>  // datas
+    pub buffers: VecDeque<Vec<u8>>, // datas
+    pub seq: u32,
+    pub ack: u32
 }
 
 lazy_static! {
-    static ref SOCKET_TABLE:UPIntrFreeCell<Vec<Option<Socket>>> = unsafe {
-        UPIntrFreeCell::new(Vec::new())
-    };
+    static ref SOCKET_TABLE: UPIntrFreeCell<Vec<Option<Socket>>> =
+        unsafe { UPIntrFreeCell::new(Vec::new()) };
+}
+
+/// get the seq and ack by socket index
+pub fn get_s_a_by_index(index: usize) -> Option<(u32, u32)> {
+    let socket_table = SOCKET_TABLE.exclusive_access();
+
+    assert!(index < socket_table.len());
+
+    socket_table.get(index).map_or(None, |x| {
+        match x {
+            Some(x) => Some((x.seq, x.ack)),
+            None => None,
+        }
+    })
+}
+
+pub fn set_s_a_by_index(index: usize, seq: u32, ack: u32) {
+    let mut socket_table = SOCKET_TABLE.exclusive_access();
+
+    assert!(socket_table.len() > index);
+    assert!(socket_table[index].is_some());
+
+    let sock = socket_table[index]
+    .as_mut()
+    .unwrap();
+
+    sock.ack = ack;
+    sock.seq = seq;
 }
 
 pub fn get_socket(raddr: IPv4, lport: u16, rport: u16) -> Option<usize> {
@@ -30,7 +58,7 @@ pub fn get_socket(raddr: IPv4, lport: u16, rport: u16) -> Option<usize> {
 
         let sock = sock.as_ref().unwrap();
         if sock.raddr == raddr && sock.lport == lport && sock.rport == rport {
-            return Some(i)
+            return Some(i);
         }
     }
     None
@@ -54,7 +82,9 @@ pub fn add_socket(raddr: IPv4, lport: u16, rport: u16) -> Option<usize> {
         raddr,
         lport,
         rport,
-        buffers: VecDeque::new()
+        buffers: VecDeque::new(),
+        seq: 0,
+        ack: 0
     };
 
     if index == usize::MAX {
@@ -80,7 +110,11 @@ pub fn push_data(index: usize, data: Vec<u8>) {
     assert!(socket_table.len() > index);
     assert!(socket_table[index].is_some());
 
-    socket_table[index].as_mut().unwrap().buffers.push_back(data);
+    socket_table[index]
+        .as_mut()
+        .unwrap()
+        .buffers
+        .push_back(data);
 }
 
 pub fn pop_data(index: usize) -> Option<Vec<u8>> {

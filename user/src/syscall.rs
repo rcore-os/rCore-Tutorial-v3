@@ -1,5 +1,7 @@
 const SYSCALL_DUP: usize = 24;
 const SYSCALL_CONNECT: usize = 29;
+const SYSCALL_LISTEN: usize = 30;
+const SYSCALL_ACCEPT: usize = 31;
 const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
@@ -50,7 +52,19 @@ pub fn sys_dup(fd: usize) -> isize {
 }
 
 pub fn sys_connect(dest: u32, sport: u16, dport: u16) -> isize {
-    syscall(SYSCALL_CONNECT, [dest as usize, sport as usize, dport as usize])
+    syscall(
+        SYSCALL_CONNECT,
+        [dest as usize, sport as usize, dport as usize],
+    )
+}
+
+// just listen for tcp connections now
+pub fn sys_listen(sport: u16) -> isize {
+    syscall(SYSCALL_LISTEN, [sport as usize, 0, 0])
+}
+
+pub fn sys_accept(socket_fd: usize) -> isize {
+    syscall(SYSCALL_ACCEPT, [socket_fd, 0, 0])
 }
 
 pub fn sys_open(path: &str, flags: u32) -> isize {
@@ -163,7 +177,6 @@ pub fn sys_condvar_signal(condvar_id: usize) -> isize {
 pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
     syscall(SYSCALL_CONDVAR_WAIT, [condvar_id, mutex_id, 0])
 }
-
 
 pub fn sys_framebuffer() -> isize {
     syscall(SYSCALL_FRAMEBUFFER, [0, 0, 0])

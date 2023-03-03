@@ -1,34 +1,44 @@
-use super::net_interrupt_handler;
-use super::socket::{add_socket, pop_data, remove_socket};
-use super::LOSE_NET_STACK;
-use super::NET_DEVICE;
-use crate::fs::File;
 use alloc::vec;
-use lose_net_stack::packets::udp::UDPPacket;
-use lose_net_stack::IPv4;
 use lose_net_stack::MacAddress;
+use lose_net_stack::IPv4;
+use lose_net_stack::TcpFlags;
+use lose_net_stack::packets::tcp::TCPPacket;
 
-pub struct UDP {
+use crate::{drivers::NET_DEVICE, fs::File};
+
+use super::socket::get_s_a_by_index;
+use super::{
+    net_interrupt_handler,
+    socket::{add_socket, pop_data, remove_socket},
+    LOSE_NET_STACK,
+};
+
+// add tcp packet info to this structure
+pub struct TCP {
     pub target: IPv4,
     pub sport: u16,
     pub dport: u16,
+    pub seq: u32,
+    pub ack: u32,
     pub socket_index: usize,
 }
 
-impl UDP {
-    pub fn new(target: IPv4, sport: u16, dport: u16) -> Self {
+impl TCP {
+    pub fn new(target: IPv4, sport: u16, dport: u16, seq: u32, ack: u32) -> Self {
         let index = add_socket(target, sport, dport).expect("can't add socket");
 
         Self {
             target,
             sport,
             dport,
+            seq,
+            ack,
             socket_index: index,
         }
     }
 }
 
-impl File for UDP {
+impl File for TCP {
     fn readable(&self) -> bool {
         true
     }
@@ -73,22 +83,30 @@ impl File for UDP {
 
         let len = data.len();
 
-        let udp_packet = UDPPacket::new(
-            lose_net_stack.ip,
-            lose_net_stack.mac,
-            self.sport,
-            self.target,
-            MacAddress::new([0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
-            self.dport,
-            len,
-            data.as_ref(),
-        );
-        NET_DEVICE.transmit(&udp_packet.build_data());
+        // get sock and sequence
+        let (ack, seq) = get_s_a_by_index(self.socket_index).map_or((0, 0), |x| x);
+
+        let tcp_packet = TCPPacket {
+            source_ip: lose_net_stack.ip,
+            source_mac: lose_net_stack.mac,
+            source_port: self.sport,
+            dest_ip: self.target,
+            dest_mac: MacAddress::new([0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
+            dest_port: self.dport,
+            data_len: len,
+            seq,
+            ack,
+            flags: TcpFlags::A,
+            win: 65535,
+            urg: 0,
+            data: data.as_ref(),
+        };
+        NET_DEVICE.transmit(&tcp_packet.build_data());
         len
     }
 }
 
-impl Drop for UDP {
+impl Drop for TCP {
     fn drop(&mut self) {
         remove_socket(self.socket_index)
     }

@@ -86,7 +86,7 @@ run-inner-none: build
 		-device virtio-keyboard-device  \
 		-device virtio-mouse-device \
 		-device virtio-net-device,netdev=net0 \
-		-netdev user,id=net0,hostfwd=udp::6200-:2000 \
+		-netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80 \
 		-serial stdio
 
 run-inner: build
@@ -102,7 +102,7 @@ run-inner: build
 		-device virtio-keyboard-device  \
 		-device virtio-mouse-device \
 		-device virtio-net-device,netdev=net0 \
-		-netdev user,id=net0,hostfwd=udp::6200-:2000 \
+		-netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80 \
 		-serial stdio
 
 fdt:
