@@ -1,5 +1,7 @@
 const SYSCALL_DUP: usize = 24;
 const SYSCALL_CONNECT: usize = 29;
+const SYSCALL_LISTEN: usize = 30;
+const SYSCALL_ACCEPT: usize = 31;
 const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
@@ -34,23 +36,25 @@ const SYSCALL_KEY_PRESSED: usize = 3001;
 mod fs;
 mod gui;
 mod input;
+mod net;
 mod process;
 mod sync;
 mod thread;
-mod net;
 
 use fs::*;
 use gui::*;
 use input::*;
+use net::*;
 use process::*;
 use sync::*;
 use thread::*;
-use net::*;
 
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
     match syscall_id {
         SYSCALL_DUP => sys_dup(args[0]),
         SYSCALL_CONNECT => sys_connect(args[0] as _, args[1] as _, args[2] as _),
+        SYSCALL_LISTEN => sys_listen(args[0] as _),
+        SYSCALL_ACCEPT => sys_accept(args[0] as _),
         SYSCALL_OPEN => sys_open(args[0] as *const u8, args[1] as u32),
         SYSCALL_CLOSE => sys_close(args[0]),
         SYSCALL_PIPE => sys_pipe(args[0] as *mut usize),

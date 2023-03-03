@@ -8,12 +8,12 @@ extern crate user_lib;
 #[macro_use]
 extern crate alloc;
 
-use user_lib::{connect, write, read};
+use user_lib::{connect, read, write};
 
 #[no_mangle]
 pub fn main() -> i32 {
     println!("udp test open!");
-    
+
     let udp_fd = connect(10 << 24 | 0 << 16 | 2 << 8 | 2, 2001, 26099);
 
     if udp_fd < 0 {
