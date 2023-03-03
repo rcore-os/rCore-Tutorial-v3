@@ -1,7 +1,7 @@
 use crate::net::port_table::{listen, PortFd, accept, port_acceptable};
 use crate::net::udp::UDP;
 use crate::net::{IPv4, net_interrupt_handler};
-use crate::task::{current_process, block_current_and_run_next, current_task, current_trap_cx};
+use crate::task::{current_process, current_task, current_trap_cx};
 use alloc::sync::Arc;
 
 // just support udp

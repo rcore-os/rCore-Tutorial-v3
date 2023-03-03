@@ -2,7 +2,9 @@ use alloc::{vec::Vec, sync::Arc};
 use lazy_static::lazy_static;
 use lose_net_stack::packets::tcp::TCPPacket;
 
-use crate::{sync::UPIntrFreeCell, fs::File, task::{TaskControlBlock, wakeup_task}};
+use crate::fs::File;
+use crate::sync::UPIntrFreeCell;
+use crate::task::TaskControlBlock;
 
 use super::tcp::TCP;
 
@@ -83,7 +85,7 @@ pub fn check_accept(port: u16, tcp_packet: &TCPPacket) -> Option<()> {
     })
 }
 
-pub fn accept_connection(port: u16, tcp_packet: &TCPPacket, task: Arc<TaskControlBlock>) {
+pub fn accept_connection(_port: u16, tcp_packet: &TCPPacket, task: Arc<TaskControlBlock>) {
     let process = task.process.upgrade().unwrap();
     let mut inner = process.inner_exclusive_access();
     let fd = inner.alloc_fd();
