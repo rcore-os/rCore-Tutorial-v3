@@ -78,8 +78,8 @@ fn handle_tcp_client(client_fd: usize) -> bool {
         <body>
         
         <div class="container-fluid p-5 bg-primary text-white text-center">
-        <h1>lose-net-stack</h1>
-        <p>rcore-tutorial 是一个 基于 RISC-V 架构的 类 Unix 内核.</p> 
+        <h1>rCore-tutorial-V3</h1>
+        <p>rCore-tutorial-V3 是一个 基于 RISC-V 架构的 类 Unix 内核.</p> 
         </div>
         
         <div class="container mt-5">
