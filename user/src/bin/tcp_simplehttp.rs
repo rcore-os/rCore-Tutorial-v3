@@ -157,9 +157,8 @@ pub fn main() -> i32 {
 #[allow(unused)]
 pub fn hexdump(data: &[u8]) {
     const PRELAND_WIDTH: usize = 70;
-    println!("[kernel] {:-^1$}", " hexdump ", PRELAND_WIDTH);
+    println!("{:-^1$}", " hexdump ", PRELAND_WIDTH);
     for offset in (0..data.len()).step_by(16) {
-        print!("[kernel] ");
         for i in 0..16 {
             if offset + i < data.len() {
                 print!("{:02x} ", data[offset + i]);
@@ -185,5 +184,5 @@ pub fn hexdump(data: &[u8]) {
 
         println!("");
     }
-    println!("[kernel] {:-^1$}", " hexdump end ", PRELAND_WIDTH);
+    println!("{:-^1$}", " hexdump end ", PRELAND_WIDTH);
 }
