@@ -92,7 +92,7 @@ fn handle_tcp_client(client_fd: usize) -> bool {
             <div class="col-sm-4">
             <h3>仓库地址</h3>        
             <p>repo url</p>
-            <p>https://github.com/yfblock/lose-net-stack</p>
+            <p>https://github.com/rcore-os/rCore-Tutorial-v3</p>
             </div>
             <div class="col-sm-4">
             <h3>QQ 群号</h3>        
