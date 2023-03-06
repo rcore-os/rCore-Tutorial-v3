@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["accept",""],["accept_connection",""],["check_accept",""],["listen",""],["port_acceptable",""]],"struct":[["LISTEN_TABLE",""],["Port",""],["PortFd",""]]};

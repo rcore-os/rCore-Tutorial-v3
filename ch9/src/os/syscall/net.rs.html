@@ -12,10 +12,50 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::IPv4</span>;
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::port_table</span>::{<span class="ident">listen</span>, <span class="ident">PortFd</span>, <span class="ident">accept</span>, <span class="ident">port_acceptable</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::udp::UDP</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::current_process</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">IPv4</span>, <span class="ident">net_interrupt_handler</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_process</span>, <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>};
+<span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 
 <span class="comment">// just support udp</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_connect</span>(<span class="ident">raddr</span>: <span class="ident">u32</span>, <span class="ident">lport</span>: <span class="ident">u16</span>, <span class="ident">rport</span>: <span class="ident">u16</span>) -&gt; <span class="ident">isize</span> {
@@ -24,6 +64,45 @@
     <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">alloc_fd</span>();
     <span class="kw">let</span> <span class="ident">udp_node</span> <span class="op">=</span> <span class="ident">UDP::new</span>(<span class="ident">IPv4::from_u32</span>(<span class="ident">raddr</span>), <span class="ident">lport</span>, <span class="ident">rport</span>);
     <span class="ident">inner</span>.<span class="ident">fd_table</span>[<span class="ident">fd</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">udp_node</span>));
-    <span class="ident">fd</span> <span class="kw">as</span> <span class="ident">isize</span>    
-}</code></pre></div>
+    <span class="ident">fd</span> <span class="kw">as</span> <span class="ident">isize</span>
+}
+
+<span class="comment">// listen a port</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_listen</span>(<span class="ident">port</span>: <span class="ident">u16</span>) -&gt; <span class="ident">isize</span> {
+    <span class="kw">match</span> <span class="ident">listen</span>(<span class="ident">port</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">port_index</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">process</span> <span class="op">=</span> <span class="ident">current_process</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
+            <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">alloc_fd</span>();
+            <span class="kw">let</span> <span class="ident">port_fd</span> <span class="op">=</span> <span class="ident">PortFd::new</span>(<span class="ident">port_index</span>);
+            <span class="ident">inner</span>.<span class="ident">fd_table</span>[<span class="ident">fd</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">port_fd</span>));
+
+            <span class="comment">// NOTICE: this return the port index, not the fd</span>
+            <span class="ident">port_index</span> <span class="kw">as</span> <span class="ident">isize</span>
+        }
+        <span class="prelude-val">None</span> =&gt; <span class="op">-</span><span class="number">1</span>,
+    }
+}
+
+<span class="comment">// accept a tcp connection</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_accept</span>(<span class="ident">port_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">isize</span> {
+    <span class="macro">println!</span>(<span class="string">&quot;accepting port {}&quot;</span>, <span class="ident">port_index</span>);
+    
+    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">current_task</span>().<span class="ident">unwrap</span>();
+    <span class="ident">accept</span>(<span class="ident">port_index</span>, <span class="ident">task</span>);
+    <span class="comment">// block_current_and_run_next();</span>
+    
+    <span class="comment">// NOTICE: There does not have interrupt handler, just call it munually.</span>
+    <span class="kw">loop</span> {
+        <span class="ident">net_interrupt_handler</span>();
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">port_acceptable</span>(<span class="ident">port_index</span>) {
+            <span class="kw">break</span>;
+        }
+    }
+
+    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">current_trap_cx</span>();
+    <span class="ident">cx</span>.<span class="ident">x</span>[<span class="number">10</span>] <span class="kw">as</span> <span class="ident">isize</span>
+}
+</code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>

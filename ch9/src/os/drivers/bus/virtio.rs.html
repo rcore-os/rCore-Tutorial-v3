@@ -44,9 +44,11 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mm</span>::{
-    <span class="ident">frame_dealloc</span>, <span class="ident">kernel_token</span>, <span class="ident">FrameTracker</span>, <span class="ident">PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>,
-    <span class="ident">StepByOne</span>, <span class="ident">VirtAddr</span>, <span class="ident">frame_alloc_more</span>,
+    <span class="ident">frame_alloc_more</span>, <span class="ident">frame_dealloc</span>, <span class="ident">kernel_token</span>, <span class="ident">FrameTracker</span>, <span class="ident">PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>,
+    <span class="ident">StepByOne</span>, <span class="ident">VirtAddr</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
@@ -64,7 +66,9 @@
     <span class="kw">fn</span> <span class="ident">dma_alloc</span>(<span class="ident">pages</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="ident">trakcers</span> <span class="op">=</span> <span class="ident">frame_alloc_more</span>(<span class="ident">pages</span>);
         <span class="kw">let</span> <span class="ident">ppn_base</span> <span class="op">=</span> <span class="ident">trakcers</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">ppn</span>;
-        <span class="ident">QUEUE_FRAMES</span>.<span class="ident">exclusive_access</span>().<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">trakcers</span>.<span class="ident">unwrap</span>());
+        <span class="ident">QUEUE_FRAMES</span>
+            .<span class="ident">exclusive_access</span>()
+            .<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">trakcers</span>.<span class="ident">unwrap</span>());
         <span class="kw">let</span> <span class="ident">pa</span>: <span class="ident">PhysAddr</span> <span class="op">=</span> <span class="ident">ppn_base</span>.<span class="ident">into</span>();
         <span class="ident">pa</span>.<span class="number">0</span>
     }
