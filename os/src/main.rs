@@ -20,13 +20,13 @@ mod drivers;
 mod fs;
 mod lang_items;
 mod mm;
+mod net;
 mod sbi;
 mod sync;
 mod syscall;
 mod task;
 mod timer;
 mod trap;
-mod net;
 
 use crate::drivers::chardev::CharDevice;
 use crate::drivers::chardev::UART;
