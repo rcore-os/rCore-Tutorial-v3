@@ -9,7 +9,8 @@ edition = "2021"
 [dependencies]
 riscv = { git = "https://github.com/rcore-os/riscv", features = ["inline-asm"] }
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
-cfg-if = { version = "1.0.0" }
+log = "0.4"
+sbi-rt = { version = "0.0.2", features = ["legacy"] }
 
 [profile.release]
 debug = true

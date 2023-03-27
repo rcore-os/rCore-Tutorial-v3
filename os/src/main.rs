@@ -22,10 +22,6 @@
 #![feature(panic_info_message)]
 
 use core::arch::global_asm;
-
-#[path = "boards/qemu.rs"]
-mod board;
-
 #[macro_use]
 mod console;
 mod config;
