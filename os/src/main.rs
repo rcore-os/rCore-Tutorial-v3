@@ -22,9 +22,6 @@ mod lang_items;
 mod logging;
 mod sbi;
 
-#[path = "boards/qemu.rs"]
-mod board;
-
 global_asm!(include_str!("entry.asm"));
 
 /// clear BSS segment
@@ -73,7 +70,7 @@ pub fn rust_main() -> ! {
     );
     error!("[kernel] .bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
 
-    use crate::board::QEMUExit;
-    crate::board::QEMU_EXIT_HANDLE.exit_success(); // CI autotest success
-                                                   //crate::board::QEMU_EXIT_HANDLE.exit_failure(); // CI autoest failed
+    // CI autotest success: sbi::shutdown(false)
+    // CI autotest failed : sbi::shutdown(true)
+    sbi::shutdown(false)
 }

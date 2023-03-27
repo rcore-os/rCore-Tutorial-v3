@@ -8,5 +8,7 @@ edition = "2021"
 
 [dependencies]
 log = "0.4"
+sbi-rt = { version = "0.0.2", features = ["legacy"] }
+
 [profile.release]
 debug = true
