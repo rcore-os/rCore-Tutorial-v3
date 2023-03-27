@@ -18,6 +18,8 @@ lose-net-stack = { git = "https://github.com/yfblock/lose-net-stack", rev = "db4
 easy-fs = { path = "../easy-fs" }
 embedded-graphics = "0.7.1"
 tinybmp = "0.3.1"
+log = "0.4"
+sbi-rt = { version = "0.0.2", features = ["legacy"] }
 
 [profile.release]
 debug = true
