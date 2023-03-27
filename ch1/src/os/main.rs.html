@@ -74,9 +74,6 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The operating system and app also starts in this module. Kernel code starts</span>
@@ -100,9 +97,6 @@
 <span class="kw">mod</span> <span class="ident">lang_items</span>;
 <span class="kw">mod</span> <span class="ident">logging</span>;
 <span class="kw">mod</span> <span class="ident">sbi</span>;
-
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;boards/qemu.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">board</span>;
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;entry.asm&quot;</span>));
 
@@ -152,9 +146,9 @@
     );
     <span class="macro">error!</span>(<span class="string">&quot;[kernel] .bss [{:#x}, {:#x})&quot;</span>, <span class="ident">sbss</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ebss</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
-    <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>(); <span class="comment">// CI autotest success</span>
-                                                   <span class="comment">//crate::board::QEMU_EXIT_HANDLE.exit_failure(); // CI autoest failed</span>
+    <span class="comment">// CI autotest success: sbi::shutdown(false)</span>
+    <span class="comment">// CI autotest failed : sbi::shutdown(true)</span>
+    <span class="ident">sbi::shutdown</span>(<span class="bool-val">false</span>)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>
