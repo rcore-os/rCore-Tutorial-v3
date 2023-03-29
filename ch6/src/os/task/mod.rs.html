@@ -122,7 +122,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Task management implementation</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Everything about task management, like starting and switching tasks is</span>
@@ -149,6 +148,7 @@
 <span class="kw">mod</span> <span class="ident">task</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fs</span>::{<span class="ident">open_file</span>, <span class="ident">OpenFlags</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::shutdown</span>;
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context::TaskContext</span>;
 <span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="kw-2">*</span>;
@@ -184,8 +184,6 @@
 <span class="doccomment">/// pid of usertests app in make run TEST=1</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IDLE_PID</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
-
 <span class="doccomment">/// Exit the current &#39;Running&#39; task and run the next task in task list.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit_current_and_run_next</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
     <span class="comment">// take from Processor</span>
@@ -199,10 +197,10 @@
         );
         <span class="kw">if</span> <span class="ident">exit_code</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="comment">//crate::sbi::shutdown(255); //255 == -1 for err hint</span>
-            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_failure</span>();
+            <span class="ident">shutdown</span>(<span class="bool-val">true</span>)
         } <span class="kw">else</span> {
             <span class="comment">//crate::sbi::shutdown(0); //0 for success hint</span>
-            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
+            <span class="ident">shutdown</span>(<span class="bool-val">false</span>)
         }
     }
 
