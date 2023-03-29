@@ -221,6 +221,7 @@
 <span class="kw">mod</span> <span class="ident">task</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loader</span>::{<span class="ident">get_app_data</span>, <span class="ident">get_num_app</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sbi::shutdown</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trap::TrapContext</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
@@ -357,8 +358,7 @@
             <span class="comment">// go back to user mode</span>
         } <span class="kw">else</span> {
             <span class="macro">println!</span>(<span class="string">&quot;All applications completed!&quot;</span>);
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::board::QEMUExit</span>;
-            <span class="ident"><span class="kw">crate</span>::board::QEMU_EXIT_HANDLE</span>.<span class="ident">exit_success</span>();
+            <span class="ident">shutdown</span>(<span class="bool-val">false</span>);
         }
     }
 }
