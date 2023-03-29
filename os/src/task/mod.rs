@@ -46,8 +46,6 @@ pub fn suspend_current_and_run_next() {
 /// pid of usertests app in make run TEST=1
 pub const IDLE_PID: usize = 0;
 
-use crate::board::QEMUExit;
-
 /// Exit the current 'Running' task and run the next task in task list.
 pub fn exit_current_and_run_next(exit_code: i32) {
     // take from Processor
@@ -61,10 +59,10 @@ pub fn exit_current_and_run_next(exit_code: i32) {
         );
         if exit_code != 0 {
             //crate::sbi::shutdown(255); //255 == -1 for err hint
-            crate::board::QEMU_EXIT_HANDLE.exit_failure();
+            shutdown(true)
         } else {
             //crate::sbi::shutdown(0); //0 for success hint
-            crate::board::QEMU_EXIT_HANDLE.exit_success();
+            shutdown(false)
         }
     }
 
