@@ -58,8 +58,8 @@ impl DrawingBoard {
 pub fn main() -> i32 {
     let mut board = DrawingBoard::new();
     let _ = board.disp.clear(Rgb888::BLACK).unwrap();
-    for i in 0..5 {
-        board.latest_pos.x += (RECT_SIZE as i32 + 20);
+    for _ in 0..5 {
+        board.latest_pos.x += RECT_SIZE as i32 + 20;
         //board.latest_pos.y += i;
         board.paint();
     }
