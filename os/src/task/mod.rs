@@ -10,6 +10,7 @@ mod task;
 
 use self::id::TaskUserRes;
 use crate::fs::{open_file, OpenFlags};
+use crate::sbi::shutdown;
 use alloc::{sync::Arc, vec::Vec};
 use lazy_static::*;
 use manager::fetch_task;
@@ -78,10 +79,10 @@ pub fn exit_current_and_run_next(exit_code: i32) {
             );
             if exit_code != 0 {
                 //crate::sbi::shutdown(255); //255 == -1 for err hint
-                crate::board::QEMU_EXIT_HANDLE.exit_failure();
+                shutdown(true);
             } else {
                 //crate::sbi::shutdown(0); //0 for success hint
-                crate::board::QEMU_EXIT_HANDLE.exit_success();
+                shutdown(false);
             }
         }
         remove_from_pid2process(pid);
