@@ -9,6 +9,7 @@ mod switch;
 mod task;
 
 use crate::fs::{open_file, OpenFlags};
+use crate::sbi::shutdown;
 use alloc::sync::Arc;
 pub use context::TaskContext;
 use lazy_static::*;
