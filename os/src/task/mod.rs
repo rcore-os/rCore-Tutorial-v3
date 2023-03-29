@@ -15,6 +15,7 @@ mod switch;
 mod task;
 
 use crate::loader::{get_app_data, get_num_app};
+use crate::sbi::shutdown;
 use crate::sync::UPSafeCell;
 use crate::trap::TrapContext;
 use alloc::vec::Vec;
@@ -151,8 +152,7 @@ impl TaskManager {
             // go back to user mode
         } else {
             println!("All applications completed!");
-            use crate::board::QEMUExit;
-            crate::board::QEMU_EXIT_HANDLE.exit_success();
+            shutdown(false);
         }
     }
 }
