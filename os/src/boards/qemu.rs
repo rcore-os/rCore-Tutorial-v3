@@ -79,7 +79,7 @@ pub unsafe extern "C" fn timervec() -> ! {
     // used for processing in this scratch space.
     // a0 saved in mscrach, a1 ~ a3 saved in scratch space.
     //loop {}
-    asm!(
+    core::arch::asm!(
         "csrrw a0, mscratch, a0",
         "sd a1, 0(a0)",
         "sd a2, 8(a0)",
