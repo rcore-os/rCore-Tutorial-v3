@@ -58,6 +58,7 @@ pub fn block_current_and_run_next() {
 }
 use crate::board::QEMUExit;
 
+/// Exit the current 'Running' task and run the next task in task list.
 pub fn exit_current_and_run_next(exit_code: i32) {
     let task = take_current_task().unwrap();
     let mut task_inner = task.inner_exclusive_access();
