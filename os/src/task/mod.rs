@@ -57,7 +57,6 @@ pub fn block_current_and_run_next() {
     let task_cx_ptr = block_current_task();
     schedule(task_cx_ptr);
 }
-use crate::board::QEMUExit;
 
 /// Exit the current 'Running' task and run the next task in task list.
 pub fn exit_current_and_run_next(exit_code: i32) {
