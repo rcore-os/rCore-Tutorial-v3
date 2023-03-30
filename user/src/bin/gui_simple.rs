@@ -3,8 +3,8 @@
 
 extern crate user_lib;
 
-use user_lib::{VIRTGPU_XRES, VIRTGPU_YRES, Display};
 use embedded_graphics::prelude::Size;
+use user_lib::{Display, VIRTGPU_XRES, VIRTGPU_YRES};
 
 #[no_mangle]
 pub fn main() -> i32 {

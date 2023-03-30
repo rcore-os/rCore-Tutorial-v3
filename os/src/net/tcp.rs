@@ -1,8 +1,8 @@
 use alloc::vec;
-use lose_net_stack::MacAddress;
-use lose_net_stack::IPv4;
-use lose_net_stack::TcpFlags;
 use lose_net_stack::packets::tcp::TCPPacket;
+use lose_net_stack::IPv4;
+use lose_net_stack::MacAddress;
+use lose_net_stack::TcpFlags;
 
 use crate::{drivers::NET_DEVICE, fs::File};
 

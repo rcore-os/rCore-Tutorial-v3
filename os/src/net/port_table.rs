@@ -1,4 +1,4 @@
-use alloc::{vec::Vec, sync::Arc};
+use alloc::{sync::Arc, vec::Vec};
 use lazy_static::lazy_static;
 use lose_net_stack::packets::tcp::TCPPacket;
 
@@ -11,7 +11,7 @@ use super::tcp::TCP;
 pub struct Port {
     pub port: u16,
     pub receivable: bool,
-    pub schedule: Option<Arc<TaskControlBlock>>
+    pub schedule: Option<Arc<TaskControlBlock>>,
 }
 
 lazy_static! {
@@ -32,7 +32,7 @@ pub fn listen(port: u16) -> Option<usize> {
     let listen_port = Port {
         port,
         receivable: false,
-        schedule: None
+        schedule: None,
     };
 
     if index == usize::MAX {
@@ -66,10 +66,13 @@ pub fn port_acceptable(listen_index: usize) -> bool {
 // check whether it can accept request
 pub fn check_accept(port: u16, tcp_packet: &TCPPacket) -> Option<()> {
     LISTEN_TABLE.exclusive_session(|listen_table| {
-        let mut listen_ports: Vec<&mut Option<Port>> = listen_table.iter_mut().filter(|x| match x {
-            Some(t) => t.port == port && t.receivable == true,
-            None => false,
-        }).collect();
+        let mut listen_ports: Vec<&mut Option<Port>> = listen_table
+            .iter_mut()
+            .filter(|x| match x {
+                Some(t) => t.port == port && t.receivable == true,
+                None => false,
+            })
+            .collect();
         if listen_ports.len() == 0 {
             None
         } else {
@@ -90,7 +93,13 @@ pub fn accept_connection(_port: u16, tcp_packet: &TCPPacket, task: Arc<TaskContr
     let mut inner = process.inner_exclusive_access();
     let fd = inner.alloc_fd();
 
-    let tcp_socket = TCP::new(tcp_packet.source_ip, tcp_packet.dest_port, tcp_packet.source_port, tcp_packet.seq, tcp_packet.ack);
+    let tcp_socket = TCP::new(
+        tcp_packet.source_ip,
+        tcp_packet.dest_port,
+        tcp_packet.source_port,
+        tcp_packet.seq,
+        tcp_packet.ack,
+    );
 
     inner.fd_table[fd] = Some(Arc::new(tcp_socket));
 
@@ -130,4 +139,3 @@ impl File for PortFd {
         0
     }
 }
-

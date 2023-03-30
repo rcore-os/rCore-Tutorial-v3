@@ -5,8 +5,8 @@
 extern crate user_lib;
 extern crate alloc;
 
-use user_lib::{thread_create, exit, waittid};
 use alloc::vec::Vec;
+use user_lib::{exit, thread_create, waittid};
 
 const THREAD_NUM: usize = 3;
 

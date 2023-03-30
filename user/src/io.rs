@@ -1,7 +1,7 @@
 use super::*;
+use embedded_graphics::pixelcolor::Rgb888;
 use embedded_graphics::prelude::{RgbColor, Size};
 use embedded_graphics::{draw_target::DrawTarget, prelude::OriginDimensions};
-use embedded_graphics::pixelcolor::Rgb888;
 use virtio_input_decoder::Decoder;
 pub use virtio_input_decoder::{DecodeType, Key, KeyType, Mouse};
 
@@ -24,9 +24,8 @@ pub struct Display {
 impl Display {
     pub fn new(size: Size) -> Self {
         let fb_ptr = framebuffer() as *mut u8;
-        let fb =
-            unsafe { core::slice::from_raw_parts_mut(fb_ptr, VIRTGPU_LEN as usize) };
-        Self { size, fb}
+        let fb = unsafe { core::slice::from_raw_parts_mut(fb_ptr, VIRTGPU_LEN as usize) };
+        Self { size, fb }
     }
     pub fn framebuffer(&mut self) -> &mut [u8] {
         self.fb
@@ -53,9 +52,7 @@ impl DrawTarget for Display {
         I: IntoIterator<Item = embedded_graphics::Pixel<Self::Color>>,
     {
         pixels.into_iter().for_each(|px| {
-            let idx = (px.0.y * VIRTGPU_XRES as i32 + px.0.x)
-                as usize
-                * 4;
+            let idx = (px.0.y * VIRTGPU_XRES as i32 + px.0.x) as usize * 4;
             if idx + 2 >= self.fb.len() {
                 return;
             }
@@ -113,6 +110,7 @@ impl InputEvent {
             self.event_type as usize,
             self.code as usize,
             self.value as usize,
-        ).ok()
+        )
+        .ok()
     }
 }

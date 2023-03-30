@@ -10,7 +10,7 @@ extern crate alloc;
 
 // use http://localhost:6201/ to access the http server
 
-use user_lib::{read, write, listen, accept};
+use user_lib::{accept, listen, read, write};
 
 // get url from the tcp request list.
 fn get_url_from_tcp_request(req: &[u8]) -> String {
@@ -35,8 +35,8 @@ fn handle_tcp_client(client_fd: usize) -> bool {
     println!("receive {} bytes", len);
     hexdump(&buf[..len as usize]);
 
-    // verify whether it is a valid HTTP request simply, [0x47,0x45,0x54, 0x20] is GET 
-    if len < 4 || buf[..4] != [0x47,0x45,0x54, 0x20] {
+    // verify whether it is a valid HTTP request simply, [0x47,0x45,0x54, 0x20] is GET
+    if len < 4 || buf[..4] != [0x47, 0x45, 0x54, 0x20] {
         println!("it's not a valid http request");
         return false;
     }
@@ -136,12 +136,12 @@ pub fn main() -> i32 {
     loop {
         let client = accept(tcp_fd as usize);
         println!("client connected: {}", client);
-        
+
         if client < 1 {
             println!("Failed to accept a client on port 80");
             return -1;
         }
-    
+
         if handle_tcp_client(client as usize) {
             break;
         }

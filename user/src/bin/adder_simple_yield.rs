@@ -55,7 +55,9 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
             per_thread = argv[2].parse().unwrap();
         }
     }
-    unsafe { PER_THREAD = per_thread; }
+    unsafe {
+        PER_THREAD = per_thread;
+    }
     let start = get_time();
     let mut v = Vec::new();
     for _ in 0..thread_count {

@@ -1,7 +1,7 @@
+pub mod port_table;
 pub mod socket;
 pub mod tcp;
 pub mod udp;
-pub mod port_table;
 
 pub use lose_net_stack::IPv4;
 
@@ -95,7 +95,7 @@ pub fn net_interrupt_handler() {
             if let Some(socket_index) = get_socket(target, lport, rport) {
                 push_data(socket_index, tcp_packet.data.to_vec());
                 set_s_a_by_index(socket_index, tcp_packet.seq, tcp_packet.ack);
-            } 
+            }
         }
         _ => {}
     }

@@ -9,7 +9,7 @@ extern crate alloc;
 use alloc::vec;
 use user_lib::exit;
 use user_lib::{
-    semaphore_create, semaphore_down, semaphore_up, mutex_blocking_create, mutex_lock, mutex_unlock,
+    mutex_blocking_create, mutex_lock, mutex_unlock, semaphore_create, semaphore_down, semaphore_up,
 };
 use user_lib::{sleep, thread_create, waittid};
 

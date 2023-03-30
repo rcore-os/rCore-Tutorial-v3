@@ -8,7 +8,7 @@ use user_lib::{Display, VIRTGPU_XRES, VIRTGPU_YRES};
 
 use embedded_graphics::pixelcolor::Rgb888;
 use embedded_graphics::prelude::{DrawTarget, Drawable, Point, RgbColor, Size};
-use embedded_graphics::primitives::{Circle, Primitive, PrimitiveStyle, Rectangle,Triangle};
+use embedded_graphics::primitives::{Circle, Primitive, PrimitiveStyle, Rectangle, Triangle};
 
 const INIT_X: i32 = 80;
 const INIT_Y: i32 = 400;
@@ -35,10 +35,14 @@ impl DrawingBoard {
             .into_styled(PrimitiveStyle::with_fill(Rgb888::BLUE))
             .draw(&mut self.disp)
             .ok();
-        Triangle::new(self.latest_pos + Point::new(0, 150), self.latest_pos + Point::new(80, 200), self.latest_pos + Point::new(-120, 300))
-            .into_styled(PrimitiveStyle::with_stroke(Rgb888::GREEN, 10))
-            .draw(&mut self.disp)
-            .ok();
+        Triangle::new(
+            self.latest_pos + Point::new(0, 150),
+            self.latest_pos + Point::new(80, 200),
+            self.latest_pos + Point::new(-120, 300),
+        )
+        .into_styled(PrimitiveStyle::with_stroke(Rgb888::GREEN, 10))
+        .draw(&mut self.disp)
+        .ok();
     }
     fn unpaint(&mut self) {
         Rectangle::with_center(self.latest_pos, Size::new(RECT_SIZE, RECT_SIZE))
