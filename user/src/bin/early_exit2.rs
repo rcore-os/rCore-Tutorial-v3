@@ -5,7 +5,7 @@
 extern crate user_lib;
 extern crate alloc;
 
-use user_lib::{exit, thread_create, sleep};
+use user_lib::{exit, sleep, thread_create};
 
 pub fn thread_a() -> ! {
     println!("into thread_a");

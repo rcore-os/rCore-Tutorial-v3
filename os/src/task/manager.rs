@@ -22,12 +22,14 @@ impl TaskManager {
         self.ready_queue.pop_front()
     }
     pub fn remove(&mut self, task: Arc<TaskControlBlock>) {
-        if let Some((id, _)) = self.ready_queue
+        if let Some((id, _)) = self
+            .ready_queue
             .iter()
             .enumerate()
-            .find(|(_, t)| Arc::as_ptr(t) == Arc::as_ptr(&task)) {
-                self.ready_queue.remove(id);
-            }
+            .find(|(_, t)| Arc::as_ptr(t) == Arc::as_ptr(&task))
+        {
+            self.ready_queue.remove(id);
+        }
     }
 }
 

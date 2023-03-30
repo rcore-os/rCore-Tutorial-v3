@@ -64,7 +64,7 @@ pub fn remove_timer(task: Arc<TaskControlBlock>) {
     let mut temp = BinaryHeap::<TimerCondVar>::new();
     for condvar in timers.drain() {
         if Arc::as_ptr(&task) != Arc::as_ptr(&condvar.task) {
-            temp.push(condvar); 
+            temp.push(condvar);
         }
     }
     timers.clear();

@@ -69,7 +69,7 @@ impl Task {
         // we can allocate memory for it later, but it keeps complexity down and lets us focus on more interesting parts
         // to do it here. The important part is that once allocated it MUST NOT move in memory.
         Task {
-            id:id,
+            id: id,
             stack: vec![0_u8; DEFAULT_STACK_SIZE],
             ctx: TaskContext::default(),
             state: State::Available,
