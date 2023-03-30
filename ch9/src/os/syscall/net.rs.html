@@ -51,9 +51,9 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::port_table</span>::{<span class="ident">listen</span>, <span class="ident">PortFd</span>, <span class="ident">accept</span>, <span class="ident">port_acceptable</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::port_table</span>::{<span class="ident">accept</span>, <span class="ident">listen</span>, <span class="ident">port_acceptable</span>, <span class="ident">PortFd</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::udp::UDP</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">IPv4</span>, <span class="ident">net_interrupt_handler</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net</span>::{<span class="ident">net_interrupt_handler</span>, <span class="ident">IPv4</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_process</span>, <span class="ident">current_task</span>, <span class="ident">current_trap_cx</span>};
 <span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 
@@ -87,11 +87,11 @@
 <span class="comment">// accept a tcp connection</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_accept</span>(<span class="ident">port_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">isize</span> {
     <span class="macro">println!</span>(<span class="string">&quot;accepting port {}&quot;</span>, <span class="ident">port_index</span>);
-    
+
     <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">current_task</span>().<span class="ident">unwrap</span>();
     <span class="ident">accept</span>(<span class="ident">port_index</span>, <span class="ident">task</span>);
     <span class="comment">// block_current_and_run_next();</span>
-    
+
     <span class="comment">// NOTICE: There does not have interrupt handler, just call it munually.</span>
     <span class="kw">loop</span> {
         <span class="ident">net_interrupt_handler</span>();

@@ -44,7 +44,7 @@
 <span id="44">44</span>
 <span id="45">45</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">wakeup_task</span>, <span class="ident">block_current_and_run_next</span>, <span class="ident">current_task</span>, <span class="ident">TaskControlBlock</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">block_current_and_run_next</span>, <span class="ident">current_task</span>, <span class="ident">wakeup_task</span>, <span class="ident">TaskControlBlock</span>};
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Semaphore</span> {

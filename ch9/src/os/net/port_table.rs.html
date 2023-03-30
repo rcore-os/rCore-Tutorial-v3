@@ -131,7 +131,15 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec::Vec</span>, <span class="ident">sync::Arc</span>};
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
 <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
 <span class="kw">use</span> <span class="ident">lose_net_stack::packets::tcp::TCPPacket</span>;
 
@@ -144,7 +152,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Port</span> {
     <span class="kw">pub</span> <span class="ident">port</span>: <span class="ident">u16</span>,
     <span class="kw">pub</span> <span class="ident">receivable</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">schedule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="ident">schedule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TaskControlBlock</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="macro">lazy_static!</span> {
@@ -165,7 +173,7 @@
     <span class="kw">let</span> <span class="ident">listen_port</span> <span class="op">=</span> <span class="ident">Port</span> {
         <span class="ident">port</span>,
         <span class="ident">receivable</span>: <span class="bool-val">false</span>,
-        <span class="ident">schedule</span>: <span class="prelude-val">None</span>
+        <span class="ident">schedule</span>: <span class="prelude-val">None</span>,
     };
 
     <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="ident">usize::MAX</span> {
@@ -199,10 +207,13 @@
 <span class="comment">// check whether it can accept request</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_accept</span>(<span class="ident">port</span>: <span class="ident">u16</span>, <span class="ident">tcp_packet</span>: <span class="kw-2">&amp;</span><span class="ident">TCPPacket</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">LISTEN_TABLE</span>.<span class="ident">exclusive_session</span>(<span class="op">|</span><span class="ident">listen_table</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listen_ports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">listen_table</span>.<span class="ident">iter_mut</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">port</span> <span class="op">==</span> <span class="ident">port</span> <span class="op">&amp;&amp;</span> <span class="ident">t</span>.<span class="ident">receivable</span> <span class="op">==</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-        }).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listen_ports</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">listen_table</span>
+            .<span class="ident">iter_mut</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">port</span> <span class="op">==</span> <span class="ident">port</span> <span class="op">&amp;&amp;</span> <span class="ident">t</span>.<span class="ident">receivable</span> <span class="op">==</span> <span class="bool-val">true</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+            })
+            .<span class="ident">collect</span>();
         <span class="kw">if</span> <span class="ident">listen_ports</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -223,7 +234,13 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">process</span>.<span class="ident">inner_exclusive_access</span>();
     <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">alloc_fd</span>();
 
-    <span class="kw">let</span> <span class="ident">tcp_socket</span> <span class="op">=</span> <span class="ident">TCP::new</span>(<span class="ident">tcp_packet</span>.<span class="ident">source_ip</span>, <span class="ident">tcp_packet</span>.<span class="ident">dest_port</span>, <span class="ident">tcp_packet</span>.<span class="ident">source_port</span>, <span class="ident">tcp_packet</span>.<span class="ident">seq</span>, <span class="ident">tcp_packet</span>.<span class="ident">ack</span>);
+    <span class="kw">let</span> <span class="ident">tcp_socket</span> <span class="op">=</span> <span class="ident">TCP::new</span>(
+        <span class="ident">tcp_packet</span>.<span class="ident">source_ip</span>,
+        <span class="ident">tcp_packet</span>.<span class="ident">dest_port</span>,
+        <span class="ident">tcp_packet</span>.<span class="ident">source_port</span>,
+        <span class="ident">tcp_packet</span>.<span class="ident">seq</span>,
+        <span class="ident">tcp_packet</span>.<span class="ident">ack</span>,
+    );
 
     <span class="ident">inner</span>.<span class="ident">fd_table</span>[<span class="ident">fd</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">tcp_socket</span>));
 
@@ -263,6 +280,5 @@
         <span class="number">0</span>
     }
 }
-
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (f6f9d5e73 2022-08-04)" ></div></body></html>

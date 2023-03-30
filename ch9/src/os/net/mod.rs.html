@@ -134,10 +134,10 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">socket</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">port_table</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">socket</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tcp</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">udp</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">port_table</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lose_net_stack::IPv4</span>;
 
@@ -231,7 +231,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">socket_index</span>) <span class="op">=</span> <span class="ident">get_socket</span>(<span class="ident">target</span>, <span class="ident">lport</span>, <span class="ident">rport</span>) {
                 <span class="ident">push_data</span>(<span class="ident">socket_index</span>, <span class="ident">tcp_packet</span>.<span class="ident">data</span>.<span class="ident">to_vec</span>());
                 <span class="ident">set_s_a_by_index</span>(<span class="ident">socket_index</span>, <span class="ident">tcp_packet</span>.<span class="ident">seq</span>, <span class="ident">tcp_packet</span>.<span class="ident">ack</span>);
-            } 
+            }
         }
         <span class="kw">_</span> =&gt; {}
     }
