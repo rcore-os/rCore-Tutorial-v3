@@ -9,8 +9,8 @@ extern crate user_lib;
 extern crate alloc;
 
 use alloc::vec::Vec;
-use user_lib::{exit, get_time, thread_create, waittid};
 use core::sync::atomic::{compiler_fence, Ordering};
+use user_lib::{exit, get_time, thread_create, waittid};
 
 static mut A: usize = 0;
 static mut FLAG: [bool; 2] = [false; 2];
@@ -38,7 +38,7 @@ unsafe fn lock(id: usize) {
     // Why do we need to use volatile_read here?
     // Otherwise the compiler will assume that they will never
     // be changed on this thread. Thus, they will be accessed
-    // only once! 
+    // only once!
     while vload!(&FLAG[j]) && vload!(&TURN) == j {}
 }
 
@@ -66,7 +66,9 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
             per_thread = argv[2].parse().unwrap();
         }
     }
-    unsafe { PER_THREAD = per_thread; }
+    unsafe {
+        PER_THREAD = per_thread;
+    }
 
     // uncomment this if you want to check the assembly
     // println!(
@@ -76,7 +78,10 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
     // );
     let start = get_time();
     let mut v = Vec::new();
-    assert_eq!(thread_count, 2, "Peterson works when there are only 2 threads.");
+    assert_eq!(
+        thread_count, 2,
+        "Peterson works when there are only 2 threads."
+    );
     for id in 0..thread_count {
         v.push(thread_create(f as usize, id) as usize);
     }

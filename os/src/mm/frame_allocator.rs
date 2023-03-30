@@ -75,7 +75,7 @@ impl FrameAllocator for StackFrameAllocator {
             None
         } else {
             self.current += pages;
-            let arr:Vec<usize> = (1..pages + 1).collect();
+            let arr: Vec<usize> = (1..pages + 1).collect();
             let v = arr.iter().map(|x| (self.current - x).into()).collect();
             Some(v)
         }
@@ -143,7 +143,6 @@ pub fn frame_allocator_test() {
     drop(v);
     println!("frame_allocator_test passed!");
 }
-
 
 #[allow(unused)]
 pub fn frame_allocator_alloc_more_test() {

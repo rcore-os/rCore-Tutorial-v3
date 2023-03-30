@@ -12,7 +12,7 @@ pub struct Socket {
     pub rport: u16,                 // rempote port
     pub buffers: VecDeque<Vec<u8>>, // datas
     pub seq: u32,
-    pub ack: u32
+    pub ack: u32,
 }
 
 lazy_static! {
@@ -26,11 +26,9 @@ pub fn get_s_a_by_index(index: usize) -> Option<(u32, u32)> {
 
     assert!(index < socket_table.len());
 
-    socket_table.get(index).map_or(None, |x| {
-        match x {
-            Some(x) => Some((x.seq, x.ack)),
-            None => None,
-        }
+    socket_table.get(index).map_or(None, |x| match x {
+        Some(x) => Some((x.seq, x.ack)),
+        None => None,
     })
 }
 
@@ -40,9 +38,7 @@ pub fn set_s_a_by_index(index: usize, seq: u32, ack: u32) {
     assert!(socket_table.len() > index);
     assert!(socket_table[index].is_some());
 
-    let sock = socket_table[index]
-    .as_mut()
-    .unwrap();
+    let sock = socket_table[index].as_mut().unwrap();
 
     sock.ack = ack;
     sock.seq = seq;
@@ -84,7 +80,7 @@ pub fn add_socket(raddr: IPv4, lport: u16, rport: u16) -> Option<usize> {
         rport,
         buffers: VecDeque::new(),
         seq: 0,
-        ack: 0
+        ack: 0,
     };
 
     if index == usize::MAX {

@@ -26,8 +26,8 @@ unsafe fn critical_section(t: &mut usize) {
 
 fn lock() {
     while OCCUPIED
-    .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
-    .is_err()
+        .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+        .is_err()
     {
         yield_();
     }
@@ -57,7 +57,9 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
             per_thread = argv[2].parse().unwrap();
         }
     }
-    unsafe { PER_THREAD = per_thread; }
+    unsafe {
+        PER_THREAD = per_thread;
+    }
     let start = get_time();
     let mut v = Vec::new();
     for _ in 0..thread_count {

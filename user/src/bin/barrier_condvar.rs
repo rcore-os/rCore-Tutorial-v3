@@ -5,10 +5,13 @@
 extern crate user_lib;
 extern crate alloc;
 
-use user_lib::{thread_create, exit, waittid, mutex_create, mutex_lock, mutex_unlock, condvar_create, condvar_signal, condvar_wait};
 use alloc::vec::Vec;
 use core::cell::UnsafeCell;
 use lazy_static::*;
+use user_lib::{
+    condvar_create, condvar_signal, condvar_wait, exit, mutex_create, mutex_lock, mutex_unlock,
+    thread_create, waittid,
+};
 
 const THREAD_NUM: usize = 3;
 
@@ -31,7 +34,9 @@ impl Barrier {
         let count = self.count.get();
         // SAFETY: Here, the accesses of the count is in the
         // critical section protected by the mutex.
-        unsafe { *count = *count + 1; } 
+        unsafe {
+            *count = *count + 1;
+        }
         if unsafe { *count } == THREAD_NUM {
             condvar_signal(self.condvar_id);
         } else {
@@ -50,11 +55,17 @@ lazy_static! {
 }
 
 fn thread_fn() {
-    for _ in 0..300 { print!("a"); }
+    for _ in 0..300 {
+        print!("a");
+    }
     BARRIER_AB.block();
-    for _ in 0..300 { print!("b"); }
+    for _ in 0..300 {
+        print!("b");
+    }
     BARRIER_BC.block();
-    for _ in 0..300 { print!("c"); }
+    for _ in 0..300 {
+        print!("c");
+    }
     exit(0)
 }
 

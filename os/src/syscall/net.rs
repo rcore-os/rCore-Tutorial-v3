@@ -1,6 +1,6 @@
-use crate::net::port_table::{listen, PortFd, accept, port_acceptable};
+use crate::net::port_table::{accept, listen, port_acceptable, PortFd};
 use crate::net::udp::UDP;
-use crate::net::{IPv4, net_interrupt_handler};
+use crate::net::{net_interrupt_handler, IPv4};
 use crate::task::{current_process, current_task, current_trap_cx};
 use alloc::sync::Arc;
 
@@ -34,11 +34,11 @@ pub fn sys_listen(port: u16) -> isize {
 // accept a tcp connection
 pub fn sys_accept(port_index: usize) -> isize {
     println!("accepting port {}", port_index);
-    
+
     let task = current_task().unwrap();
     accept(port_index, task);
     // block_current_and_run_next();
-    
+
     // NOTICE: There does not have interrupt handler, just call it munually.
     loop {
         net_interrupt_handler();

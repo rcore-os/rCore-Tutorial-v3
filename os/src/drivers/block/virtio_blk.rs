@@ -1,10 +1,10 @@
 use super::BlockDevice;
+use crate::drivers::bus::virtio::VirtioHal;
 use crate::sync::{Condvar, UPIntrFreeCell};
 use crate::task::schedule;
 use crate::DEV_NON_BLOCKING_ACCESS;
 use alloc::collections::BTreeMap;
 use virtio_drivers::{BlkResp, RespStatus, VirtIOBlk, VirtIOHeader};
-use crate::drivers::bus::virtio::VirtioHal;
 
 #[allow(unused)]
 const VIRTIO0: usize = 0x10008000;

@@ -1,11 +1,11 @@
 #![no_std]
 #![no_main]
 
-extern crate user_lib;
 extern crate alloc;
+extern crate user_lib;
 
 use user_lib::console::getchar;
-use user_lib::{Display, key_pressed, sleep, VIRTGPU_XRES, VIRTGPU_YRES};
+use user_lib::{key_pressed, sleep, Display, VIRTGPU_XRES, VIRTGPU_YRES};
 
 use embedded_graphics::pixelcolor::*;
 use embedded_graphics::prelude::{Drawable, Point, RgbColor, Size};

@@ -1,10 +1,10 @@
+use crate::drivers::bus::virtio::VirtioHal;
 use crate::sync::UPIntrFreeCell;
 use alloc::{sync::Arc, vec::Vec};
 use core::any::Any;
 use embedded_graphics::pixelcolor::Rgb888;
 use tinybmp::Bmp;
 use virtio_drivers::{VirtIOGpu, VirtIOHeader};
-use crate::drivers::bus::virtio::VirtioHal;
 const VIRTIO7: usize = 0x10007000;
 pub trait GpuDevice: Send + Sync + Any {
     fn update_cursor(&self);

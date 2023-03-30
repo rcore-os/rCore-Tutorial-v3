@@ -24,7 +24,7 @@ ifeq ($(MODE), release)
 endif
 
 # KERNEL ENTRY
-KERNEL_ENTRY_PA := 0x80000000
+KERNEL_ENTRY_PA := 0x80200000
 
 # Binutils
 OBJDUMP := rust-objdump --arch-name=riscv64
@@ -108,18 +108,6 @@ run-inner: build
 fdt:
 	@qemu-system-riscv64 -M 128m -machine virt,dumpdtb=virt.out
 	fdtdump virt.out
-
-debug-none: build
-	@tmux new-session -d \
-		"qemu-system-riscv64 -machine virt -nographic -bios none -kernel $(KERNEL_ELF) \
-		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
-        -device virtio-blk-device,drive=x0 \
-		-device virtio-keyboard-device  \
-		-device virtio-mouse-device \
-		-serial stdio \		
-		 -s -S" && \
-		tmux split-window -h "riscv64-unknown-elf-gdb -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'" && \
-		tmux -2 attach-session -d
 
 debug: build
 	@tmux new-session -d \

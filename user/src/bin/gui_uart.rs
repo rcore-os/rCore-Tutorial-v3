@@ -113,7 +113,7 @@ pub fn main() -> i32 {
     let mut board = DrawingBoard::new();
     let _ = board.disp.clear(Rgb888::BLACK).unwrap();
     for i in 0..20 {
-        let c=getchar();
+        let c = getchar();
         if c == LF || c == CR {
             break;
         }
