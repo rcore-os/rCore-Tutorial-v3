@@ -160,7 +160,6 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PhysAddr</span>, <span class="ident">PhysPageNum</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MEMORY_END</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UPIntrFreeCell</span>;
@@ -238,7 +237,7 @@
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="ident">pages</span>;
-            <span class="kw">let</span> <span class="ident">arr</span>:<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">1</span>..<span class="ident">pages</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">collect</span>();
+            <span class="kw">let</span> <span class="ident">arr</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">1</span>..<span class="ident">pages</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">collect</span>();
             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">arr</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">current</span> <span class="op">-</span> <span class="ident">x</span>).<span class="ident">into</span>()).<span class="ident">collect</span>();
             <span class="prelude-val">Some</span>(<span class="ident">v</span>)
         }
@@ -306,7 +305,6 @@
     <span class="ident">drop</span>(<span class="ident">v</span>);
     <span class="macro">println!</span>(<span class="string">&quot;frame_allocator_test passed!&quot;</span>);
 }
-
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">frame_allocator_alloc_more_test</span>() {

@@ -86,12 +86,12 @@
 <span id="86">86</span>
 <span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BlockDevice</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{<span class="ident">Condvar</span>, <span class="ident">UPIntrFreeCell</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::schedule</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DEV_NON_BLOCKING_ACCESS</span>;
 <span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
 <span class="kw">use</span> <span class="ident">virtio_drivers</span>::{<span class="ident">BlkResp</span>, <span class="ident">RespStatus</span>, <span class="ident">VirtIOBlk</span>, <span class="ident">VirtIOHeader</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
 <span class="kw">const</span> <span class="ident">VIRTIO0</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x10008000</span>;

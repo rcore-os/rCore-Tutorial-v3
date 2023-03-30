@@ -167,26 +167,6 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">context</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::TRAMPOLINE</span>;
@@ -200,7 +180,7 @@
 <span class="kw">use</span> <span class="ident">riscv::register</span>::{
     <span class="ident">mtvec::TrapMode</span>,
     <span class="ident">scause</span>::{<span class="self">self</span>, <span class="ident">Exception</span>, <span class="ident">Interrupt</span>, <span class="ident">Trap</span>},
-    <span class="ident">sie</span>, <span class="ident">sscratch</span>, <span class="ident">sstatus</span>, <span class="ident">stval</span>, <span class="ident">stvec</span>,<span class="ident">sip</span>
+    <span class="ident">sie</span>, <span class="ident">sip</span>, <span class="ident">sscratch</span>, <span class="ident">sstatus</span>, <span class="ident">stval</span>, <span class="ident">stvec</span>,
 };
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">&quot;trap.S&quot;</span>));
@@ -284,20 +264,10 @@
         <span class="ident">Trap::Exception</span>(<span class="ident">Exception::IllegalInstruction</span>) =&gt; {
             <span class="ident">current_add_signal</span>(<span class="ident">SignalFlags::SIGILL</span>);
         }
-        <span class="comment">// Trap::Interrupt(Interrupt::SupervisorTimer) =&gt; {</span>
-        <span class="comment">//     set_next_trigger();</span>
-        <span class="comment">//     check_timer();</span>
-        <span class="comment">//     suspend_current_and_run_next();</span>
-        <span class="comment">// }</span>
-        <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorSoft</span>) =&gt; {
-            <span class="comment">//set_next_trigger();</span>
-            <span class="kw">const</span> <span class="ident">SSIP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-            <span class="kw">unsafe</span> {
-                <span class="macro">asm!</span>(<span class="string">&quot;csrc sip, {}&quot;</span>, <span class="kw">in</span>(<span class="ident">reg</span>) <span class="ident">SSIP</span>);
-            }
-            <span class="comment">//println!(&quot;TRAP: ssoft in Kern&quot;);</span>
+        <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorTimer</span>) =&gt; {
+            <span class="ident">set_next_trigger</span>();
             <span class="ident">check_timer</span>();
-            <span class="comment">// do not schedule now</span>
+            <span class="ident">suspend_current_and_run_next</span>();
         }
         <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorExternal</span>) =&gt; {
             <span class="ident"><span class="kw">crate</span>::board::irq_handler</span>();
@@ -350,18 +320,8 @@
         <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorExternal</span>) =&gt; {
             <span class="ident"><span class="kw">crate</span>::board::irq_handler</span>();
         }
-        <span class="comment">// Trap::Interrupt(Interrupt::SupervisorTimer) =&gt; {</span>
-        <span class="comment">//     //set_next_trigger();</span>
-        <span class="comment">//     check_timer();</span>
-        <span class="comment">//     // do not schedule now</span>
-        <span class="comment">// }</span>
-        <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorSoft</span>) =&gt; {
-            <span class="comment">//set_next_trigger();</span>
-            <span class="kw">const</span> <span class="ident">SSIP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-            <span class="kw">unsafe</span> {
-                <span class="macro">asm!</span>(<span class="string">&quot;csrc sip, {}&quot;</span>, <span class="kw">in</span>(<span class="ident">reg</span>) <span class="ident">SSIP</span>);
-            }
-            <span class="comment">//println!(&quot;TRAP: ssoft in Kern&quot;);</span>
+        <span class="ident">Trap::Interrupt</span>(<span class="ident">Interrupt::SupervisorTimer</span>) =&gt; {
+            <span class="ident">set_next_trigger</span>();
             <span class="ident">check_timer</span>();
             <span class="comment">// do not schedule now</span>
         }
