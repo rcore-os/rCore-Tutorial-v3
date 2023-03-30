@@ -104,11 +104,7 @@ pub fn sys_sigaction(
 ) -> isize {
     syscall(
         SYSCALL_SIGACTION,
-        [
-            signum as usize,
-            action as usize,
-            old_action as usize,
-        ],
+        [signum as usize, action as usize, old_action as usize],
     )
     /*
     syscall(

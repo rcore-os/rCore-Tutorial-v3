@@ -103,20 +103,13 @@ fn kernel_sig_test_failignorekill() {
         panic!("Should not set sigaction to kill!");
     }
 
-    if sigaction(
-        9,
-        Some(&new),
-        None) >= 0 {
+    if sigaction(9, Some(&new), None) >= 0 {
         panic!("Should not set sigaction to kill!");
     }
 
-    if sigaction(
-        9,
-        None,
-        Some(&mut old)) >= 0 {
+    if sigaction(9, None, Some(&mut old)) >= 0 {
         panic!("Should not set sigaction to kill!");
     }
-
 }
 
 fn final_sig_test() {

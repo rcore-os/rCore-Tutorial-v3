@@ -238,7 +238,7 @@ pub fn sigaction(
     sys_sigaction(
         signum,
         action.map_or(core::ptr::null(), |a| a),
-        old_action.map_or(core::ptr::null_mut(), |a| a)
+        old_action.map_or(core::ptr::null_mut(), |a| a),
     )
 }
 
