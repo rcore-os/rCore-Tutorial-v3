@@ -22,9 +22,7 @@ static SUCC_TESTS: &[(&str, &str, &str, &str, i32)] = &[
     ("yield\0", "\0", "\0", "\0", 0),
 ];
 
-static FAIL_TESTS: &[(&str, &str, &str, &str, i32)] = &[
-    ("stack_overflow\0", "\0", "\0", "\0", -2),
-];
+static FAIL_TESTS: &[(&str, &str, &str, &str, i32)] = &[("stack_overflow\0", "\0", "\0", "\0", -2)];
 
 use user_lib::{exec, fork, waitpid};
 
