@@ -88,8 +88,8 @@
 <span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::UPSafeCell</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::TaskControlBlock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">wakeup_task</span>, <span class="ident">current_task</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">block_current_and_run_next</span>, <span class="ident">suspend_current_and_run_next</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">current_task</span>, <span class="ident">wakeup_task</span>};
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Mutex</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> {
