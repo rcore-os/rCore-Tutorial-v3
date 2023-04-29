@@ -73,51 +73,34 @@ disasm-vim: kernel
 
 run: run-inner
 
-run-inner-none: build
-	@qemu-system-riscv64 \
-		-M 128m \
-		-machine virt \
-		-bios none \
-		$(GUI_OPTION) \
-		-kernel $(KERNEL_ELF) \
-		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
-        -device virtio-blk-device,drive=x0 \
-#		-device virtio-gpu-device  \
-		-device virtio-keyboard-device  \
-		-device virtio-mouse-device \
-		-device virtio-net-device,netdev=net0 \
-		-netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80 \
-		-serial stdio
-
-run-inner: build
-	@qemu-system-riscv64 \
-		-M 128m \
-		-machine virt \
-		-bios $(BOOTLOADER) \
-		$(GUI_OPTION) \
-		-device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) \
-		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
-        -device virtio-blk-device,drive=x0 \
-		-device virtio-gpu-device  \
-		-device virtio-keyboard-device  \
-		-device virtio-mouse-device \
-		-device virtio-net-device,netdev=net0 \
-		-netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80 \
-		-serial stdio
+QEMU_ARGS := -machine virt \
+			 -nographic \
+			 -bios $(BOOTLOADER) \
+			 -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) \
+			 -drive file=$(FS_IMG),if=none,format=raw,id=x0 \
+			 -device virtio-blk-device,drive=x0 \
+			 -device virtio-gpu-device \
+			 -device virtio-keyboard-device \
+			 -device virtio-mouse-device \
+			 -device virtio-net-device,netdev=net0 \
+			 -netdev user,id=net0,hostfwd=udp::6200-:2000,hostfwd=tcp::6201-:80
 
 fdt:
 	@qemu-system-riscv64 -M 128m -machine virt,dumpdtb=virt.out
 	fdtdump virt.out
 
+run-inner: build
+	@qemu-system-riscv64 $(QEMU_ARGS)
+
 debug: build
 	@tmux new-session -d \
-		"qemu-system-riscv64 -machine virt -nographic -bios $(BOOTLOADER) -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) -s -S" && \
+		"qemu-system-riscv64 $(QEMU_ARGS) -s -S" && \
 		tmux split-window -h "riscv64-unknown-elf-gdb -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'" && \
 		tmux -2 attach-session -d
 
 
 gdbserver: build
-	@qemu-system-riscv64 -machine virt -nographic -bios $(BOOTLOADER) -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) -s -S
+	@qemu-system-riscv64 $(QEMU_ARGS) -s -S
 
 gdbclient:
 	@riscv64-unknown-elf-gdb -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'
