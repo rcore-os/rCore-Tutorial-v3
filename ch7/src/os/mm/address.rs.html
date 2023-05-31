@@ -260,6 +260,14 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PageTableEntry</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">PAGE_SIZE</span>, <span class="ident">PAGE_SIZE_BITS</span>};
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>};
@@ -363,7 +371,11 @@
         <span class="ident">VirtPageNum</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ceil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">VirtPageNum</span> {
-        <span class="ident">VirtPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="ident">VirtPageNum</span>(<span class="number">0</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">VirtPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        }
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="ident">PAGE_SIZE</span> <span class="op">-</span> <span class="number">1</span>)
@@ -388,7 +400,11 @@
         <span class="ident">PhysPageNum</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ceil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PhysPageNum</span> {
-        <span class="ident">PhysPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="ident">PhysPageNum</span>(<span class="number">0</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">PhysPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        }
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="ident">PAGE_SIZE</span> <span class="op">-</span> <span class="number">1</span>)
