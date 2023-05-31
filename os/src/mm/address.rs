@@ -107,7 +107,11 @@ impl VirtAddr {
     }
     ///`VirtAddr`->`VirtPageNum`
     pub fn ceil(&self) -> VirtPageNum {
-        VirtPageNum((self.0 - 1 + PAGE_SIZE) / PAGE_SIZE)
+        if self.0 == 0 {
+            VirtPageNum(0)
+        } else {
+            VirtPageNum((self.0 - 1 + PAGE_SIZE) / PAGE_SIZE)
+        }
     }
     ///Get page offset
     pub fn page_offset(&self) -> usize {
@@ -136,7 +140,11 @@ impl PhysAddr {
     }
     ///`PhysAddr`->`PhysPageNum`
     pub fn ceil(&self) -> PhysPageNum {
-        PhysPageNum((self.0 - 1 + PAGE_SIZE) / PAGE_SIZE)
+        if self.0 == 0 {
+            PhysPageNum(0)
+        } else {
+            PhysPageNum((self.0 - 1 + PAGE_SIZE) / PAGE_SIZE)
+        }
     }
     ///Get page offset
     pub fn page_offset(&self) -> usize {
