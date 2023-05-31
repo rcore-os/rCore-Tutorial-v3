@@ -282,6 +282,14 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of physical and virtual address and page number.</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PageTableEntry</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">PAGE_SIZE</span>, <span class="ident">PAGE_SIZE_BITS</span>};
@@ -391,7 +399,11 @@
     }
     <span class="doccomment">///`VirtAddr`-&gt;`VirtPageNum`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ceil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">VirtPageNum</span> {
-        <span class="ident">VirtPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="ident">VirtPageNum</span>(<span class="number">0</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">VirtPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        }
     }
     <span class="doccomment">///Get page offset</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
@@ -420,7 +432,11 @@
     }
     <span class="doccomment">///`PhysAddr`-&gt;`PhysPageNum`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ceil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PhysPageNum</span> {
-        <span class="ident">PhysPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="ident">PhysPageNum</span>(<span class="number">0</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">PhysPageNum</span>((<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">PAGE_SIZE</span>) <span class="op">/</span> <span class="ident">PAGE_SIZE</span>)
+        }
     }
     <span class="doccomment">///Get page offset</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
