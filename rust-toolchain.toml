@@ -1,5 +1,5 @@
 [toolchain]
 profile = "minimal"
 # use the nightly version of the last stable toolchain, see <https://forge.rust-lang.org/>
-channel = "nightly-2022-08-05"
+channel = "nightly-2023-10-09"
 components = ["rust-src", "llvm-tools-preview", "rustfmt", "clippy"]
