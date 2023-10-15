@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["CLOCK_FREQ",""]]};
+window.SIDEBAR_ITEMS = {"constant":["CLOCK_FREQ"]};
