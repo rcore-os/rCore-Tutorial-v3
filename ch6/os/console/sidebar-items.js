@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["print",""]],"struct":[["Stdout",""]]};
+window.SIDEBAR_ITEMS = {"fn":["print"],"struct":["Stdout"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Stdin","Standard input"],["Stdout","Standard output"]]};
+window.SIDEBAR_ITEMS = {"struct":["Stdin","Stdout"]};
