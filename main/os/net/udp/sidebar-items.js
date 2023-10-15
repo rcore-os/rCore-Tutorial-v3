@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["UDP",""]]};
+window.SIDEBAR_ITEMS = {"struct":["UDP"]};

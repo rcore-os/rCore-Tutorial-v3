@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["TaskContext",""]]};
+window.SIDEBAR_ITEMS = {"struct":["TaskContext"]};

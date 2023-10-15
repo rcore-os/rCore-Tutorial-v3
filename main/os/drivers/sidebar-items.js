@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["block",""],["bus",""],["chardev",""],["gpu",""],["input",""],["net",""],["plic",""]]};
+window.SIDEBAR_ITEMS = {"mod":["block","bus","chardev","gpu","input","net","plic"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["add_socket",""],["get_s_a_by_index","get the seq and ack by socket index"],["get_socket",""],["pop_data",""],["push_data",""],["remove_socket",""],["set_s_a_by_index",""]],"struct":[["SOCKET_TABLE",""],["Socket",""]]};
+window.SIDEBAR_ITEMS = {"fn":["add_socket","get_s_a_by_index","get_socket","pop_data","push_data","remove_socket","set_s_a_by_index"],"struct":["SOCKET_TABLE","Socket"]};

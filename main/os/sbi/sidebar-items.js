@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["set_timer","use sbi call to set timer"],["shutdown","use sbi call to shutdown the kernel"]]};
+window.SIDEBAR_ITEMS = {"fn":["set_timer","shutdown"]};

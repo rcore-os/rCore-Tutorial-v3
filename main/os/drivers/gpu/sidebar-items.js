@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["VIRTIO7",""]],"static":[["BMP_DATA",""]],"struct":[["GPU_DEVICE",""],["VirtIOGpuWrapper",""]],"trait":[["GpuDevice",""]]};
+window.SIDEBAR_ITEMS = {"constant":["VIRTIO7"],"static":["BMP_DATA"],"struct":["GPU_DEVICE","VirtIOGpuWrapper"],"trait":["GpuDevice"]};

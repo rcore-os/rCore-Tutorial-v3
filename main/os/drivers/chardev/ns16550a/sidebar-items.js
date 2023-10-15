@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["IER","InterruptEnableRegister"],["LSR","LineStatusRegister"],["MCR","Model Control Register"],["NS16550a",""],["NS16550aInner",""],["NS16550aRaw",""],["ReadWithoutDLAB",""],["WriteWithoutDLAB",""]]};
+window.SIDEBAR_ITEMS = {"struct":["IER","LSR","MCR","NS16550a","NS16550aInner","NS16550aRaw","ReadWithoutDLAB","WriteWithoutDLAB"]};

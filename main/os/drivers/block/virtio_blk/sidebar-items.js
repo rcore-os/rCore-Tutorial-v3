@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["VIRTIO0",""]],"struct":[["VirtIOBlock",""]]};
+window.SIDEBAR_ITEMS = {"constant":["VIRTIO0"],"struct":["VirtIOBlock"]};
