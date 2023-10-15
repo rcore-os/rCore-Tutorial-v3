@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["MAX_SIG",""]],"struct":[["SignalFlags",""]]};
+window.SIDEBAR_ITEMS = {"constant":["MAX_SIG"],"struct":["SignalFlags"]};

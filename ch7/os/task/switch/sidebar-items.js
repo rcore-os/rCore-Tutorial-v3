@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["__switch",""]]};
+window.SIDEBAR_ITEMS = {"fn":["__switch"]};
