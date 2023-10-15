@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["SYSCALL_EXIT",""],["SYSCALL_WRITE",""]],"fn":[["syscall","handle syscall exception with `syscall_id` and other arguments"]],"mod":[["fs","File and filesystem-related syscalls"],["process","App management syscalls"]]};
+window.SIDEBAR_ITEMS = {"constant":["SYSCALL_EXIT","SYSCALL_WRITE"],"fn":["syscall"],"mod":["fs","process"]};
