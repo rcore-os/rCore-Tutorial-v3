@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["sys_exit","task exits and submit an exit code"],["sys_get_time","get current time"],["sys_sbrk","change data segment size"],["sys_yield","current task gives up resources for other tasks"]]};
+window.SIDEBAR_ITEMS = {"fn":["sys_exit","sys_get_time","sys_sbrk","sys_yield"]};

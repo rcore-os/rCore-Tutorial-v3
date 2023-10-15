@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["get_app_data","get applications data"],["get_num_app","Get the total number of applications."]]};
+window.SIDEBAR_ITEMS = {"fn":["get_app_data","get_num_app"]};
