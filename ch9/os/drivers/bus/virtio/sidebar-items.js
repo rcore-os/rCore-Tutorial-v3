@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["QUEUE_FRAMES",""],["VirtioHal",""]]};
+window.SIDEBAR_ITEMS = {"struct":["QUEUE_FRAMES","VirtioHal"]};

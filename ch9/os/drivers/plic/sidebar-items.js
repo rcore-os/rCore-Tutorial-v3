@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["IntrTargetPriority",""]],"struct":[["PLIC",""]]};
+window.SIDEBAR_ITEMS = {"enum":["IntrTargetPriority"],"struct":["PLIC"]};

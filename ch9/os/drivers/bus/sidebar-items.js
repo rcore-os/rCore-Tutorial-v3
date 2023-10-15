@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["virtio",""]]};
+window.SIDEBAR_ITEMS = {"mod":["virtio"]};
