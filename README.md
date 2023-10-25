@@ -5,7 +5,9 @@ rCore-Tutorial API Docs.  See the [API Docs of Ten OSes ](#OS-API-DOCS)
 
 If you don't know  Rust Language and try to learn it, please visit [Rust Learning Resources](https://github.com/rcore-os/rCore/wiki/study-resource-of-system-programming-in-RUST)
 
-Official QQ group number: 735045051
+Official QQ group number: 
+* Group 1: 735045051(FULL)
+* Group 2: 635245268
 
 ## news
 - 23/06/2022: Version 3.6.0 is on the way! Now we directly update the code on chX branches, please periodically check if there are any updates.
