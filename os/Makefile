@@ -74,8 +74,9 @@ disasm-vim: kernel
 run: run-inner
 
 QEMU_ARGS := -machine virt \
-			 -nographic \
 			 -bios $(BOOTLOADER) \
+			 -serial stdio \
+			 $(GUI_OPTION) \
 			 -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) \
 			 -drive file=$(FS_IMG),if=none,format=raw,id=x0 \
 			 -device virtio-blk-device,drive=x0 \
