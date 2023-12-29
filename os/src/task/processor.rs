@@ -4,6 +4,7 @@ use super::{ProcessControlBlock, TaskContext, TaskControlBlock};
 use crate::sync::UPIntrFreeCell;
 use crate::trap::TrapContext;
 use alloc::sync::Arc;
+use core::arch::asm;
 use lazy_static::*;
 
 pub struct Processor {
@@ -91,7 +92,14 @@ pub fn current_trap_cx_user_va() -> usize {
 }
 
 pub fn current_kstack_top() -> usize {
-    current_task().unwrap().kstack.get_top()
+    if let Some(task) = current_task() {
+        task.kstack.get_top()
+    } else {
+        let mut boot_stack_top;
+        unsafe { asm!("la {},boot_stack_top",out(reg) boot_stack_top) };
+        boot_stack_top
+    }
+    // current_task().unwrap().kstack.get_top()
 }
 
 pub fn schedule(switched_task_cx_ptr: *mut TaskContext) {
