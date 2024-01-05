@@ -7,6 +7,6 @@ _start:
     .section .bss.stack
     .globl boot_stack_lower_bound
 boot_stack_lower_bound:
-    .space 4096 * 16
+    .space 4096 * 256
     .globl boot_stack_top
 boot_stack_top:

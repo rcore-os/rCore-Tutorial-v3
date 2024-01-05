@@ -1,18 +1,22 @@
-//!An easy file system isolated from the kernel
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 #![deny(missing_docs)]
+
+//! EasyFileSystem
+
 extern crate alloc;
+
 mod bitmap;
 mod block_cache;
 mod block_dev;
 mod efs;
 mod layout;
+#[cfg(test)]
+mod test_helper;
 mod vfs;
-/// Use a block size of 512 bytes
+
+/// Each block is of 512 bytes.
 pub const BLOCK_SZ: usize = 512;
-use bitmap::Bitmap;
-use block_cache::{block_cache_sync_all, get_block_cache};
+pub use block_cache::{BlockCache, BlockCacheMgr};
 pub use block_dev::BlockDevice;
 pub use efs::EasyFileSystem;
-use layout::*;
 pub use vfs::Inode;

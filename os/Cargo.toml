@@ -16,6 +16,7 @@ virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers", rev = "4e
 easy-fs = { path = "../easy-fs" }
 log = "0.4"
 sbi-rt = { version = "0.0.2", features = ["legacy"] }
+lock_api = "0.4.11"
 
 [profile.release]
 debug = true

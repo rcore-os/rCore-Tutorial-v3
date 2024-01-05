@@ -7,12 +7,16 @@
 use super::File;
 use crate::drivers::BLOCK_DEVICE;
 use crate::mm::UserBuffer;
-use crate::sync::UPSafeCell;
+use crate::sync::{RawExclusiveLock, UPSafeCell};
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bitflags::*;
-use easy_fs::{EasyFileSystem, Inode};
+use easy_fs::{BlockCacheMgr, EasyFileSystem, Inode};
 use lazy_static::*;
+
+const BLOCK_CACHE_SIZE: usize = 64;
+type InodeType = Inode<RawExclusiveLock, BLOCK_CACHE_SIZE, RawExclusiveLock, RawExclusiveLock>;
+
 /// A wrapper around a filesystem inode
 /// to implement File trait atop
 pub struct OSInode {
@@ -23,12 +27,12 @@ pub struct OSInode {
 /// The OS inode inner in 'UPSafeCell'
 pub struct OSInodeInner {
     offset: usize,
-    inode: Arc<Inode>,
+    inode: Arc<InodeType>,
 }
 
 impl OSInode {
     /// Construct an OS inode from a inode
-    pub fn new(readable: bool, writable: bool, inode: Arc<Inode>) -> Self {
+    pub fn new(readable: bool, writable: bool, inode: Arc<InodeType>) -> Self {
         Self {
             readable,
             writable,
@@ -53,15 +57,21 @@ impl OSInode {
 }
 
 lazy_static! {
-    pub static ref ROOT_INODE: Arc<Inode> = {
-        let efs = EasyFileSystem::open(BLOCK_DEVICE.clone());
-        Arc::new(EasyFileSystem::root_inode(&efs))
+    pub static ref ROOT_INODE: Arc<InodeType> = {
+        let block_dev = BLOCK_DEVICE.clone();
+        let bcache_mgr: BlockCacheMgr<BLOCK_CACHE_SIZE, RawExclusiveLock> =
+            BlockCacheMgr::new(&block_dev);
+        let efs: EasyFileSystem<BLOCK_CACHE_SIZE, RawExclusiveLock, _> =
+            EasyFileSystem::open(bcache_mgr);
+        let efs = Arc::new(lock_api::Mutex::<RawExclusiveLock, _>::new(efs));
+        Arc::new(Inode::root_inode(&efs))
     };
 }
 /// List all files in the filesystems
+#[allow(warnings)]
 pub fn list_apps() {
     println!("/**** APPS ****");
-    for app in ROOT_INODE.ls() {
+    for app in ROOT_INODE.listdir() {
         println!("{}", app);
     }
     println!("**************/");
