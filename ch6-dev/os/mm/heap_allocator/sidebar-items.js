@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["handle_alloc_error","panic when heap allocation error occurs"],["heap_test",""],["init_heap","initiate heap allocator"]],"static":[["HEAP_ALLOCATOR","heap allocator instance"],["HEAP_SPACE","heap space ([u8; KERNEL_HEAP_SIZE])"]]});
+window.SIDEBAR_ITEMS = {"fn":["handle_alloc_error","heap_test","init_heap"],"static":["HEAP_ALLOCATOR","HEAP_SPACE"]};

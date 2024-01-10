@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["panic",""]]});
+window.SIDEBAR_ITEMS = {"fn":["panic"]};
