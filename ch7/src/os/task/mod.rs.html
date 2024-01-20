@@ -411,7 +411,7 @@
         task_inner.signals ^= signal;
 
         <span class="comment">// backup trapframe
-        </span><span class="kw">let </span><span class="kw-2">mut </span>trap_ctx = task_inner.get_trap_cx();
+        </span><span class="kw">let </span>trap_ctx = task_inner.get_trap_cx();
         task_inner.trap_ctx_backup = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>trap_ctx);
 
         <span class="comment">// modify trapframe
