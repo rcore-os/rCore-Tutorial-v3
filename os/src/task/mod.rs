@@ -170,7 +170,7 @@ fn call_user_signal_handler(sig: usize, signal: SignalFlags) {
         task_inner.signals ^= signal;
 
         // backup trapframe
-        let mut trap_ctx = task_inner.get_trap_cx();
+        let trap_ctx = task_inner.get_trap_cx();
         task_inner.trap_ctx_backup = Some(*trap_ctx);
 
         // modify trapframe
