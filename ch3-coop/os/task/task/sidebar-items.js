@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["TaskStatus",""]],"struct":[["TaskControlBlock",""]]};
+window.SIDEBAR_ITEMS = {"enum":["TaskStatus"],"struct":["TaskControlBlock"]};

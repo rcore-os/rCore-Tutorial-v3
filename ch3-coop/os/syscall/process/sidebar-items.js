@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["sys_exit","task exits and submit an exit code"],["sys_yield","current task gives up resources for other tasks"]]};
+window.SIDEBAR_ITEMS = {"fn":["sys_exit","sys_yield"]};
