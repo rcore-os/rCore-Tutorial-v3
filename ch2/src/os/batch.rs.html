@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/batch.rs`."><title>batch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (bf9a1c8a1 2023-10-08)" data-channel="nightly" data-search-js="search-5f5ec5419eadd0c9.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../os/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/batch.rs`."><title>batch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-4e54bb2b497cc83f.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (6ae4cfbbb 2024-01-17)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../os/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -187,7 +189,7 @@
     <span class="kw">fn </span>get_sp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.data.as_ptr() <span class="kw">as </span>usize + KERNEL_STACK_SIZE
     }
-    <span class="kw">pub fn </span>push_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: TrapContext) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>TrapContext {
+    <span class="kw">pub fn </span>push_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: TrapContext) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span><span class="kw-2">mut </span>TrapContext {
         <span class="kw">let </span>cx_ptr = (<span class="self">self</span>.get_sp() - core::mem::size_of::&lt;TrapContext&gt;()) <span class="kw">as </span><span class="kw-2">*mut </span>TrapContext;
         <span class="kw">unsafe </span>{
             <span class="kw-2">*</span>cx_ptr = cx;
@@ -210,10 +212,10 @@
 
 <span class="kw">impl </span>AppManager {
     <span class="kw">pub fn </span>print_app_info(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="macro">println!</span>(<span class="string">&quot;[kernel] num_app = {}&quot;</span>, <span class="self">self</span>.num_app);
+        <span class="macro">println!</span>(<span class="string">"[kernel] num_app = {}"</span>, <span class="self">self</span>.num_app);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.num_app {
             <span class="macro">println!</span>(
-                <span class="string">&quot;[kernel] app_{} [{:#x}, {:#x})&quot;</span>,
+                <span class="string">"[kernel] app_{} [{:#x}, {:#x})"</span>,
                 i,
                 <span class="self">self</span>.app_start[i],
                 <span class="self">self</span>.app_start[i + <span class="number">1</span>]
@@ -223,10 +225,10 @@
 
     <span class="kw">unsafe fn </span>load_app(<span class="kw-2">&amp;</span><span class="self">self</span>, app_id: usize) {
         <span class="kw">if </span>app_id &gt;= <span class="self">self</span>.num_app {
-            <span class="macro">println!</span>(<span class="string">&quot;All applications completed!&quot;</span>);
+            <span class="macro">println!</span>(<span class="string">"All applications completed!"</span>);
             shutdown(<span class="bool-val">false</span>);
         }
-        <span class="macro">println!</span>(<span class="string">&quot;[kernel] Loading app_{}&quot;</span>, app_id);
+        <span class="macro">println!</span>(<span class="string">"[kernel] Loading app_{}"</span>, app_id);
         <span class="comment">// clear app area
         </span>core::slice::from_raw_parts_mut(APP_BASE_ADDRESS <span class="kw">as </span><span class="kw-2">*mut </span>u8, APP_SIZE_LIMIT).fill(<span class="number">0</span>);
         <span class="kw">let </span>app_src = core::slice::from_raw_parts(
@@ -240,8 +242,8 @@
         // observes all previous writes to the instruction memory.
         // Therefore, fence.i must be executed after we have loaded
         // the code of the next app into the instruction memory.
-        // See also: riscv non-priv spec chapter 3, &#39;Zifencei&#39; extension.
-        </span><span class="macro">asm!</span>(<span class="string">&quot;fence.i&quot;</span>);
+        // See also: riscv non-priv spec chapter 3, 'Zifencei' extension.
+        </span><span class="macro">asm!</span>(<span class="string">"fence.i"</span>);
     }
 
     <span class="kw">pub fn </span>get_current_app(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
@@ -256,7 +258,7 @@
 <span class="macro">lazy_static! </span>{
     <span class="kw">static </span><span class="kw-2">ref </span>APP_MANAGER: UPSafeCell&lt;AppManager&gt; = <span class="kw">unsafe </span>{
         UPSafeCell::new({
-            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">extern </span><span class="string">"C" </span>{
                 <span class="kw">fn </span>_num_app();
             }
             <span class="kw">let </span>num_app_ptr = _num_app <span class="kw">as </span>usize <span class="kw">as </span><span class="kw-2">*const </span>usize;
@@ -295,7 +297,7 @@
     drop(app_manager);
     <span class="comment">// before this we have to drop local variables related to resources manually
     // and release the resources
-    </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    </span><span class="kw">extern </span><span class="string">"C" </span>{
         <span class="kw">fn </span>__restore(cx_addr: usize);
     }
     <span class="kw">unsafe </span>{
@@ -304,6 +306,6 @@
             USER_STACK.get_sp(),
         )) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize);
     }
-    <span class="macro">panic!</span>(<span class="string">&quot;Unreachable in batch::run_current_app!&quot;</span>);
+    <span class="macro">panic!</span>(<span class="string">"Unreachable in batch::run_current_app!"</span>);
 }
 </code></pre></div></section></main></body></html>
