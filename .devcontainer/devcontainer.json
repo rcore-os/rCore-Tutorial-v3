@@ -1,0 +1,21 @@
+{
+  "name": "rcore-tutorial-v3",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "args": {
+      "QEMU_VERSION": "7.0.0",
+      "DEBIAN_FRONTEND": "noninteractive",
+      "GDB_VERSION": "14.1"
+    }
+  },
+  "postCreateCommand": "rustup show",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "ms-vscode.cpptools",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  }
+}
