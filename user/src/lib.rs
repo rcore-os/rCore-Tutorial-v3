@@ -70,15 +70,17 @@ fn main(_argc: usize, _argv: &[&str]) -> i32 {
 
 #[macro_export]
 macro_rules! vstore {
-    ($var_ref: expr, $value: expr) => {
-        unsafe { core::intrinsics::volatile_store($var_ref as *const _ as _, $value) }
+    ($var: expr, $value: expr) => {
+        // unsafe { core::intrinsics::volatile_store($var_ref as *const _ as _, $value) }
+        unsafe { core::ptr::write_volatile(core::ptr::addr_of_mut!($var), $value); }
     };
 }
 
 #[macro_export]
 macro_rules! vload {
-    ($var_ref: expr) => {
-        unsafe { core::intrinsics::volatile_load($var_ref as *const _ as _) }
+    ($var: expr) => {
+        // unsafe { core::intrinsics::volatile_load($var_ref as *const _ as _) }
+        unsafe { core::ptr::read_volatile(core::ptr::addr_of!($var)) }
     };
 }
 
