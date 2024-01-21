@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(core_intrinsics)]
 
 #[macro_use]
 extern crate user_lib;
@@ -8,6 +7,7 @@ extern crate alloc;
 extern crate core;
 
 use alloc::vec::Vec;
+use core::ptr::{addr_of, addr_of_mut, read_volatile, write_volatile};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use user_lib::{exit, sleep, thread_create, waittid};
 const N: usize = 1000;
@@ -28,12 +28,12 @@ fn critical_test_exit() {
     assert_eq!(GUARD.fetch_sub(1, Ordering::SeqCst), 1);
 }
 
-fn peterson_enter_critical(id: usize, peer_id: usize) {
+unsafe fn peterson_enter_critical(id: usize, peer_id: usize) {
     // println!("Thread[{}] try enter", id);
-    vstore!(&FLAG[id], true);
-    vstore!(&TURN, peer_id);
+    write_volatile(addr_of_mut!(FLAG[id]), true);
+    write_volatile(addr_of_mut!(TURN), peer_id);
     memory_fence!();
-    while vload!(&FLAG[peer_id]) && vload!(&TURN) == peer_id {
+    while read_volatile(addr_of!(FLAG[peer_id])) && read_volatile(addr_of!(TURN)) == peer_id {
         // println!("Thread[{}] enter fail", id);
         sleep(1);
         // println!("Thread[{}] retry enter", id);
@@ -41,12 +41,12 @@ fn peterson_enter_critical(id: usize, peer_id: usize) {
     // println!("Thread[{}] enter", id);
 }
 
-fn peterson_exit_critical(id: usize) {
-    vstore!(&FLAG[id], false);
+unsafe fn peterson_exit_critical(id: usize) {
+    write_volatile(addr_of_mut!(FLAG[id]), false);
     // println!("Thread[{}] exit", id);
 }
 
-pub fn thread_fn(id: usize) -> ! {
+pub unsafe fn thread_fn(id: usize) -> ! {
     // println!("Thread[{}] init.", id);
     let peer_id: usize = id ^ 1;
     for iter in 0..N {
