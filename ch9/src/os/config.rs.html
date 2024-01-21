@@ -12,18 +12,16 @@
 <a href="#10" id="10">10</a>
 <a href="#11" id="11">11</a>
 <a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
 </pre></div><pre class="rust"><code><span class="attr">#[allow(unused)]
 
 </span><span class="kw">pub const </span>USER_STACK_SIZE: usize = <span class="number">4096 </span>* <span class="number">2</span>;
 <span class="kw">pub const </span>KERNEL_STACK_SIZE: usize = <span class="number">4096 </span>* <span class="number">2</span>;
 <span class="kw">pub const </span>KERNEL_HEAP_SIZE: usize = <span class="number">0x100_0000</span>;
-<span class="kw">pub const </span>MEMORY_END: usize = <span class="number">0x88000000</span>;
 <span class="kw">pub const </span>PAGE_SIZE: usize = <span class="number">0x1000</span>;
 <span class="kw">pub const </span>PAGE_SIZE_BITS: usize = <span class="number">0xc</span>;
 
 <span class="kw">pub const </span>TRAMPOLINE: usize = usize::MAX - PAGE_SIZE + <span class="number">1</span>;
 <span class="kw">pub const </span>TRAP_CONTEXT_BASE: usize = TRAMPOLINE - PAGE_SIZE;
 
-<span class="kw">pub use </span><span class="kw">crate</span>::board::{CLOCK_FREQ, MMIO};
+<span class="kw">pub use </span><span class="kw">crate</span>::board::{CLOCK_FREQ, MEMORY_END, MMIO};
 </code></pre></div></section></main></body></html>
