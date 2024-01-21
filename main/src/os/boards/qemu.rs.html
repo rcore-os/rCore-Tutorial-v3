@@ -54,7 +54,9 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
 </pre></div><pre class="rust"><code><span class="kw">pub const </span>CLOCK_FREQ: usize = <span class="number">12500000</span>;
+<span class="kw">pub const </span>MEMORY_END: usize = <span class="number">0x8800_0000</span>;
 
 <span class="kw">pub const </span>MMIO: <span class="kw-2">&amp;</span>[(usize, usize)] = <span class="kw-2">&amp;</span>[
     (<span class="number">0x0010_0000</span>, <span class="number">0x00_2000</span>), <span class="comment">// VIRT_TEST/RTC  in virt machine
