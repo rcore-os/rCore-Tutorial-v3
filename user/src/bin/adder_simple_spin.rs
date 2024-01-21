@@ -6,7 +6,7 @@ extern crate user_lib;
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::ptr::{addr_of, addr_of_mut, read_volatile};
+use core::ptr::addr_of_mut;
 use user_lib::{exit, get_time, thread_create, waittid};
 
 static mut A: usize = 0;
@@ -25,7 +25,7 @@ unsafe fn critical_section(t: &mut usize) {
 }
 
 unsafe fn lock() {
-    while read_volatile(addr_of!(OCCUPIED)) {}
+    while vload!(OCCUPIED) {}
     OCCUPIED = true;
 }
 

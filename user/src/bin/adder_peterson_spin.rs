@@ -8,7 +8,7 @@ extern crate user_lib;
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::ptr::{addr_of, addr_of_mut, read_volatile};
+use core::ptr::addr_of_mut;
 use core::sync::atomic::{compiler_fence, Ordering};
 use user_lib::{exit, get_time, thread_create, waittid};
 
@@ -39,7 +39,7 @@ unsafe fn lock(id: usize) {
     // Otherwise the compiler will assume that they will never
     // be changed on this thread. Thus, they will be accessed
     // only once!
-    while read_volatile(addr_of!(FLAG[j])) && read_volatile(addr_of!(TURN)) == j {}
+    while vload!(FLAG[j]) && vload!(TURN) == j {}
 }
 
 unsafe fn unlock(id: usize) {
