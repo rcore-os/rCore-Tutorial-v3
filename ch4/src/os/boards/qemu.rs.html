@@ -7,9 +7,11 @@
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
 <a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Constants used in rCore for qemu
 
 </span><span class="kw">pub const </span>CLOCK_FREQ: usize = <span class="number">12500000</span>;
+<span class="kw">pub const </span>MEMORY_END: usize = <span class="number">0x8800_0000</span>;
 
 <span class="kw">pub const </span>MMIO: <span class="kw-2">&amp;</span>[(usize, usize)] = <span class="kw-2">&amp;</span>[
     (<span class="number">0x0010_0000</span>, <span class="number">0x00_2000</span>), <span class="comment">// VIRT_TEST/RTC  in virt machine

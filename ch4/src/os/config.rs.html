@@ -18,13 +18,11 @@
 <a href="#16" id="16">16</a>
 <a href="#17" id="17">17</a>
 <a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Constants used in rCore
 
 </span><span class="kw">pub const </span>USER_STACK_SIZE: usize = <span class="number">4096 </span>* <span class="number">2</span>;
 <span class="kw">pub const </span>KERNEL_STACK_SIZE: usize = <span class="number">4096 </span>* <span class="number">2</span>;
 <span class="kw">pub const </span>KERNEL_HEAP_SIZE: usize = <span class="number">0x30_0000</span>;
-<span class="kw">pub const </span>MEMORY_END: usize = <span class="number">0x80800000</span>;
 <span class="kw">pub const </span>PAGE_SIZE: usize = <span class="number">0x1000</span>;
 <span class="kw">pub const </span>PAGE_SIZE_BITS: usize = <span class="number">0xc</span>;
 
@@ -37,5 +35,5 @@
     (bottom, top)
 }
 
-<span class="kw">pub use </span><span class="kw">crate</span>::board::{CLOCK_FREQ, MMIO};
+<span class="kw">pub use </span><span class="kw">crate</span>::board::{CLOCK_FREQ, MEMORY_END, MMIO};
 </code></pre></div></section></main></body></html>
