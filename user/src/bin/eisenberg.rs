@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(core_intrinsics)]
 
 #[macro_use]
 extern crate user_lib;
@@ -8,7 +7,10 @@ extern crate alloc;
 extern crate core;
 
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::{
+    ptr::{addr_of, addr_of_mut, read_volatile, write_volatile},
+    sync::atomic::{AtomicUsize, Ordering},
+};
 use user_lib::{exit, sleep, thread_create, waittid};
 
 const N: usize = 2;
@@ -38,19 +40,19 @@ fn critical_test_exit() {
     assert_eq!(GUARD.fetch_sub(1, Ordering::SeqCst), 1);
 }
 
-fn eisenberg_enter_critical(id: usize) {
+unsafe fn eisenberg_enter_critical(id: usize) {
     /* announce that we want to enter */
     loop {
         println!("Thread[{}] try enter", id);
-        vstore!(&FLAG[id], FlagState::Want);
+        write_volatile(addr_of_mut!(FLAG[id]), FlagState::Want);
         loop {
             /* check if any with higher priority is `Want` or `In` */
             let mut prior_thread: Option<usize> = None;
-            let turn = vload!(&TURN);
+            let turn = read_volatile(addr_of!(TURN));
             let ring_id = if id < turn { id + THREAD_NUM } else { id };
             // FLAG.iter() may lead to some errors, use for-loop instead
             for i in turn..ring_id {
-                if vload!(&FLAG[i % THREAD_NUM]) != FlagState::Out {
+                if read_volatile(addr_of!(FLAG[i % THREAD_NUM])) != FlagState::Out {
                     prior_thread = Some(i % THREAD_NUM);
                     break;
                 }
@@ -66,13 +68,13 @@ fn eisenberg_enter_critical(id: usize) {
             sleep(1);
         }
         /* now tentatively claim the resource */
-        vstore!(&FLAG[id], FlagState::In);
+        write_volatile(addr_of_mut!(FLAG[id]), FlagState::In);
         /* enforce the order of `claim` and `conflict check`*/
         memory_fence!();
         /* check if anthor thread is also `In`, which imply a conflict*/
         let mut conflict = false;
         for i in 0..THREAD_NUM {
-            if i != id && vload!(&FLAG[i]) == FlagState::In {
+            if i != id && read_volatile(addr_of!(FLAG[i])) == FlagState::In {
                 conflict = true;
             }
         }
@@ -83,28 +85,28 @@ fn eisenberg_enter_critical(id: usize) {
         /* no need to sleep */
     }
     /* clain the trun */
-    vstore!(&TURN, id);
+    write_volatile(addr_of_mut!(TURN), id);
     println!("Thread[{}] enter", id);
 }
 
-fn eisenberg_exit_critical(id: usize) {
+unsafe fn eisenberg_exit_critical(id: usize) {
     /* find next one who wants to enter and give the turn to it*/
     let mut next = id;
     let ring_id = id + THREAD_NUM;
     for i in (id + 1)..ring_id {
         let idx = i % THREAD_NUM;
-        if vload!(&FLAG[idx]) == FlagState::Want {
+        if read_volatile(addr_of!(FLAG[idx])) == FlagState::Want {
             next = idx;
             break;
         }
     }
-    vstore!(&TURN, next);
+    write_volatile(addr_of_mut!(TURN), next);
     /* All done */
-    vstore!(&FLAG[id], FlagState::Out);
+    write_volatile(addr_of_mut!(FLAG[id]), FlagState::Out);
     println!("Thread[{}] exit, give turn to {}", id, next);
 }
 
-pub fn thread_fn(id: usize) -> ! {
+pub unsafe fn thread_fn(id: usize) -> ! {
     println!("Thread[{}] init.", id);
     for _ in 0..N {
         eisenberg_enter_critical(id);

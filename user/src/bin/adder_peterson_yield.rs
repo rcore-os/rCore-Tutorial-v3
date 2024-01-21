@@ -2,14 +2,16 @@
 
 #![no_std]
 #![no_main]
-#![feature(core_intrinsics)]
 
 #[macro_use]
 extern crate user_lib;
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::sync::atomic::{compiler_fence, Ordering};
+use core::{
+    ptr::addr_of_mut,
+    sync::atomic::{compiler_fence, Ordering},
+};
 use user_lib::{exit, get_time, thread_create, waittid, yield_};
 
 static mut A: usize = 0;
@@ -20,7 +22,7 @@ const THREAD_COUNT_DEFAULT: usize = 2;
 static mut PER_THREAD: usize = 0;
 
 unsafe fn critical_section(t: &mut usize) {
-    let a = &mut A as *mut usize;
+    let a = addr_of_mut!(A);
     let cur = a.read_volatile();
     for _ in 0..500 {
         *t = (*t) * (*t) % 10007;
