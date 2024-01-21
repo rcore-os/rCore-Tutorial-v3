@@ -7,7 +7,6 @@ extern crate alloc;
 extern crate core;
 
 use alloc::vec::Vec;
-use core::ptr::{addr_of, addr_of_mut, read_volatile, write_volatile};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use user_lib::{exit, sleep, thread_create, waittid};
 const N: usize = 1000;
@@ -30,10 +29,10 @@ fn critical_test_exit() {
 
 unsafe fn peterson_enter_critical(id: usize, peer_id: usize) {
     // println!("Thread[{}] try enter", id);
-    write_volatile(addr_of_mut!(FLAG[id]), true);
-    write_volatile(addr_of_mut!(TURN), peer_id);
+    vstore!(FLAG[id], true);
+    vstore!(TURN, peer_id);
     memory_fence!();
-    while read_volatile(addr_of!(FLAG[peer_id])) && read_volatile(addr_of!(TURN)) == peer_id {
+    while vload!(FLAG[peer_id]) && vload!(TURN) == peer_id {
         // println!("Thread[{}] enter fail", id);
         sleep(1);
         // println!("Thread[{}] retry enter", id);
@@ -42,7 +41,7 @@ unsafe fn peterson_enter_critical(id: usize, peer_id: usize) {
 }
 
 unsafe fn peterson_exit_critical(id: usize) {
-    write_volatile(addr_of_mut!(FLAG[id]), false);
+    vstore!(FLAG[id], false);
     // println!("Thread[{}] exit", id);
 }
 
