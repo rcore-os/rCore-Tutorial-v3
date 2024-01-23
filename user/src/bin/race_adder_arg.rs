@@ -7,6 +7,7 @@ extern crate alloc;
 
 use crate::alloc::string::ToString;
 use alloc::vec::Vec;
+use core::ptr::addr_of_mut;
 use user_lib::{exit, get_time, thread_create, waittid};
 
 static mut A: usize = 0;
@@ -16,7 +17,7 @@ const THREAD_COUNT: usize = 16;
 unsafe fn f(count: usize) -> ! {
     let mut t = 2usize;
     for _ in 0..PER_THREAD {
-        let a = &mut A as *mut usize;
+        let a = addr_of_mut!(A);
         let cur = a.read_volatile();
         for _ in 0..count {
             t = t * t % 10007;
