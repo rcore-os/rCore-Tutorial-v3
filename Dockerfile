@@ -1,88 +1,72 @@
 # syntax=docker/dockerfile:1
-# This Dockerfile is adapted from https://github.com/LearningOS/rCore-Tutorial-v3/blob/main/Dockerfile
-# with the following major updates:
-# - ubuntu 18.04 -> 20.04
-# - qemu 5.0.0 -> 7.0.0
-# - Extensive comments linking to relevant documentation
-FROM ubuntu:20.04
+
+# Stage 1 Build QEMU
+# - https://www.qemu.org/download/
+# - https://wiki.qemu.org/Hosts/Linux#Building_QEMU_for_Linux
+# - https://wiki.qemu.org/Documentation/Platforms/RISCV
+
+FROM ubuntu:20.04 as build_qemu
 
 ARG QEMU_VERSION=7.0.0
-ARG GDB_VERSION=14.1
-ARG HOME=/root
 
-# 0. Install general tools
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && \
-    apt-get install -y \
-    curl \
-    git \
-    python3 \
-    wget
+RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \ 
+    sed -i 's/security.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \ 
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y wget build-essential libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build
 
-# 1. Set up QEMU RISC-V
-# - https://learningos.github.io/rust-based-os-comp2022/0setup-devel-env.html#qemu
-# - https://www.qemu.org/download/
-# - https://wiki.qemu.org/Documentation/Platforms/RISCV
-# - https://risc-v-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html
-
-# 1.1. Download source
-WORKDIR ${HOME}
 RUN wget https://download.qemu.org/qemu-${QEMU_VERSION}.tar.xz && \
-    tar xvJf qemu-${QEMU_VERSION}.tar.xz
-
-RUN wget https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz && \
-    tar xvJf gdb-${GDB_VERSION}.tar.xz
-
-# 1.2. Install dependencies
-# - https://risc-v-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html#prerequisites
-RUN apt-get install -y \
-    autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev \
-    gawk build-essential bison flex texinfo gperf libtool patchutils bc \
-    zlib1g-dev libexpat-dev git \
-    ninja-build pkg-config libglib2.0-dev libpixman-1-dev libsdl2-dev \
-    libncurses5-dev python2 python2-dev libreadline-dev tmux
-
-
-# 1.3. Build and install from source
-WORKDIR ${HOME}/qemu-${QEMU_VERSION}
-RUN ./configure --target-list=riscv64-softmmu,riscv64-linux-user && \
+    tar xf qemu-${QEMU_VERSION}.tar.xz && \
+    cd qemu-${QEMU_VERSION} && \ 
+    ./configure --target-list=riscv64-softmmu,riscv64-linux-user && \
     make -j$(nproc) && \
     make install
 
-WORKDIR ${HOME}/gdb-${GDB_VERSION}
-RUN ./configure --prefix=/usr/local --target=riscv64-unknown-elf --enable-tui=yes && \
-    make -j$(nproc) && \
-    make install
+# Stage 2 Set Lab Environment
+FROM ubuntu:20.04 as build
 
-# 1.4. Clean up
-WORKDIR ${HOME}
-RUN rm -rf qemu-${QEMU_VERSION} qemu-${QEMU_VERSION}.tar.xz ${HOME}/gdb-${GDB_VERSION} gdb-${GDB_VERSION}.tar.xz
+WORKDIR /tmp
 
-# 1.5. Sanity checking
-RUN qemu-system-riscv64 --version && \
-    qemu-riscv64 --version
+# 2.0. Install general tools
+RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \ 
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y jq curl git python3 wget build-essential \
+    # qemu dependency
+    libglib2.0-0 libfdt1 libpixman-1-0 zlib1g \
+    # gdb
+    gdb-multiarch
 
-# 2. Set up Rust
-# - https://learningos.github.io/rust-based-os-comp2022/0setup-devel-env.html#qemu
+# 2.1. Copy qemu
+COPY --from=build_qemu /usr/local/bin/* /usr/local/bin
+
+# 2.2. Install Rust
 # - https://www.rust-lang.org/tools/install
-# - https://github.com/rust-lang/docker-rust/blob/master/Dockerfile-debian.template
-
-# 2.1. Install
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=nightly
-RUN set -eux; \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init; \
-    chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION; \
-    rm rustup-init; \
-    chmod -R a+w $RUSTUP_HOME $CARGO_HOME;
+    RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static \
+    RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --no-modify-path --profile minimal --default-toolchain nightly
 
-# 2.2. Sanity checking
-RUN rustup --version && \
+# 2.3. Build env for labs
+# See os/Makefile `env:` for example.
+# This avoids having to wait for these steps each time using a new container.
+COPY rust-toolchain.toml rust-toolchain.toml
+RUN rustup target add riscv64gc-unknown-none-elf && \
+    cargo install toml-cli cargo-binutils && \
+    RUST_VERSION=$(toml get -r rust-toolchain.toml toolchain.channel) && \
+    Components=$(toml get -r rust-toolchain.toml toolchain.components | jq -r 'join(" ")') && \
+    rustup install $RUST_VERSION && \
+    rustup component add --toolchain $RUST_VERSION $Components
+
+# 2.4. Set GDB
+RUN ln -s /usr/bin/gdb-multiarch /usr/bin/riscv64-unknown-elf-gdb
+
+# Stage 3 Sanity checking
+FROM build as test
+RUN qemu-system-riscv64 --version && \
+    qemu-riscv64 --version && \
+    rustup --version && \
     cargo --version && \
-    rustc --version
-
-# Ready to go
-WORKDIR ${HOME}
+    rustc --version && \
+    riscv64-unknown-elf-gdb --version
