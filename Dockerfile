@@ -10,6 +10,7 @@ FROM ubuntu:20.04 as build_qemu
 ARG QEMU_VERSION=7.0.0
 
 RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \ 
+    sed -i 's/security.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \ 
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y wget build-essential libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build
 
