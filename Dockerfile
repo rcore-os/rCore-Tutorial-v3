@@ -36,7 +36,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/source
     gdb-multiarch
 
 # 2.1. Copy qemu
-COPY --from=build_qemu /usr/local/bin/* /usr/local/bin
+COPY --from=build_qemu /usr/local/bin/* /usr/local/bin/
 
 # 2.2. Install Rust
 # - https://www.rust-lang.org/tools/install
