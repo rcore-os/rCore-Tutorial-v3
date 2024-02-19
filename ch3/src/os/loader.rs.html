@@ -98,6 +98,11 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Loading user applications into memory
 //!
 //! For chapter 3, user applications are simply part of the data included in the
@@ -170,10 +175,6 @@
     <span class="kw">let </span>num_app_ptr = _num_app <span class="kw">as </span>usize <span class="kw">as </span><span class="kw-2">*const </span>usize;
     <span class="kw">let </span>num_app = get_num_app();
     <span class="kw">let </span>app_start = <span class="kw">unsafe </span>{ core::slice::from_raw_parts(num_app_ptr.add(<span class="number">1</span>), num_app + <span class="number">1</span>) };
-    <span class="comment">// clear i-cache first
-    </span><span class="kw">unsafe </span>{
-        <span class="macro">asm!</span>(<span class="string">"fence.i"</span>);
-    }
     <span class="comment">// load apps
     </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..num_app {
         <span class="kw">let </span>base_i = get_base_i(i);
@@ -186,6 +187,15 @@
         };
         <span class="kw">let </span>dst = <span class="kw">unsafe </span>{ core::slice::from_raw_parts_mut(base_i <span class="kw">as </span><span class="kw-2">*mut </span>u8, src.len()) };
         dst.copy_from_slice(src);
+    }
+    <span class="comment">// Memory fence about fetching the instruction memory
+    // It is guaranteed that a subsequent instruction fetch must
+    // observes all previous writes to the instruction memory.
+    // Therefore, fence.i must be executed after we have loaded
+    // the code of the next app into the instruction memory.
+    // See also: riscv non-priv spec chapter 3, 'Zifencei' extension.
+    </span><span class="kw">unsafe </span>{
+        <span class="macro">asm!</span>(<span class="string">"fence.i"</span>);
     }
 }
 
