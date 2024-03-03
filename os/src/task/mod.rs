@@ -127,6 +127,13 @@ pub fn exit_current_and_run_next(exit_code: i32) {
         process_inner.memory_set.recycle_data_pages();
         // drop file descriptors
         process_inner.fd_table.clear();
+        // Remove all tasks except for the main thread itself.
+        // This is because we are still using the kstack under the TCB
+        // of the main thread. This TCB, including its kstack, will be
+        // deallocated when the process is reaped via waitpid.
+        while process_inner.tasks.len() > 1 {
+            process_inner.tasks.pop();
+        }
     }
     drop(process);
     // we do not have to save task context
