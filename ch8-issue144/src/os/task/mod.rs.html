@@ -170,6 +170,11 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>context;
 <span class="kw">mod </span>id;
 <span class="kw">mod </span>manager;
@@ -303,8 +308,13 @@
         </span>process_inner.memory_set.recycle_data_pages();
         <span class="comment">// drop file descriptors
         </span>process_inner.fd_table.clear();
-        <span class="comment">// remove all tasks
-        </span>process_inner.tasks.clear();
+        <span class="comment">// Remove all tasks except for the main thread itself.
+        // This is because we are still using the kstack under the TCB
+        // of the main thread. This TCB, including its kstack, will be
+        // deallocated when the process is reaped via waitpid.
+        </span><span class="kw">while </span>process_inner.tasks.len() &gt; <span class="number">1 </span>{
+            process_inner.tasks.pop();
+        }
     }
     drop(process);
     <span class="comment">// we do not have to save task context
