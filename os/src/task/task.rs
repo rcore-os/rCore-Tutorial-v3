@@ -19,6 +19,7 @@ pub struct TaskControlBlock {
 
 pub struct TaskControlBlockInner {
     pub trap_cx_ppn: PhysPageNum,
+    #[allow(unused)]
     pub base_size: usize,
     pub task_cx: TaskContext,
     pub task_status: TaskStatus,
