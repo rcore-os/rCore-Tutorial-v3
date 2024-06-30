@@ -328,7 +328,7 @@ const CR: u8 = 0x0du8;
 #[no_mangle]
 pub fn main() -> i32 {
     let mut disp = Display::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES));
-    let mut game = SnakeGame::<20, Rgb888>::new(1280, 800, 20, 20, Rgb888::RED, Rgb888::YELLOW, 50);
+    let mut game = SnakeGame::<20, Rgb888>::new(1280, 800, 20, 20, Rgb888::RED, Rgb888::YELLOW, 200);
     let _ = disp.clear(Rgb888::BLACK).unwrap();
     loop {
         if key_pressed() {
@@ -345,7 +345,8 @@ pub fn main() -> i32 {
         }
         let _ = disp.clear(Rgb888::BLACK).unwrap();
         game.draw(&mut disp);
-        sleep(10);
+        disp.flush();
+        sleep(40);
     }
     0
 }
