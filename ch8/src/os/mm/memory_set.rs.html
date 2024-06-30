@@ -678,7 +678,7 @@
     }
     <span class="doccomment">/// data: start-aligned but maybe with shorter length
     /// assume that all frames were cleared before
-    </span><span class="kw">pub fn </span>copy_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, page_table: <span class="kw-2">&amp;mut </span>PageTable, data: <span class="kw-2">&amp;</span>[u8]) {
+    </span><span class="kw">pub fn </span>copy_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, page_table: <span class="kw-2">&amp;</span>PageTable, data: <span class="kw-2">&amp;</span>[u8]) {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.map_type, MapType::Framed);
         <span class="kw">let </span><span class="kw-2">mut </span>start: usize = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>current_vpn = <span class="self">self</span>.vpn_range.get_start();
