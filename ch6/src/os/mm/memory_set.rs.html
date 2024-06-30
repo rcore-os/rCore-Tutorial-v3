@@ -487,7 +487,7 @@
     <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>map_area: MapArea, data: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;) {
         map_area.map(<span class="kw-2">&amp;mut </span><span class="self">self</span>.page_table);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = data {
-            map_area.copy_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>.page_table, data);
+            map_area.copy_data(<span class="kw-2">&amp;</span><span class="self">self</span>.page_table, data);
         }
         <span class="self">self</span>.areas.push(map_area);
     }
