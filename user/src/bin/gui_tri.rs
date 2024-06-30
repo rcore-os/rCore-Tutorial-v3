@@ -19,5 +19,6 @@ pub fn main() -> i32 {
             }
         }
     });
+    disp.flush();
     0
 }

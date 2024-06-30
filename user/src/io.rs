@@ -32,6 +32,8 @@ impl Display {
     }
     pub fn paint_on_framebuffer(&mut self, p: impl FnOnce(&mut [u8]) -> ()) {
         p(self.framebuffer());
+    }
+    pub fn flush(&self) {
         framebuffer_flush();
     }
 }
@@ -60,7 +62,6 @@ impl DrawTarget for Display {
             self.fb[idx + 1] = px.1.g();
             self.fb[idx + 2] = px.1.r();
         });
-        framebuffer_flush();
         Ok(())
     }
 }
