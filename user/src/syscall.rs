@@ -13,7 +13,7 @@ fn syscall(id: usize, args: [usize; 3]) -> isize {
             in("x12") args[2],
             in("x17") id
         );
-    }
+    }//a0~a2 和 a7 作为输入寄存器分别表示系统调用参数和系统调用 ID ，而当系统调用返回后， a0 作为输出寄存器保存系统调用的返回值
     ret
 }
 
