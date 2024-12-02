@@ -199,7 +199,7 @@ impl Runtime {
 
             available.ctx.x1 = guard as u64; //ctx.x1  is old return address
             available.ctx.nx1 = f as u64; //ctx.nx2 is new return address
-            available.ctx.x2 = s_ptr.offset(-32) as u64; //cxt.x2 is sp
+            available.ctx.x2 = s_ptr as u64; //cxt.x2 is sp
         }
         available.state = State::Ready;
     }
