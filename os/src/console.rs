@@ -14,6 +14,7 @@ impl Write for Stdout {
     }
 }
 
+/// Print a str with format to stdout.
 pub fn print(args: fmt::Arguments) {
     Stdout.write_fmt(args).unwrap();
 }

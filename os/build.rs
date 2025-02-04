@@ -1,13 +1,17 @@
 use std::fs::{read_dir, File};
 use std::io::{Result, Write};
+use std::path::Path;
+
+static USER_TARGET_PATH: &str = "../user/target/riscv64gc-unknown-none-elf/release/";
+static KERNEL_TARGET_PATH: &str = "target/riscv64gc-unknown-none-elf/release/";
 
 fn main() {
     println!("cargo:rerun-if-changed=../user/src/");
-    println!("cargo:rerun-if-changed={}", TARGET_PATH);
+    println!("cargo:rerun-if-changed={}", USER_TARGET_PATH);
+    println!("cargo:rerun-if-changed=src/");
     insert_app_data().unwrap();
+    insert_kernel_symbol_elf().unwrap();
 }
-
-static TARGET_PATH: &str = "../user/target/riscv64gc-unknown-none-elf/release/";
 
 fn insert_app_data() -> Result<()> {
     let mut f = File::create("src/link_app.S").unwrap();
@@ -50,8 +54,36 @@ _num_app:
 app_{0}_start:
     .incbin "{2}{1}"
 app_{0}_end:"#,
-            idx, app, TARGET_PATH
+            idx, app, USER_TARGET_PATH
         )?;
     }
+    Ok(())
+}
+
+fn insert_kernel_symbol_elf() -> Result<()> {
+    let mut f = File::create("src/ksymbol.S")?;
+    let symtab_path = format!("{}os.symtab", KERNEL_TARGET_PATH);
+    writeln!(
+        f,
+        r#"
+    .section .rodata
+    .align 12
+    .global _start_ksymbol_elf
+_start_ksymbol_elf:"#
+    )?;
+    if Path::exists(Path::new(&symtab_path)) {
+        writeln!(
+            f,
+            r#"
+    .incbin "{}""#,
+            symtab_path.as_str()
+        )?;
+    }
+    writeln!(
+        f,
+        r#"
+    .global _end_ksymbol_elf
+_end_ksymbol_elf:"#
+    )?;
     Ok(())
 }

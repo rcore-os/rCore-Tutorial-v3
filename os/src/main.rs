@@ -16,11 +16,12 @@
 //! userspace.
 
 #![deny(missing_docs)]
-#![deny(warnings)]
+// #![deny(warnings)]
 #![no_std]
 #![no_main]
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
+#![feature(str_from_raw_parts)]
 
 extern crate alloc;
 
@@ -31,8 +32,9 @@ extern crate bitflags;
 mod board;
 
 #[macro_use]
-mod console;
+pub mod console;
 mod config;
+pub mod ksymbol;
 mod lang_items;
 mod loader;
 mod mm;

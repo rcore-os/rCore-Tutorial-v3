@@ -1,9 +1,11 @@
 # Building
 TARGET := riscv64gc-unknown-none-elf
 MODE := release
-KERNEL_ELF := target/$(TARGET)/$(MODE)/os
+TARGET_PATH := target/$(TARGET)/$(MODE)
+KERNEL_ELF := $(TARGET_PATH)/os
+KERNEL_SYMTAB := $(TARGET_PATH)/os.symtab
 KERNEL_BIN := $(KERNEL_ELF).bin
-DISASM_TMP := target/$(TARGET)/$(MODE)/asm
+DISASM_TMP := $(TARGET_PATH)/asm
 
 # BOARD
 BOARD := qemu
@@ -40,6 +42,13 @@ kernel:
 	@cd ../user && make build
 	@echo Platform: $(BOARD)
 	@cp src/linker-$(BOARD).ld src/linker.ld
+	@rm -f $(KERNEL_SYMTAB)
+	@cargo build $(MODE_ARG)
+	@echo Extract symbol table and build again
+#	@$(OBJCOPY) --strip-debug $(KERNEL_ELF) $(KERNEL_SYMTAB)
+#	@$(OBJCOPY) --remove-section .text --remove-section .data $(KERNEL_SYMTAB) $(KERNEL_SYMTAB)
+#	@$(OBJCOPY) --remove-section .bss --remove-section .rodata $(KERNEL_SYMTAB) $(KERNEL_SYMTAB)
+	@$(OBJCOPY) --only-keep-debug $(KERNEL_ELF) $(KERNEL_SYMTAB)
 	@cargo build $(MODE_ARG)
 	@rm src/linker.ld
 

@@ -14,6 +14,7 @@ bitflags = "1.2.1"
 xmas-elf = "0.7.0"
 log = "0.4"
 sbi-rt = { version = "0.0.2", features = ["legacy"] }
+rustc-demangle = "0.1.24"
 
 [profile.release]
 debug = true
