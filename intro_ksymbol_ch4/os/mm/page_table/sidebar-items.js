@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["translated_byte_buffer"],"struct":["PTEFlags","PageTable","PageTableEntry"]};
