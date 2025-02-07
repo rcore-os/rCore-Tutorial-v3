@@ -23,6 +23,8 @@
 #![feature(alloc_error_handler)]
 #![feature(str_from_raw_parts)]
 
+use ksymbol::kernel_func_by_addr;
+
 extern crate alloc;
 
 #[macro_use]
@@ -67,6 +69,8 @@ pub fn rust_main() -> ! {
     println!("[kernel] Hello, world!");
     mm::init();
     println!("[kernel] back to world!");
+    println!("rust_main addr={:#x} symbol = {:?}", rust_main as usize,
+             kernel_func_by_addr(rust_main as usize).unwrap());
     mm::remap_test();
     trap::init();
     //trap::enable_interrupt();
