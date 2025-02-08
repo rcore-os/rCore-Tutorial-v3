@@ -5,7 +5,7 @@
 # - https://wiki.qemu.org/Hosts/Linux#Building_QEMU_for_Linux
 # - https://wiki.qemu.org/Documentation/Platforms/RISCV
 
-FROM ubuntu:20.04 as build_qemu
+FROM ubuntu:20.04 AS build_qemu
 
 ARG QEMU_VERSION=7.0.0
 
@@ -22,7 +22,7 @@ RUN wget https://download.qemu.org/qemu-${QEMU_VERSION}.tar.xz && \
     make install
 
 # Stage 2 Set Lab Environment
-FROM ubuntu:20.04 as build
+FROM ubuntu:20.04 AS build
 
 WORKDIR /tmp
 
@@ -63,7 +63,7 @@ RUN rustup target add riscv64gc-unknown-none-elf && \
 RUN ln -s /usr/bin/gdb-multiarch /usr/bin/riscv64-unknown-elf-gdb
 
 # Stage 3 Sanity checking
-FROM build as test
+FROM build AS test
 RUN qemu-system-riscv64 --version && \
     qemu-riscv64 --version && \
     rustup --version && \
