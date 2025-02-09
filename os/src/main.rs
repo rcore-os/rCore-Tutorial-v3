@@ -10,6 +10,8 @@ extern crate alloc;
 #[macro_use]
 extern crate bitflags;
 
+use log::*;
+
 #[path = "boards/qemu.rs"]
 mod board;
 
@@ -19,6 +21,7 @@ mod config;
 mod drivers;
 mod fs;
 mod lang_items;
+mod logging;
 mod mm;
 mod net;
 mod sbi;
@@ -55,15 +58,16 @@ lazy_static! {
 #[no_mangle]
 pub fn rust_main() -> ! {
     clear_bss();
+    logging::init();
     mm::init();
     UART.init();
-    println!("KERN: init gpu");
+    info!("KERN: init gpu");
     let _gpu = GPU_DEVICE.clone();
-    println!("KERN: init keyboard");
+    info!("KERN: init keyboard");
     let _keyboard = KEYBOARD_DEVICE.clone();
-    println!("KERN: init mouse");
+    info!("KERN: init mouse");
     let _mouse = MOUSE_DEVICE.clone();
-    println!("KERN: init trap");
+    info!("KERN: init trap");
     trap::init();
     trap::enable_timer_interrupt();
     timer::set_next_trigger();
