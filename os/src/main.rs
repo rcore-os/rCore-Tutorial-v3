@@ -27,6 +27,8 @@ extern crate alloc;
 #[macro_use]
 extern crate bitflags;
 
+use log::*;
+
 #[path = "boards/qemu.rs"]
 mod board;
 
@@ -35,6 +37,7 @@ mod console;
 mod config;
 mod lang_items;
 mod loader;
+mod logging;
 mod mm;
 mod sbi;
 mod sync;
@@ -62,9 +65,10 @@ fn clear_bss() {
 /// the rust entry-point of os
 pub fn rust_main() -> ! {
     clear_bss();
-    println!("[kernel] Hello, world!");
+    logging::init();
+    info!("[kernel] Hello, world!");
     mm::init();
-    println!("[kernel] back to world!");
+    info!("[kernel] back to world!");
     mm::remap_test();
     trap::init();
     //trap::enable_interrupt();
