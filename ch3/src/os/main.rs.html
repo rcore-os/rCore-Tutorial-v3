@@ -65,6 +65,9 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint
 //!
 //! Various facilities of the kernels are implemented as submodules. The most
@@ -89,6 +92,7 @@
 #![feature(panic_info_message)]
 
 </span><span class="kw">use </span>core::arch::global_asm;
+<span class="kw">use </span>log::<span class="kw-2">*</span>;
 
 <span class="attr">#[path = <span class="string">"boards/qemu.rs"</span>]
 </span><span class="kw">mod </span>board;
@@ -98,6 +102,7 @@
 <span class="kw">mod </span>config;
 <span class="kw">mod </span>lang_items;
 <span class="kw">mod </span>loader;
+<span class="kw">mod </span>logging;
 <span class="kw">mod </span>sbi;
 <span class="kw">mod </span>sync;
 <span class="kw">pub mod </span>syscall;
@@ -124,7 +129,8 @@
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub fn </span>rust_main() -&gt; ! {
     clear_bss();
-    <span class="macro">println!</span>(<span class="string">"[kernel] Hello, world!"</span>);
+    logging::init();
+    <span class="macro">info!</span>(<span class="string">"[kernel] Hello, world!"</span>);
     trap::init();
     loader::load_apps();
     trap::enable_timer_interrupt();
