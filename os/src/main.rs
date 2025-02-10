@@ -22,11 +22,13 @@
 #![feature(panic_info_message)]
 
 use core::arch::global_asm;
+use log::*;
 #[macro_use]
 mod console;
 mod config;
 mod lang_items;
 mod loader;
+mod logging;
 mod sbi;
 mod sync;
 pub mod syscall;
@@ -52,7 +54,8 @@ fn clear_bss() {
 #[no_mangle]
 pub fn rust_main() -> ! {
     clear_bss();
-    println!("[kernel] Hello, world!");
+    logging::init();
+    info!("[kernel] Hello, world!");
     trap::init();
     loader::load_apps();
     task::run_first_task();
