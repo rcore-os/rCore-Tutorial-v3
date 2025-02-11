@@ -58,6 +58,9 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint
 //!
 //! Various facilities of the kernels are implemented as submodules. The most
@@ -82,11 +85,13 @@
 #![feature(panic_info_message)]
 
 </span><span class="kw">use </span>core::arch::global_asm;
+<span class="kw">use </span>log::<span class="kw-2">*</span>;
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>console;
 <span class="kw">mod </span>config;
 <span class="kw">mod </span>lang_items;
 <span class="kw">mod </span>loader;
+<span class="kw">mod </span>logging;
 <span class="kw">mod </span>sbi;
 <span class="kw">mod </span>sync;
 <span class="kw">pub mod </span>syscall;
@@ -112,7 +117,8 @@
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub fn </span>rust_main() -&gt; ! {
     clear_bss();
-    <span class="macro">println!</span>(<span class="string">"[kernel] Hello, world!"</span>);
+    logging::init();
+    <span class="macro">info!</span>(<span class="string">"[kernel] Hello, world!"</span>);
     trap::init();
     loader::load_apps();
     task::run_first_task();
