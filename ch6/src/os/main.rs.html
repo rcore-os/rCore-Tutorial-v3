@@ -78,6 +78,10 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The main module and entrypoint
 //!
 //! Various facilities of the kernels are implemented as submodules. The most
@@ -111,6 +115,8 @@
 <span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>bitflags;
 
+<span class="kw">use </span>log::<span class="kw-2">*</span>;
+
 <span class="attr">#[path = <span class="string">"boards/qemu.rs"</span>]
 </span><span class="kw">mod </span>board;
 
@@ -120,6 +126,7 @@
 <span class="kw">mod </span>drivers;
 <span class="kw">pub mod </span>fs;
 <span class="kw">pub mod </span>lang_items;
+<span class="kw">mod </span>logging;
 <span class="kw">pub mod </span>mm;
 <span class="kw">pub mod </span>sbi;
 <span class="kw">pub mod </span>sync;
@@ -147,7 +154,8 @@
 </span><span class="doccomment">/// the rust entry-point of os
 </span><span class="kw">pub fn </span>rust_main() -&gt; ! {
     clear_bss();
-    <span class="macro">println!</span>(<span class="string">"[kernel] Hello, world!"</span>);
+    logging::init();
+    <span class="macro">info!</span>(<span class="string">"[kernel] Hello, world!"</span>);
     mm::init();
     mm::remap_test();
     trap::init();
