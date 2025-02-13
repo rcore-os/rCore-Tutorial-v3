@@ -180,7 +180,7 @@
 <span class="kw">use </span>riscv::register::{
     mtvec::TrapMode,
     scause::{<span class="self">self</span>, Exception, Interrupt, Trap},
-    sie, sip, sscratch, sstatus, stval, stvec,
+    sie, sscratch, sstatus, stval, stvec,
 };
 
 <span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">"trap.S"</span>));
