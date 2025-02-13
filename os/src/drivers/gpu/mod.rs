@@ -7,7 +7,6 @@ use tinybmp::Bmp;
 use virtio_drivers::{VirtIOGpu, VirtIOHeader};
 const VIRTIO7: usize = 0x10007000;
 pub trait GpuDevice: Send + Sync + Any {
-    fn update_cursor(&self);
     fn get_framebuffer(&self) -> &mut [u8];
     fn flush(&self);
 }
@@ -64,5 +63,4 @@ impl GpuDevice for VirtIOGpuWrapper {
             core::slice::from_raw_parts_mut(ptr, self.fb.len())
         }
     }
-    fn update_cursor(&self) {}
 }

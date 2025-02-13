@@ -18,7 +18,9 @@ pub struct TCP {
     pub target: IPv4,
     pub sport: u16,
     pub dport: u16,
+    #[allow(unused)]
     pub seq: u32,
+    #[allow(unused)]
     pub ack: u32,
     pub socket_index: usize,
 }
