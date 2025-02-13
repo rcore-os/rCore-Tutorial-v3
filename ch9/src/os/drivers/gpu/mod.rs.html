@@ -64,8 +64,6 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::drivers::bus::virtio::VirtioHal;
 <span class="kw">use </span><span class="kw">crate</span>::sync::UPIntrFreeCell;
 <span class="kw">use </span>alloc::{sync::Arc, vec::Vec};
@@ -75,7 +73,6 @@
 <span class="kw">use </span>virtio_drivers::{VirtIOGpu, VirtIOHeader};
 <span class="kw">const </span>VIRTIO7: usize = <span class="number">0x10007000</span>;
 <span class="kw">pub trait </span>GpuDevice: Send + Sync + Any {
-    <span class="kw">fn </span>update_cursor(<span class="kw-2">&amp;</span><span class="self">self</span>);
     <span class="kw">fn </span>get_framebuffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u8];
     <span class="kw">fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
@@ -132,6 +129,5 @@
             core::slice::from_raw_parts_mut(ptr, <span class="self">self</span>.fb.len())
         }
     }
-    <span class="kw">fn </span>update_cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
 }
 </code></pre></div></section></main></body></html>
