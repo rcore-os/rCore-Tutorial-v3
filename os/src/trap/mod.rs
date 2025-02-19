@@ -28,8 +28,8 @@ global_asm!(include_str!("trap.S"));
 
 /// initialize CSR `stvec` as the entry of `__alltraps`
 pub fn init() {
-    extern "C" {
-        fn __alltraps();
+    unsafe extern "C" {
+        safe fn __alltraps();
     }
     unsafe {
         stvec::write(__alltraps as usize, TrapMode::Direct);
@@ -43,7 +43,7 @@ pub fn enable_timer_interrupt() {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// handle an interrupt, exception, or system call from user space
 pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
     let scause = scause::read(); // get trap cause
@@ -54,7 +54,10 @@ pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
             cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
         }
         Trap::Exception(Exception::StoreFault) | Trap::Exception(Exception::StorePageFault) => {
-            println!("[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it.", stval, cx.sepc);
+            println!(
+                "[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it.",
+                stval, cx.sepc
+            );
             exit_current_and_run_next();
         }
         Trap::Exception(Exception::IllegalInstruction) => {

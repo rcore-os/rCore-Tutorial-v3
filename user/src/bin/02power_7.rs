@@ -6,7 +6,7 @@ extern crate user_lib;
 
 const LEN: usize = 100;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     let p = 7u64;
     let m = 998244353u64;
