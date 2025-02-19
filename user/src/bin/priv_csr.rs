@@ -6,7 +6,7 @@ extern crate user_lib;
 
 use riscv::register::sstatus::{self, SPP};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     println!("Try to access privileged CSR in U Mode");
     println!("Kernel should kill this application!");

@@ -46,7 +46,7 @@ impl DrawingBoard {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut board = DrawingBoard::new();
     let _ = board.disp.clear(Rgb888::BLACK).unwrap();

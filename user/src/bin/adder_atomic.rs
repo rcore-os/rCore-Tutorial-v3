@@ -16,13 +16,15 @@ const PER_THREAD_DEFAULT: usize = 10000;
 const THREAD_COUNT_DEFAULT: usize = 16;
 static mut PER_THREAD: usize = 0;
 
-unsafe fn critical_section(t: &mut usize) {
+fn critical_section(t: &mut usize) {
     let a = addr_of_mut!(A);
-    let cur = a.read_volatile();
+    let cur = unsafe { a.read_volatile() };
     for _ in 0..500 {
         *t = (*t) * (*t) % 10007;
     }
-    a.write_volatile(cur + 1);
+    unsafe {
+        a.write_volatile(cur + 1);
+    }
 }
 
 fn lock() {
@@ -38,9 +40,9 @@ fn unlock() {
     OCCUPIED.store(false, Ordering::Relaxed);
 }
 
-unsafe fn f() -> ! {
+fn f() -> ! {
     let mut t = 2usize;
-    for _ in 0..PER_THREAD {
+    for _ in 0..unsafe { PER_THREAD } {
         lock();
         critical_section(&mut t);
         unlock();
@@ -48,7 +50,7 @@ unsafe fn f() -> ! {
     exit(t as i32)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     let mut thread_count = THREAD_COUNT_DEFAULT;
     let mut per_thread = PER_THREAD_DEFAULT;

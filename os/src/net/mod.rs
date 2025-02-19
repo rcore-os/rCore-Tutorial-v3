@@ -6,7 +6,7 @@ pub mod udp;
 pub use lose_net_stack::IPv4;
 
 use alloc::{sync::Arc, vec};
-use lose_net_stack::{results::Packet, LoseStack, MacAddress, TcpFlags};
+use lose_net_stack::{LoseStack, MacAddress, TcpFlags, results::Packet};
 
 use crate::{
     drivers::NET_DEVICE,

@@ -63,7 +63,7 @@ fn philosopher_dining_problem(id: *const usize) {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut v = Vec::new();
     let ids: Vec<_> = (0..N).collect();

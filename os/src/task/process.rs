@@ -1,12 +1,12 @@
+use super::TaskControlBlock;
 use super::id::RecycleAllocator;
 use super::manager::insert_into_pid2process;
-use super::TaskControlBlock;
-use super::{add_task, SignalFlags};
-use super::{pid_alloc, PidHandle};
+use super::{PidHandle, pid_alloc};
+use super::{SignalFlags, add_task};
 use crate::fs::{File, Stdin, Stdout};
-use crate::mm::{translated_refmut, MemorySet, KERNEL_SPACE};
+use crate::mm::{KERNEL_SPACE, MemorySet, translated_refmut};
 use crate::sync::{Condvar, Mutex, Semaphore, UPIntrFreeCell, UPIntrRefMut};
-use crate::trap::{trap_handler, TrapContext};
+use crate::trap::{TrapContext, trap_handler};
 use alloc::string::String;
 use alloc::sync::{Arc, Weak};
 use alloc::vec;

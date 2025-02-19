@@ -1,12 +1,12 @@
 #![no_std]
 #![no_main]
 
-use user_lib::{event_get, DecodeType, Key, KeyType};
+use user_lib::{DecodeType, Key, KeyType, event_get};
 
 #[macro_use]
 extern crate user_lib;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("Input device event test");
     loop {

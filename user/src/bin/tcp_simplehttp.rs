@@ -60,7 +60,11 @@ fn handle_tcp_client(client_fd: usize) -> bool {
         </div>
         </body>
         </html>"#;
-        let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnecion: Close\r\n\r\n{}", content.len(),content);
+        let response = format!(
+            "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnecion: Close\r\n\r\n{}",
+            content.len(),
+            content
+        );
         write(client_fd, response.as_bytes());
         // terminate the connection immediately.
         return true;
@@ -114,7 +118,11 @@ fn handle_tcp_client(client_fd: usize) -> bool {
         </body>
         </html>"#;
 
-    let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnecion: Close\r\n\r\n{}", content.len(),content);
+    let response = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnecion: Close\r\n\r\n{}",
+        content.len(),
+        content
+    );
 
     // write a response
     write(client_fd, response.as_bytes());
@@ -122,7 +130,7 @@ fn handle_tcp_client(client_fd: usize) -> bool {
     false
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("This is a very simple http server");
 

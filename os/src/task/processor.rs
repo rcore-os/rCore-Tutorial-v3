@@ -1,6 +1,6 @@
 use super::__switch;
-use super::{fetch_task, TaskStatus};
 use super::{ProcessControlBlock, TaskContext, TaskControlBlock};
+use super::{TaskStatus, fetch_task};
 use crate::sync::UPIntrFreeCell;
 use crate::trap::TrapContext;
 use alloc::sync::Arc;

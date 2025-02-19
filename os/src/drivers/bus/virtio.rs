@@ -1,6 +1,6 @@
 use crate::mm::{
-    frame_alloc_more, frame_dealloc, kernel_token, FrameTracker, PageTable, PhysAddr, PhysPageNum,
-    StepByOne, VirtAddr,
+    FrameTracker, PageTable, PhysAddr, PhysPageNum, StepByOne, VirtAddr, frame_alloc_more,
+    frame_dealloc, kernel_token,
 };
 use crate::sync::UPIntrFreeCell;
 use alloc::vec::Vec;

@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
 //use crate::drivers::{GPU_DEVICE, KEYBOARD_DEVICE, MOUSE_DEVICE, INPUT_CONDVAR};
@@ -37,9 +36,9 @@ use crate::drivers::chardev::UART;
 core::arch::global_asm!(include_str!("entry.asm"));
 
 fn clear_bss() {
-    extern "C" {
-        fn sbss();
-        fn ebss();
+    unsafe extern "C" {
+        safe fn sbss();
+        safe fn ebss();
     }
     unsafe {
         core::slice::from_raw_parts_mut(sbss as usize as *mut u8, ebss as usize - sbss as usize)
@@ -55,7 +54,7 @@ lazy_static! {
         unsafe { UPIntrFreeCell::new(false) };
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn rust_main() -> ! {
     clear_bss();
     logging::init();

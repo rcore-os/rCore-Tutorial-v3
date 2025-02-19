@@ -4,9 +4,9 @@
 #[macro_use]
 extern crate user_lib;
 
-use user_lib::{exec, fork, get_time, kill, waitpid, waitpid_nb, SignalFlags};
+use user_lib::{SignalFlags, exec, fork, get_time, kill, waitpid, waitpid_nb};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     assert_eq!(argc, 3, "argc must be 3!");
     let timeout_ms = argv[2]

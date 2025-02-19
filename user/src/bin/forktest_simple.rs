@@ -6,7 +6,7 @@ extern crate user_lib;
 
 use user_lib::{fork, getpid, wait};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     assert_eq!(wait(&mut 0i32), -1);
     println!("sys_wait without child process test passed!");

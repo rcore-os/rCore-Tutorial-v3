@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(linkage)]
-#![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
 #[macro_use]
@@ -16,6 +15,8 @@ mod task;
 extern crate alloc;
 #[macro_use]
 extern crate bitflags;
+
+use core::ptr::addr_of_mut;
 
 use alloc::vec::Vec;
 use buddy_system_allocator::LockedHeap;
@@ -38,12 +39,12 @@ pub fn handle_alloc_error(layout: core::alloc::Layout) -> ! {
     panic!("Heap allocation error, layout = {:?}", layout);
 }
 
-#[no_mangle]
-#[link_section = ".text.entry"]
+#[unsafe(no_mangle)]
+#[unsafe(link_section = ".text.entry")]
 pub extern "C" fn _start(argc: usize, argv: usize) -> ! {
     unsafe {
         HEAP.lock()
-            .init(HEAP_SPACE.as_ptr() as usize, USER_HEAP_SIZE);
+            .init(addr_of_mut!(HEAP_SPACE) as usize, USER_HEAP_SIZE);
     }
     let mut v: Vec<&'static str> = Vec::new();
     for i in 0..argc {
@@ -63,7 +64,7 @@ pub extern "C" fn _start(argc: usize, argv: usize) -> ! {
 }
 
 #[linkage = "weak"]
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main(_argc: usize, _argv: &[&str]) -> i32 {
     panic!("Cannot find main!");
 }
@@ -72,7 +73,9 @@ fn main(_argc: usize, _argv: &[&str]) -> i32 {
 macro_rules! vstore {
     ($var: expr, $value: expr) => {
         // unsafe { core::intrinsics::volatile_store($var_ref as *const _ as _, $value) }
-        unsafe { core::ptr::write_volatile(core::ptr::addr_of_mut!($var), $value); }
+        unsafe {
+            core::ptr::write_volatile(core::ptr::addr_of_mut!($var), $value);
+        }
     };
 }
 
