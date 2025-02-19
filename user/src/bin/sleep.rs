@@ -15,7 +15,7 @@ fn sleepy() {
     exit(0);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let current_time = get_time();
     let pid = fork();

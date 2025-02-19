@@ -5,7 +5,7 @@
 extern crate user_lib;
 use user_lib::{getpid, yield_};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("Hello, I am process {}.", getpid());
     for i in 0..5 {

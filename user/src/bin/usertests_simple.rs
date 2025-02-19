@@ -20,7 +20,7 @@ static TESTS: &[&str] = &[
 
 use user_lib::{exec, fork, waitpid};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     for test in TESTS {
         println!("Usertests: Running {}", test);

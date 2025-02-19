@@ -1,6 +1,7 @@
 //! The global allocator
 use crate::config::KERNEL_HEAP_SIZE;
 use buddy_system_allocator::LockedHeap;
+use core::ptr::addr_of_mut;
 
 #[global_allocator]
 /// heap allocator instance
@@ -18,7 +19,7 @@ pub fn init_heap() {
     unsafe {
         HEAP_ALLOCATOR
             .lock()
-            .init(HEAP_SPACE.as_ptr() as usize, KERNEL_HEAP_SIZE);
+            .init(addr_of_mut!(HEAP_SPACE) as usize, KERNEL_HEAP_SIZE);
     }
 }
 
@@ -26,9 +27,9 @@ pub fn init_heap() {
 pub fn heap_test() {
     use alloc::boxed::Box;
     use alloc::vec::Vec;
-    extern "C" {
-        fn sbss();
-        fn ebss();
+    unsafe extern "C" {
+        safe fn sbss();
+        safe fn ebss();
     }
     let bss_range = sbss as usize..ebss as usize;
     let a = Box::new(5);

@@ -1,6 +1,6 @@
 //! File and filesystem-related syscalls
-use crate::fs::{open_file, OpenFlags};
-use crate::mm::{translated_byte_buffer, translated_str, UserBuffer};
+use crate::fs::{OpenFlags, open_file};
+use crate::mm::{UserBuffer, translated_byte_buffer, translated_str};
 use crate::task::{current_task, current_user_token};
 
 pub fn sys_write(fd: usize, buf: *const u8, len: usize) -> isize {

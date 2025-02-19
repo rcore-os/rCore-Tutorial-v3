@@ -5,9 +5,9 @@
 extern crate user_lib;
 extern crate alloc;
 
-use user_lib::{close, open, read, OpenFlags};
+use user_lib::{OpenFlags, close, open, read};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let fd = open("filea\0", OpenFlags::RDONLY);
     if fd == -1 {

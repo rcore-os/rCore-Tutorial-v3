@@ -1,11 +1,11 @@
 //!Implementation of [`TaskControlBlock`]
 use super::TaskContext;
-use super::{pid_alloc, KernelStack, PidHandle};
+use super::{KernelStack, PidHandle, pid_alloc};
 use crate::config::TRAP_CONTEXT;
 use crate::fs::{File, Stdin, Stdout};
-use crate::mm::{MemorySet, PhysPageNum, VirtAddr, KERNEL_SPACE};
+use crate::mm::{KERNEL_SPACE, MemorySet, PhysPageNum, VirtAddr};
 use crate::sync::UPSafeCell;
-use crate::trap::{trap_handler, TrapContext};
+use crate::trap::{TrapContext, trap_handler};
 use alloc::sync::{Arc, Weak};
 use alloc::vec;
 use alloc::vec::Vec;

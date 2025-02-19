@@ -50,7 +50,7 @@ pub fn enable_timer_interrupt() {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// handle an interrupt, exception, or system call from user space
 pub fn trap_handler() -> ! {
     set_kernel_trap_entry();
@@ -103,7 +103,7 @@ pub fn trap_handler() -> ! {
     trap_return();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// set the new addr of __restore asm function in TRAMPOLINE page,
 /// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,
 /// finally, jump to new addr of __restore asm function
@@ -111,9 +111,9 @@ pub fn trap_return() -> ! {
     set_user_trap_entry();
     let trap_cx_ptr = TRAP_CONTEXT;
     let user_satp = current_user_token();
-    extern "C" {
-        fn __alltraps();
-        fn __restore();
+    unsafe extern "C" {
+        unsafe fn __alltraps();
+        unsafe fn __restore();
     }
     let restore_va = __restore as usize - __alltraps as usize + TRAMPOLINE;
     unsafe {
@@ -128,7 +128,7 @@ pub fn trap_return() -> ! {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Unimplement: traps/interrupts/exceptions from kernel mode
 /// Todo: Chapter 9: I/O device
 pub fn trap_from_kernel() -> ! {
