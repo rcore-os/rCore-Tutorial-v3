@@ -7,7 +7,7 @@ extern crate user_lib;
 use core::ptr::slice_from_raw_parts_mut;
 use user_lib::sbrk;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     println!("Test sbrk start.");
     const PAGE_SIZE: usize = 0x1000;

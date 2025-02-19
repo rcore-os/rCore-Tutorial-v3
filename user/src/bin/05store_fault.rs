@@ -6,7 +6,7 @@ extern crate user_lib;
 
 use core::ptr::null_mut;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     println!("\nstore_fault APP running...\n");
     println!("Into Test store_fault, we will insert an invalid store operation...");

@@ -2,16 +2,16 @@
 
 /// Get the total number of applications.
 pub fn get_num_app() -> usize {
-    extern "C" {
-        fn _num_app();
+    unsafe extern "C" {
+        safe fn _num_app();
     }
     unsafe { (_num_app as usize as *const usize).read_volatile() }
 }
 
 /// get applications data
 pub fn get_app_data(app_id: usize) -> &'static [u8] {
-    extern "C" {
-        fn _num_app();
+    unsafe extern "C" {
+        safe fn _num_app();
     }
     let num_app_ptr = _num_app as usize as *const usize;
     let num_app = get_num_app();

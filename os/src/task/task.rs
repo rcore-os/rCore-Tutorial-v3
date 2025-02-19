@@ -1,8 +1,8 @@
 //! Types related to task management
 use super::TaskContext;
-use crate::config::{kernel_stack_position, TRAP_CONTEXT};
-use crate::mm::{MapPermission, MemorySet, PhysPageNum, VirtAddr, KERNEL_SPACE};
-use crate::trap::{trap_handler, TrapContext};
+use crate::config::{TRAP_CONTEXT, kernel_stack_position};
+use crate::mm::{KERNEL_SPACE, MapPermission, MemorySet, PhysPageNum, VirtAddr};
+use crate::trap::{TrapContext, trap_handler};
 
 /// task control block structure
 pub struct TaskControlBlock {
