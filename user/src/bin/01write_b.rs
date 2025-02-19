@@ -9,7 +9,7 @@ use user_lib::yield_;
 const WIDTH: usize = 10;
 const HEIGHT: usize = 2;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     for i in 0..HEIGHT {
         for _ in 0..WIDTH {
