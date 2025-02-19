@@ -1,8 +1,8 @@
 use super::BlockDevice;
+use crate::DEV_NON_BLOCKING_ACCESS;
 use crate::drivers::bus::virtio::VirtioHal;
 use crate::sync::{Condvar, UPIntrFreeCell};
 use crate::task::schedule;
-use crate::DEV_NON_BLOCKING_ACCESS;
 use alloc::collections::BTreeMap;
 use virtio_drivers::{BlkResp, RespStatus, VirtIOBlk, VirtIOHeader};
 

@@ -3,8 +3,9 @@ mod context;
 use crate::config::TRAMPOLINE;
 use crate::syscall::syscall;
 use crate::task::{
-    check_signals_of_current, current_add_signal, current_trap_cx, current_trap_cx_user_va,
-    current_user_token, exit_current_and_run_next, suspend_current_and_run_next, SignalFlags,
+    SignalFlags, check_signals_of_current, current_add_signal, current_trap_cx,
+    current_trap_cx_user_va, current_user_token, exit_current_and_run_next,
+    suspend_current_and_run_next,
 };
 use crate::timer::{check_timer, set_next_trigger};
 use core::arch::{asm, global_asm};
@@ -21,9 +22,9 @@ pub fn init() {
 }
 
 fn set_kernel_trap_entry() {
-    extern "C" {
-        fn __alltraps();
-        fn __alltraps_k();
+    unsafe extern "C" {
+        unsafe fn __alltraps();
+        unsafe fn __alltraps_k();
     }
     let __alltraps_k_va = __alltraps_k as usize - __alltraps as usize + TRAMPOLINE;
     unsafe {
@@ -56,7 +57,7 @@ fn disable_supervisor_interrupt() {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn trap_handler() -> ! {
     set_kernel_trap_entry();
     let scause = scause::read();
@@ -119,15 +120,18 @@ pub fn trap_handler() -> ! {
     trap_return();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
+/// set the new addr of __restore asm function in TRAMPOLINE page,
+/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,
+/// finally, jump to new addr of __restore asm function
 pub fn trap_return() -> ! {
     disable_supervisor_interrupt();
     set_user_trap_entry();
     let trap_cx_user_va = current_trap_cx_user_va();
     let user_satp = current_user_token();
-    extern "C" {
-        fn __alltraps();
-        fn __restore();
+    unsafe extern "C" {
+        unsafe fn __alltraps();
+        unsafe fn __restore();
     }
     let restore_va = __restore as usize - __alltraps as usize + TRAMPOLINE;
     //println!("before return");
@@ -143,7 +147,7 @@ pub fn trap_return() -> ! {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn trap_from_kernel(_trap_cx: &TrapContext) {
     let scause = scause::read();
     let stval = stval::read();

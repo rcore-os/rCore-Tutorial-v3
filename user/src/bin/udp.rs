@@ -10,7 +10,7 @@ extern crate alloc;
 
 use user_lib::{connect, read, write};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("udp test open!");
 

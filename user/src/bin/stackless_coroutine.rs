@@ -105,7 +105,7 @@ unsafe fn wake(_: *const ()) {}
 unsafe fn wake_by_ref(_: *const ()) {}
 unsafe fn drop(_: *const ()) {}
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("stackless coroutine Begin..");
     let mut exec = Executor::new();

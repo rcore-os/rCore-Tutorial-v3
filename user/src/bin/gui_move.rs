@@ -1,17 +1,17 @@
 #![no_std]
 #![no_main]
 
-extern crate user_lib;
 extern crate alloc;
+extern crate user_lib;
 
 use user_lib::console::getchar;
 use user_lib::{Display, VIRTGPU_XRES, VIRTGPU_YRES};
 
+use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::pixelcolor::Rgb888;
 use embedded_graphics::prelude::{Drawable, Point, RgbColor, Size};
 use embedded_graphics::primitives::Primitive;
 use embedded_graphics::primitives::{PrimitiveStyle, Rectangle};
-use embedded_graphics::draw_target::DrawTarget;
 
 const INIT_X: i32 = 640;
 const INIT_Y: i32 = 400;
@@ -45,7 +45,11 @@ impl DrawingBoard {
         let new_x = self.latest_pos.x + dx;
         let new_y = self.latest_pos.y + dy;
         let r = (RECT_SIZE / 2) as i32;
-        if new_x > r && new_x + r < (VIRTGPU_XRES as i32) && new_y > r && new_y + r < (VIRTGPU_YRES as i32) {
+        if new_x > r
+            && new_x + r < (VIRTGPU_XRES as i32)
+            && new_y > r
+            && new_y + r < (VIRTGPU_YRES as i32)
+        {
             self.unpaint();
             self.latest_pos.x = new_x;
             self.latest_pos.y = new_y;
@@ -56,7 +60,7 @@ impl DrawingBoard {
 
 const LF: u8 = 0x0au8;
 const CR: u8 = 0x0du8;
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut board = DrawingBoard::new();
     let _ = board.disp.clear(Rgb888::BLACK).unwrap();

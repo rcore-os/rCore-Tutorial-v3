@@ -5,13 +5,13 @@ extern crate alloc;
 extern crate user_lib;
 
 use user_lib::console::getchar;
-use user_lib::{key_pressed, sleep, Display, VIRTGPU_XRES, VIRTGPU_YRES};
+use user_lib::{Display, VIRTGPU_XRES, VIRTGPU_YRES, key_pressed, sleep};
 
+use embedded_graphics::Pixel;
 use embedded_graphics::pixelcolor::*;
 use embedded_graphics::prelude::{Drawable, Point, RgbColor, Size};
 use embedded_graphics::primitives::Primitive;
 use embedded_graphics::primitives::{PrimitiveStyle, Rectangle};
-use embedded_graphics::Pixel;
 use embedded_graphics::{draw_target::DrawTarget, prelude::OriginDimensions};
 use oorandom; //random generator
 
@@ -325,10 +325,11 @@ mod tests {
 
 const LF: u8 = 0x0au8;
 const CR: u8 = 0x0du8;
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut disp = Display::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES));
-    let mut game = SnakeGame::<20, Rgb888>::new(1280, 800, 20, 20, Rgb888::RED, Rgb888::YELLOW, 200);
+    let mut game =
+        SnakeGame::<20, Rgb888>::new(1280, 800, 20, 20, Rgb888::RED, Rgb888::YELLOW, 200);
     let _ = disp.clear(Rgb888::BLACK).unwrap();
     loop {
         if key_pressed() {

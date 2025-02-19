@@ -16,7 +16,7 @@ const LINE_START: &str = ">> ";
 use alloc::string::String;
 use alloc::vec::Vec;
 use user_lib::console::getchar;
-use user_lib::{close, dup, exec, fork, open, pipe, waitpid, OpenFlags};
+use user_lib::{OpenFlags, close, dup, exec, fork, open, pipe, waitpid};
 
 #[derive(Debug)]
 struct ProcessArguments {
@@ -74,7 +74,7 @@ impl ProcessArguments {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("Rust user shell");
     let mut line: String = String::new();

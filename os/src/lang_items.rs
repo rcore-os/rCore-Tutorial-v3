@@ -11,28 +11,30 @@ fn panic(info: &PanicInfo) -> ! {
             "[kernel] Panicked at {}:{} {}",
             location.file(),
             location.line(),
-            info.message().unwrap()
+            info.message()
         );
     } else {
-        error!("[kernel] Panicked: {}", info.message().unwrap());
+        error!("[kernel] Panicked: {}", info.message());
     }
-    unsafe {
-        backtrace();
-    }
+    backtrace();
     shutdown(true)
 }
 
-unsafe fn backtrace() {
+fn backtrace() {
     let mut fp: usize;
     let stop = current_kstack_top();
-    asm!("mv {}, s0", out(reg) fp);
+    unsafe {
+        asm!("mv {}, s0", out(reg) fp);
+    }
     println!("---START BACKTRACE---");
     for i in 0..10 {
         if fp == stop {
             break;
         }
-        println!("#{}:ra={:#x}", i, *((fp - 8) as *const usize));
-        fp = *((fp - 16) as *const usize);
+        unsafe {
+            println!("#{}:ra={:#x}", i, *((fp - 8) as *const usize));
+            fp = *((fp - 16) as *const usize);
+        }
     }
     println!("---END   BACKTRACE---");
 }

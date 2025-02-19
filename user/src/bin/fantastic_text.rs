@@ -5,12 +5,12 @@
 extern crate user_lib;
 
 macro_rules! color_text {
-    ($text:expr, $color:expr) => {{
+    ($text:expr, $color:expr) => {
         format_args!("\x1b[{}m{}\x1b[0m", $color, $text)
-    }};
+    };
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!(
         "{}{}{}{}{} {}{}{}{} {}{}{}{}{}{}",

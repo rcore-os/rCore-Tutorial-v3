@@ -76,11 +76,7 @@ pub fn event_get() -> Option<InputEvent> {
 }
 
 pub fn key_pressed() -> bool {
-    if sys_key_pressed() == 1 {
-        true
-    } else {
-        false
-    }
+    if sys_key_pressed() == 1 { true } else { false }
 }
 
 #[repr(C)]

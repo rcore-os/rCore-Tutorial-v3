@@ -7,9 +7,7 @@ extern crate alloc;
 extern crate core;
 
 use alloc::vec::Vec;
-use core::{
-    sync::atomic::{AtomicUsize, Ordering},
-};
+use core::sync::atomic::{AtomicUsize, Ordering};
 use user_lib::{exit, sleep, thread_create, waittid};
 
 const N: usize = 2;
@@ -39,7 +37,7 @@ fn critical_test_exit() {
     assert_eq!(GUARD.fetch_sub(1, Ordering::SeqCst), 1);
 }
 
-unsafe fn eisenberg_enter_critical(id: usize) {
+fn eisenberg_enter_critical(id: usize) {
     /* announce that we want to enter */
     loop {
         println!("Thread[{}] try enter", id);
@@ -88,7 +86,7 @@ unsafe fn eisenberg_enter_critical(id: usize) {
     println!("Thread[{}] enter", id);
 }
 
-unsafe fn eisenberg_exit_critical(id: usize) {
+fn eisenberg_exit_critical(id: usize) {
     /* find next one who wants to enter and give the turn to it*/
     let mut next = id;
     let ring_id = id + THREAD_NUM;
@@ -105,7 +103,7 @@ unsafe fn eisenberg_exit_critical(id: usize) {
     println!("Thread[{}] exit, give turn to {}", id, next);
 }
 
-pub unsafe fn thread_fn(id: usize) -> ! {
+pub fn thread_fn(id: usize) -> ! {
     println!("Thread[{}] init.", id);
     for _ in 0..N {
         eisenberg_enter_critical(id);
@@ -120,7 +118,7 @@ pub unsafe fn thread_fn(id: usize) -> ! {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut v = Vec::new();
     // TODO: really shuffle

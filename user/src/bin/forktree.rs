@@ -33,7 +33,7 @@ fn fork_tree(cur: &str) {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     fork_tree("");
     let mut exit_code: i32 = 0;

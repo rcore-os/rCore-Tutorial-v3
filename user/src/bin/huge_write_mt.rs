@@ -6,7 +6,7 @@ extern crate user_lib;
 extern crate alloc;
 
 use alloc::{fmt::format, vec::Vec};
-use user_lib::{close, get_time, gettid, open, write, OpenFlags};
+use user_lib::{OpenFlags, close, get_time, gettid, open, write};
 use user_lib::{exit, thread_create, waittid};
 
 fn worker(size_kib: usize) {
@@ -27,7 +27,7 @@ fn worker(size_kib: usize) {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     assert_eq!(argc, 2, "wrong argument");
     let size_mb = 1usize;

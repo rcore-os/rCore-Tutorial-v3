@@ -18,22 +18,23 @@ static mut A: usize = 0;
 const SEM_ID: usize = 0;
 const MUTEX_ID: usize = 0;
 
-unsafe fn first() -> ! {
+fn first() -> ! {
     sleep(10);
     println!("First work, Change A --> 1 and wakeup Second");
     mutex_lock(MUTEX_ID);
-    A = 1;
+    unsafe {
+        A = 1;
+    }
     semaphore_up(SEM_ID);
     mutex_unlock(MUTEX_ID);
     exit(0)
 }
-
-unsafe fn second() -> ! {
+fn second() -> ! {
     println!("Second want to continue,but need to wait A=1");
     loop {
         mutex_lock(MUTEX_ID);
-        if A == 0 {
-            println!("Second: A is {}", A);
+        if unsafe { A } == 0 {
+            println!("Second: A is {}", unsafe { A });
             mutex_unlock(MUTEX_ID);
             semaphore_down(SEM_ID);
         } else {
@@ -41,11 +42,11 @@ unsafe fn second() -> ! {
             break;
         }
     }
-    println!("A is {}, Second can work now", A);
+    println!("A is {}, Second can work now", unsafe { A });
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     // create semaphore & mutex
     assert_eq!(semaphore_create(0) as usize, SEM_ID);

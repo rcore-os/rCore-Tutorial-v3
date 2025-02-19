@@ -8,7 +8,7 @@ use user_lib::{close, fork, pipe, read, wait, write};
 
 static STR: &str = "Hello, world!";
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     // create pipe
     let mut pipe_fd = [0usize; 2];

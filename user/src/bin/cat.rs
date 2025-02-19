@@ -5,9 +5,9 @@
 extern crate user_lib;
 extern crate alloc;
 
-use user_lib::{close, open, read, OpenFlags};
+use user_lib::{OpenFlags, close, open, read};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     println!("argc = {}", argc);
     for (i, arg) in argv.iter().enumerate() {

@@ -5,7 +5,7 @@
 extern crate user_lib;
 use oorandom;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("random num  program!");
     let seed = 4;

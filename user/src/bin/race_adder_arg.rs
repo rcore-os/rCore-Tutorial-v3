@@ -14,20 +14,22 @@ static mut A: usize = 0;
 const PER_THREAD: usize = 1000;
 const THREAD_COUNT: usize = 16;
 
-unsafe fn f(count: usize) -> ! {
+fn f(count: usize) -> ! {
     let mut t = 2usize;
     for _ in 0..PER_THREAD {
         let a = addr_of_mut!(A);
-        let cur = a.read_volatile();
+        let cur = unsafe { a.read_volatile() };
         for _ in 0..count {
             t = t * t % 10007;
         }
-        a.write_volatile(cur + 1);
+        unsafe {
+            a.write_volatile(cur + 1);
+        }
     }
     exit(t as i32)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     let count: usize;
     if argc == 1 {

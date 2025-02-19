@@ -22,33 +22,37 @@ static mut TAIL: usize = 0;
 const PRODUCER_COUNT: usize = 4;
 const NUMBER_PER_PRODUCER: usize = 100;
 
-unsafe fn producer(id: *const usize) -> ! {
-    let id = *id;
-    for _ in 0..NUMBER_PER_PRODUCER {
-        semaphore_down(SEM_EMPTY);
-        semaphore_down(SEM_MUTEX);
-        BUFFER[TAIL] = id;
-        TAIL = (TAIL + 1) % BUFFER_SIZE;
-        semaphore_up(SEM_MUTEX);
-        semaphore_up(SEM_AVAIL);
+fn producer(id: *const usize) -> ! {
+    unsafe {
+        let id = *id;
+        for _ in 0..NUMBER_PER_PRODUCER {
+            semaphore_down(SEM_EMPTY);
+            semaphore_down(SEM_MUTEX);
+            BUFFER[TAIL] = id;
+            TAIL = (TAIL + 1) % BUFFER_SIZE;
+            semaphore_up(SEM_MUTEX);
+            semaphore_up(SEM_AVAIL);
+        }
     }
     exit(0)
 }
 
-unsafe fn consumer() -> ! {
-    for _ in 0..PRODUCER_COUNT * NUMBER_PER_PRODUCER {
-        semaphore_down(SEM_AVAIL);
-        semaphore_down(SEM_MUTEX);
-        print!("{} ", BUFFER[FRONT]);
-        FRONT = (FRONT + 1) % BUFFER_SIZE;
-        semaphore_up(SEM_MUTEX);
-        semaphore_up(SEM_EMPTY);
+fn consumer() -> ! {
+    unsafe {
+        for _ in 0..PRODUCER_COUNT * NUMBER_PER_PRODUCER {
+            semaphore_down(SEM_AVAIL);
+            semaphore_down(SEM_MUTEX);
+            print!("{} ", BUFFER[FRONT]);
+            FRONT = (FRONT + 1) % BUFFER_SIZE;
+            semaphore_up(SEM_MUTEX);
+            semaphore_up(SEM_EMPTY);
+        }
     }
     println!("");
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     // create semaphores
     assert_eq!(semaphore_create(1) as usize, SEM_MUTEX);

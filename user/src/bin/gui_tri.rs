@@ -6,7 +6,7 @@ extern crate user_lib;
 use embedded_graphics::prelude::Size;
 use user_lib::{Display, VIRTGPU_XRES, VIRTGPU_YRES};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut disp = Display::new(Size::new(VIRTGPU_XRES, VIRTGPU_YRES));
     disp.paint_on_framebuffer(|fb| {
