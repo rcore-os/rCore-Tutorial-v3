@@ -1,5 +1,6 @@
 //! Implementation of [`MapArea`] and [`MemorySet`].
-use super::{frame_alloc, FrameTracker};
+
+use super::{FrameTracker, frame_alloc};
 use super::{PTEFlags, PageTable, PageTableEntry};
 use super::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
 use super::{StepByOne, VPNRange};
@@ -12,17 +13,17 @@ use core::arch::asm;
 use lazy_static::*;
 use riscv::register::satp;
 
-extern "C" {
-    fn stext();
-    fn etext();
-    fn srodata();
-    fn erodata();
-    fn sdata();
-    fn edata();
-    fn sbss_with_stack();
-    fn ebss();
-    fn ekernel();
-    fn strampoline();
+unsafe extern "C" {
+    safe fn stext();
+    safe fn etext();
+    safe fn srodata();
+    safe fn erodata();
+    safe fn sdata();
+    safe fn edata();
+    safe fn sbss_with_stack();
+    safe fn ebss();
+    safe fn ekernel();
+    safe fn strampoline();
 }
 
 lazy_static! {
@@ -385,20 +386,26 @@ pub fn remap_test() {
     let mid_text: VirtAddr = ((stext as usize + etext as usize) / 2).into();
     let mid_rodata: VirtAddr = ((srodata as usize + erodata as usize) / 2).into();
     let mid_data: VirtAddr = ((sdata as usize + edata as usize) / 2).into();
-    assert!(!kernel_space
-        .page_table
-        .translate(mid_text.floor())
-        .unwrap()
-        .writable(),);
-    assert!(!kernel_space
-        .page_table
-        .translate(mid_rodata.floor())
-        .unwrap()
-        .writable(),);
-    assert!(!kernel_space
-        .page_table
-        .translate(mid_data.floor())
-        .unwrap()
-        .executable(),);
+    assert!(
+        !kernel_space
+            .page_table
+            .translate(mid_text.floor())
+            .unwrap()
+            .writable(),
+    );
+    assert!(
+        !kernel_space
+            .page_table
+            .translate(mid_rodata.floor())
+            .unwrap()
+            .writable(),
+    );
+    assert!(
+        !kernel_space
+            .page_table
+            .translate(mid_data.floor())
+            .unwrap()
+            .executable(),
+    );
     println!("remap_test passed!");
 }

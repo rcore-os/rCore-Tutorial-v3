@@ -5,15 +5,15 @@ use alloc::vec::Vec;
 use lazy_static::*;
 ///get app number
 pub fn get_num_app() -> usize {
-    extern "C" {
-        fn _num_app();
+    unsafe extern "C" {
+        safe fn _num_app();
     }
     unsafe { (_num_app as usize as *const usize).read_volatile() }
 }
 /// get applications data
 pub fn get_app_data(app_id: usize) -> &'static [u8] {
-    extern "C" {
-        fn _num_app();
+    unsafe extern "C" {
+        safe fn _num_app();
     }
     let num_app_ptr = _num_app as usize as *const usize;
     let num_app = get_num_app();
@@ -31,8 +31,8 @@ lazy_static! {
     ///All of app's name
     static ref APP_NAMES: Vec<&'static str> = {
         let num_app = get_num_app();
-        extern "C" {
-            fn _app_names();
+        unsafe extern "C" {
+            safe fn _app_names();
         }
         let mut start = _app_names as usize as *const u8;
         let mut v = Vec::new();

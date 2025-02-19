@@ -6,7 +6,7 @@ extern crate user_lib;
 
 use user_lib::{exec, fork, getpid, wait};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("pid {}: parent start forking ...", getpid());
     let pid = fork();

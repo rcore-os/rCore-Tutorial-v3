@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(linkage)]
-#![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
 #[macro_use]
@@ -9,6 +8,7 @@ mod lang_items;
 mod syscall;
 
 use buddy_system_allocator::LockedHeap;
+use core::ptr::addr_of_mut;
 use syscall::*;
 
 const USER_HEAP_SIZE: usize = 16384;
@@ -23,18 +23,18 @@ pub fn handle_alloc_error(layout: core::alloc::Layout) -> ! {
     panic!("Heap allocation error, layout = {:?}", layout);
 }
 
-#[no_mangle]
-#[link_section = ".text.entry"]
+#[unsafe(no_mangle)]
+#[unsafe(link_section = ".text.entry")]
 pub extern "C" fn _start() -> ! {
     unsafe {
         HEAP.lock()
-            .init(HEAP_SPACE.as_ptr() as usize, USER_HEAP_SIZE);
+            .init(addr_of_mut!(HEAP_SPACE) as usize, USER_HEAP_SIZE);
     }
     exit(main());
 }
 
 #[linkage = "weak"]
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn main() -> i32 {
     panic!("Cannot find main!");
 }

@@ -45,7 +45,7 @@ fn work(times: isize) {
     exit(0);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     for _ in 0..NUM {
         let pid = fork();

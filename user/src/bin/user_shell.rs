@@ -16,7 +16,7 @@ use alloc::string::String;
 use user_lib::console::getchar;
 use user_lib::{exec, fork, waitpid};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("Rust user shell");
     let mut line: String = String::new();
