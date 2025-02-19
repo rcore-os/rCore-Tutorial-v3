@@ -6,7 +6,7 @@ extern crate user_lib;
 
 use user_lib::read;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(_argc: usize, _argv: &[&str]) -> i32 {
     let mut buf = [0u8; 256];
     let mut lines = 0usize;

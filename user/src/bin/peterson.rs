@@ -27,7 +27,7 @@ fn critical_test_exit() {
     assert_eq!(GUARD.fetch_sub(1, Ordering::SeqCst), 1);
 }
 
-unsafe fn peterson_enter_critical(id: usize, peer_id: usize) {
+fn peterson_enter_critical(id: usize, peer_id: usize) {
     // println!("Thread[{}] try enter", id);
     vstore!(FLAG[id], true);
     vstore!(TURN, peer_id);
@@ -40,12 +40,12 @@ unsafe fn peterson_enter_critical(id: usize, peer_id: usize) {
     // println!("Thread[{}] enter", id);
 }
 
-unsafe fn peterson_exit_critical(id: usize) {
+fn peterson_exit_critical(id: usize) {
     vstore!(FLAG[id], false);
     // println!("Thread[{}] exit", id);
 }
 
-pub unsafe fn thread_fn(id: usize) -> ! {
+pub fn thread_fn(id: usize) -> ! {
     // println!("Thread[{}] init.", id);
     let peer_id: usize = id ^ 1;
     for iter in 0..N {
@@ -64,7 +64,7 @@ pub unsafe fn thread_fn(id: usize) -> ! {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut v = Vec::new();
     v.push(thread_create(thread_fn as usize, 0));

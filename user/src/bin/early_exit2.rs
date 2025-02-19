@@ -15,7 +15,7 @@ pub fn thread_a() -> ! {
     exit(1)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     thread_create(thread_a as usize, 0);
     sleep(100);

@@ -12,7 +12,7 @@ fn f(depth: usize) {
     f(depth + 1);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     println!("It should trigger segmentation fault!");
     f(0);

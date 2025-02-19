@@ -1,5 +1,5 @@
 use super::id::TaskUserRes;
-use super::{kstack_alloc, KernelStack, ProcessControlBlock, TaskContext};
+use super::{KernelStack, ProcessControlBlock, TaskContext, kstack_alloc};
 use crate::trap::TrapContext;
 use crate::{mm::PhysPageNum, sync::UPSafeCell};
 use alloc::sync::{Arc, Weak};

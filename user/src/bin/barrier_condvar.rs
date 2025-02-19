@@ -69,7 +69,7 @@ fn thread_fn() {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut v: Vec<isize> = Vec::new();
     for _ in 0..THREAD_NUM {

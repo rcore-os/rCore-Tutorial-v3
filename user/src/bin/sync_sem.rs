@@ -27,7 +27,7 @@ unsafe fn second() -> ! {
     exit(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     // create semaphores
     assert_eq!(semaphore_create(0) as usize, SEM_SYNC);

@@ -21,7 +21,7 @@ fn thread_print(arg: *const Argument) -> ! {
     exit(arg.rc)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut v = Vec::new();
     let args = [

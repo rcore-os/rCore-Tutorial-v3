@@ -1,5 +1,5 @@
 use crate::sync::{Mutex, UPSafeCell};
-use crate::task::{block_current_and_run_next, current_task, wakeup_task, TaskControlBlock};
+use crate::task::{TaskControlBlock, block_current_and_run_next, current_task, wakeup_task};
 use alloc::{collections::VecDeque, sync::Arc};
 
 pub struct Condvar {

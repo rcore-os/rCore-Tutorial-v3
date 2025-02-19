@@ -10,7 +10,7 @@ use alloc::format;
 use user_lib::{close, fork, get_time, pipe, read, wait, write};
 
 const LENGTH: usize = 3000;
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     // create pipes
     // parent write to child

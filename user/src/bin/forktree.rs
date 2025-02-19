@@ -29,7 +29,7 @@ fn fork_tree(cur: &str) {
     fork_child(cur, '1');
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     fork_tree("");
     sleep(3000);

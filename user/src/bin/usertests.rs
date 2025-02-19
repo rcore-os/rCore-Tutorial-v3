@@ -112,7 +112,7 @@ fn run_tests(tests: &[(&str, &str, &str, &str, i32)]) -> i32 {
     pass_num
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let succ_num = run_tests(SUCC_TESTS);
     let err_num = run_tests(FAIL_TESTS);

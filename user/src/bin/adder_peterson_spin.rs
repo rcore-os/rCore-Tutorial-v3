@@ -9,7 +9,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use core::ptr::addr_of_mut;
-use core::sync::atomic::{compiler_fence, Ordering};
+use core::sync::atomic::{Ordering, compiler_fence};
 use user_lib::{exit, get_time, thread_create, waittid};
 
 static mut A: usize = 0;
@@ -19,36 +19,42 @@ const PER_THREAD_DEFAULT: usize = 2000;
 const THREAD_COUNT_DEFAULT: usize = 2;
 static mut PER_THREAD: usize = 0;
 
-unsafe fn critical_section(t: &mut usize) {
+fn critical_section(t: &mut usize) {
     let a = addr_of_mut!(A);
-    let cur = a.read_volatile();
+    let cur = unsafe { a.read_volatile() };
     for _ in 0..500 {
         *t = (*t) * (*t) % 10007;
     }
-    a.write_volatile(cur + 1);
+    unsafe {
+        a.write_volatile(cur + 1);
+    }
 }
 
-unsafe fn lock(id: usize) {
-    FLAG[id] = true;
-    let j = 1 - id;
-    TURN = j;
-    // Tell the compiler not to reorder memory operations
-    // across this fence.
-    compiler_fence(Ordering::SeqCst);
-    // Why do we need to use volatile_read here?
-    // Otherwise the compiler will assume that they will never
-    // be changed on this thread. Thus, they will be accessed
-    // only once!
-    while vload!(FLAG[j]) && vload!(TURN) == j {}
+fn lock(id: usize) {
+    unsafe {
+        FLAG[id] = true;
+        let j = 1 - id;
+        TURN = j;
+        // Tell the compiler not to reorder memory operations
+        // across this fence.
+        compiler_fence(Ordering::SeqCst);
+        // Why do we need to use volatile_read here?
+        // Otherwise the compiler will assume that they will never
+        // be changed on this thread. Thus, they will be accessed
+        // only once!
+        while vload!(FLAG[j]) && vload!(TURN) == j {}
+    }
 }
 
-unsafe fn unlock(id: usize) {
-    FLAG[id] = false;
+fn unlock(id: usize) {
+    unsafe {
+        FLAG[id] = false;
+    }
 }
 
-unsafe fn f(id: usize) -> ! {
+fn f(id: usize) -> ! {
     let mut t = 2usize;
-    for _iter in 0..PER_THREAD {
+    for _iter in 0..unsafe { PER_THREAD } {
         lock(id);
         critical_section(&mut t);
         unlock(id);
@@ -56,7 +62,7 @@ unsafe fn f(id: usize) -> ! {
     exit(t as i32)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(argc: usize, argv: &[&str]) -> i32 {
     let mut thread_count = THREAD_COUNT_DEFAULT;
     let mut per_thread = PER_THREAD_DEFAULT;
