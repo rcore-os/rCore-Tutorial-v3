@@ -4,9 +4,9 @@
 #[macro_use]
 extern crate user_lib;
 
-use user_lib::{close, get_time, open, write, OpenFlags};
+use user_lib::{OpenFlags, close, get_time, open, write};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut buffer = [0u8; 1024]; // 1KiB
     for (i, ch) in buffer.iter_mut().enumerate() {

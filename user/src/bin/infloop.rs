@@ -4,7 +4,7 @@
 
 extern crate user_lib;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(_argc: usize, _argv: &[&str]) -> ! {
     loop {}
 }

@@ -8,7 +8,7 @@ mod switch;
 #[allow(clippy::module_inception)]
 mod task;
 
-use crate::fs::{open_file, OpenFlags};
+use crate::fs::{OpenFlags, open_file};
 use crate::sbi::shutdown;
 use alloc::sync::Arc;
 pub use context::TaskContext;
@@ -20,11 +20,11 @@ use task::{TaskControlBlock, TaskStatus};
 
 pub use action::{SignalAction, SignalActions};
 pub use manager::{add_task, pid2task};
-pub use pid::{pid_alloc, KernelStack, PidHandle};
+pub use pid::{KernelStack, PidHandle, pid_alloc};
 pub use processor::{
     current_task, current_trap_cx, current_user_token, run_tasks, schedule, take_current_task,
 };
-pub use signal::{SignalFlags, MAX_SIG};
+pub use signal::{MAX_SIG, SignalFlags};
 
 pub fn suspend_current_and_run_next() {
     // There must be an application running.

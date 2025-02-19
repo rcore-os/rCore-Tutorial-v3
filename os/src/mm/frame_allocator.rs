@@ -88,8 +88,8 @@ lazy_static! {
 }
 
 pub fn init_frame_allocator() {
-    extern "C" {
-        fn ekernel();
+    unsafe extern "C" {
+        safe fn ekernel();
     }
     FRAME_ALLOCATOR.exclusive_access().init(
         PhysAddr::from(ekernel as usize).ceil(),

@@ -10,7 +10,7 @@ fn func() {
     sigreturn();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main() -> i32 {
     let mut new = SignalAction::default();
     let mut old = SignalAction::default();

@@ -1,4 +1,4 @@
-use crate::task::{SignalFlags, MAX_SIG};
+use crate::task::{MAX_SIG, SignalFlags};
 
 /// Action for a signal
 #[repr(C, align(16))]
