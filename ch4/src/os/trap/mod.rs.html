@@ -1,251 +1,128 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/trap/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b21aa549bf6d91ff.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (f705de596 2024-04-30)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../os/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
-<a href="#2" id="2">2</a>
-<a href="#3" id="3">3</a>
-<a href="#4" id="4">4</a>
-<a href="#5" id="5">5</a>
-<a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
-<a href="#8" id="8">8</a>
-<a href="#9" id="9">9</a>
-<a href="#10" id="10">10</a>
-<a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a>
-<a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-<a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-<a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
-<a href="#46" id="46">46</a>
-<a href="#47" id="47">47</a>
-<a href="#48" id="48">48</a>
-<a href="#49" id="49">49</a>
-<a href="#50" id="50">50</a>
-<a href="#51" id="51">51</a>
-<a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Trap handling functionality
-//!
-//! For rCore, we have a single trap entry point, namely `__alltraps`. At
-//! initialization in [`init()`], we set the `stvec` CSR to point to it.
-//!
-//! All traps go through `__alltraps`, which is defined in `trap.S`. The
-//! assembly language code does just enough work restore the kernel space
-//! context, ensuring that Rust code safely runs, and transfers control to
-//! [`trap_handler()`].
-//!
-//! It then calls different functionality based on what exactly the exception
-//! was. For example, timer interrupts trigger task preemption, and syscalls go
-//! to [`syscall()`].
-</span><span class="kw">mod </span>context;
-
-<span class="kw">use </span><span class="kw">crate</span>::config::{TRAMPOLINE, TRAP_CONTEXT};
-<span class="kw">use </span><span class="kw">crate</span>::syscall::syscall;
-<span class="kw">use </span><span class="kw">crate</span>::task::{
-    current_trap_cx, current_user_token, exit_current_and_run_next, suspend_current_and_run_next,
-};
-<span class="kw">use </span><span class="kw">crate</span>::timer::set_next_trigger;
-<span class="kw">use </span>core::arch::{asm, global_asm};
-<span class="kw">use </span>riscv::register::{
-    mtvec::TrapMode,
-    scause::{<span class="self">self</span>, Exception, Interrupt, Trap},
-    sie, stval, stvec,
-};
-
-<span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">"trap.S"</span>));
-
-<span class="doccomment">/// initialize CSR `stvec` as the entry of `__alltraps`
-</span><span class="kw">pub fn </span>init() {
-    set_kernel_trap_entry();
-}
-
-<span class="kw">fn </span>set_kernel_trap_entry() {
-    <span class="kw">unsafe </span>{
-        stvec::write(trap_from_kernel <span class="kw">as </span>usize, TrapMode::Direct);
-    }
-}
-
-<span class="kw">fn </span>set_user_trap_entry() {
-    <span class="kw">unsafe </span>{
-        stvec::write(TRAMPOLINE <span class="kw">as </span>usize, TrapMode::Direct);
-    }
-}
-
-<span class="doccomment">/// enable timer interrupt in sie CSR
-</span><span class="kw">pub fn </span>enable_timer_interrupt() {
-    <span class="kw">unsafe </span>{
-        sie::set_stimer();
-    }
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="doccomment">/// handle an interrupt, exception, or system call from user space
-</span><span class="kw">pub fn </span>trap_handler() -&gt; ! {
-    set_kernel_trap_entry();
-    <span class="kw">let </span>cx = current_trap_cx();
-    <span class="kw">let </span>scause = scause::read();
-    <span class="kw">let </span>stval = stval::read();
-    <span class="kw">match </span>scause.cause() {
-        Trap::Exception(Exception::UserEnvCall) =&gt; {
-            cx.sepc += <span class="number">4</span>;
-            cx.x[<span class="number">10</span>] = syscall(cx.x[<span class="number">17</span>], [cx.x[<span class="number">10</span>], cx.x[<span class="number">11</span>], cx.x[<span class="number">12</span>]]) <span class="kw">as </span>usize;
-        }
-        Trap::Exception(Exception::StoreFault)
-        | Trap::Exception(Exception::StorePageFault)
-        | Trap::Exception(Exception::LoadFault)
-        | Trap::Exception(Exception::LoadPageFault) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it."</span>, stval, cx.sepc);
-            exit_current_and_run_next();
-        }
-        Trap::Exception(Exception::IllegalInstruction) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"[kernel] IllegalInstruction in application, kernel killed it."</span>);
-            exit_current_and_run_next();
-        }
-        Trap::Interrupt(Interrupt::SupervisorTimer) =&gt; {
-            set_next_trigger();
-            suspend_current_and_run_next();
-        }
-        <span class="kw">_ </span>=&gt; {
-            <span class="macro">panic!</span>(
-                <span class="string">"Unsupported trap {:?}, stval = {:#x}!"</span>,
-                scause.cause(),
-                stval
-            );
-        }
-    }
-    trap_return();
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="doccomment">/// set the new addr of __restore asm function in TRAMPOLINE page,
-/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,
-/// finally, jump to new addr of __restore asm function
-</span><span class="kw">pub fn </span>trap_return() -&gt; ! {
-    set_user_trap_entry();
-    <span class="kw">let </span>trap_cx_ptr = TRAP_CONTEXT;
-    <span class="kw">let </span>user_satp = current_user_token();
-    <span class="kw">extern </span><span class="string">"C" </span>{
-        <span class="kw">fn </span>__alltraps();
-        <span class="kw">fn </span>__restore();
-    }
-    <span class="kw">let </span>restore_va = __restore <span class="kw">as </span>usize - __alltraps <span class="kw">as </span>usize + TRAMPOLINE;
-    <span class="kw">unsafe </span>{
-        <span class="macro">asm!</span>(
-            <span class="string">"fence.i"</span>,
-            <span class="string">"jr {restore_va}"</span>,             <span class="comment">// jump to new addr of __restore asm function
-            </span>restore_va = <span class="kw">in</span>(reg) restore_va,
-            <span class="kw">in</span>(<span class="string">"a0"</span>) trap_cx_ptr,      <span class="comment">// a0 = virt addr of Trap Context
-            </span><span class="kw">in</span>(<span class="string">"a1"</span>) user_satp,        <span class="comment">// a1 = phy addr of usr page table
-            </span>options(noreturn)
-        );
-    }
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="doccomment">/// Unimplement: traps/interrupts/exceptions from kernel mode
-/// Todo: Chapter 9: I/O device
-</span><span class="kw">pub fn </span>trap_from_kernel() -&gt; ! {
-    <span class="macro">panic!</span>(<span class="string">"a trap from kernel!"</span>);
-}
-
-<span class="kw">pub use </span>context::TrapContext;
-</code></pre></div></section></main></body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/trap/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6c3ea77c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0-nightly (ce36a966c 2025-02-17)" data-channel="nightly" data-search-js="search-f7327375.js" data-settings-js="settings-6dad6058.js" ><script src="../../../static.files/storage-3a5871a4.js"></script><script defer src="../../../static.files/src-script-b8d3f215.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5332ae0c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">os/trap/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Trap handling functionality
+<a href=#2 id=2 data-nosnippet>2</a>//!
+<a href=#3 id=3 data-nosnippet>3</a>//! For rCore, we have a single trap entry point, namely `__alltraps`. At
+<a href=#4 id=4 data-nosnippet>4</a>//! initialization in [`init()`], we set the `stvec` CSR to point to it.
+<a href=#5 id=5 data-nosnippet>5</a>//!
+<a href=#6 id=6 data-nosnippet>6</a>//! All traps go through `__alltraps`, which is defined in `trap.S`. The
+<a href=#7 id=7 data-nosnippet>7</a>//! assembly language code does just enough work restore the kernel space
+<a href=#8 id=8 data-nosnippet>8</a>//! context, ensuring that Rust code safely runs, and transfers control to
+<a href=#9 id=9 data-nosnippet>9</a>//! [`trap_handler()`].
+<a href=#10 id=10 data-nosnippet>10</a>//!
+<a href=#11 id=11 data-nosnippet>11</a>//! It then calls different functionality based on what exactly the exception
+<a href=#12 id=12 data-nosnippet>12</a>//! was. For example, timer interrupts trigger task preemption, and syscalls go
+<a href=#13 id=13 data-nosnippet>13</a>//! to [`syscall()`].
+<a href=#14 id=14 data-nosnippet>14</a></span><span class="kw">mod </span>context;
+<a href=#15 id=15 data-nosnippet>15</a>
+<a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span><span class="kw">crate</span>::config::{TRAMPOLINE, TRAP_CONTEXT};
+<a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span><span class="kw">crate</span>::syscall::syscall;
+<a href=#18 id=18 data-nosnippet>18</a><span class="kw">use </span><span class="kw">crate</span>::task::{
+<a href=#19 id=19 data-nosnippet>19</a>    current_trap_cx, current_user_token, exit_current_and_run_next, suspend_current_and_run_next,
+<a href=#20 id=20 data-nosnippet>20</a>};
+<a href=#21 id=21 data-nosnippet>21</a><span class="kw">use </span><span class="kw">crate</span>::timer::set_next_trigger;
+<a href=#22 id=22 data-nosnippet>22</a><span class="kw">use </span>core::arch::{asm, global_asm};
+<a href=#23 id=23 data-nosnippet>23</a><span class="kw">use </span>riscv::register::{
+<a href=#24 id=24 data-nosnippet>24</a>    mtvec::TrapMode,
+<a href=#25 id=25 data-nosnippet>25</a>    scause::{<span class="self">self</span>, Exception, Interrupt, Trap},
+<a href=#26 id=26 data-nosnippet>26</a>    sie, stval, stvec,
+<a href=#27 id=27 data-nosnippet>27</a>};
+<a href=#28 id=28 data-nosnippet>28</a>
+<a href=#29 id=29 data-nosnippet>29</a><span class="macro">global_asm!</span>(<span class="macro">include_str!</span>(<span class="string">"trap.S"</span>));
+<a href=#30 id=30 data-nosnippet>30</a>
+<a href=#31 id=31 data-nosnippet>31</a><span class="doccomment">/// initialize CSR `stvec` as the entry of `__alltraps`
+<a href=#32 id=32 data-nosnippet>32</a></span><span class="kw">pub fn </span>init() {
+<a href=#33 id=33 data-nosnippet>33</a>    set_kernel_trap_entry();
+<a href=#34 id=34 data-nosnippet>34</a>}
+<a href=#35 id=35 data-nosnippet>35</a>
+<a href=#36 id=36 data-nosnippet>36</a><span class="kw">fn </span>set_kernel_trap_entry() {
+<a href=#37 id=37 data-nosnippet>37</a>    <span class="kw">unsafe </span>{
+<a href=#38 id=38 data-nosnippet>38</a>        stvec::write(trap_from_kernel <span class="kw">as </span>usize, TrapMode::Direct);
+<a href=#39 id=39 data-nosnippet>39</a>    }
+<a href=#40 id=40 data-nosnippet>40</a>}
+<a href=#41 id=41 data-nosnippet>41</a>
+<a href=#42 id=42 data-nosnippet>42</a><span class="kw">fn </span>set_user_trap_entry() {
+<a href=#43 id=43 data-nosnippet>43</a>    <span class="kw">unsafe </span>{
+<a href=#44 id=44 data-nosnippet>44</a>        stvec::write(TRAMPOLINE <span class="kw">as </span>usize, TrapMode::Direct);
+<a href=#45 id=45 data-nosnippet>45</a>    }
+<a href=#46 id=46 data-nosnippet>46</a>}
+<a href=#47 id=47 data-nosnippet>47</a>
+<a href=#48 id=48 data-nosnippet>48</a><span class="doccomment">/// enable timer interrupt in sie CSR
+<a href=#49 id=49 data-nosnippet>49</a></span><span class="kw">pub fn </span>enable_timer_interrupt() {
+<a href=#50 id=50 data-nosnippet>50</a>    <span class="kw">unsafe </span>{
+<a href=#51 id=51 data-nosnippet>51</a>        sie::set_stimer();
+<a href=#52 id=52 data-nosnippet>52</a>    }
+<a href=#53 id=53 data-nosnippet>53</a>}
+<a href=#54 id=54 data-nosnippet>54</a>
+<a href=#55 id=55 data-nosnippet>55</a><span class="attr">#[<span class="kw">unsafe</span>(no_mangle)]
+<a href=#56 id=56 data-nosnippet>56</a></span><span class="doccomment">/// handle an interrupt, exception, or system call from user space
+<a href=#57 id=57 data-nosnippet>57</a></span><span class="kw">pub fn </span>trap_handler() -&gt; ! {
+<a href=#58 id=58 data-nosnippet>58</a>    set_kernel_trap_entry();
+<a href=#59 id=59 data-nosnippet>59</a>    <span class="kw">let </span>cx = current_trap_cx();
+<a href=#60 id=60 data-nosnippet>60</a>    <span class="kw">let </span>scause = scause::read();
+<a href=#61 id=61 data-nosnippet>61</a>    <span class="kw">let </span>stval = stval::read();
+<a href=#62 id=62 data-nosnippet>62</a>    <span class="kw">match </span>scause.cause() {
+<a href=#63 id=63 data-nosnippet>63</a>        Trap::Exception(Exception::UserEnvCall) =&gt; {
+<a href=#64 id=64 data-nosnippet>64</a>            cx.sepc += <span class="number">4</span>;
+<a href=#65 id=65 data-nosnippet>65</a>            cx.x[<span class="number">10</span>] = syscall(cx.x[<span class="number">17</span>], [cx.x[<span class="number">10</span>], cx.x[<span class="number">11</span>], cx.x[<span class="number">12</span>]]) <span class="kw">as </span>usize;
+<a href=#66 id=66 data-nosnippet>66</a>        }
+<a href=#67 id=67 data-nosnippet>67</a>        Trap::Exception(Exception::StoreFault)
+<a href=#68 id=68 data-nosnippet>68</a>        | Trap::Exception(Exception::StorePageFault)
+<a href=#69 id=69 data-nosnippet>69</a>        | Trap::Exception(Exception::LoadFault)
+<a href=#70 id=70 data-nosnippet>70</a>        | Trap::Exception(Exception::LoadPageFault) =&gt; {
+<a href=#71 id=71 data-nosnippet>71</a>            <span class="macro">println!</span>(
+<a href=#72 id=72 data-nosnippet>72</a>                <span class="string">"[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it."</span>,
+<a href=#73 id=73 data-nosnippet>73</a>                stval, cx.sepc
+<a href=#74 id=74 data-nosnippet>74</a>            );
+<a href=#75 id=75 data-nosnippet>75</a>            exit_current_and_run_next();
+<a href=#76 id=76 data-nosnippet>76</a>        }
+<a href=#77 id=77 data-nosnippet>77</a>        Trap::Exception(Exception::IllegalInstruction) =&gt; {
+<a href=#78 id=78 data-nosnippet>78</a>            <span class="macro">println!</span>(<span class="string">"[kernel] IllegalInstruction in application, kernel killed it."</span>);
+<a href=#79 id=79 data-nosnippet>79</a>            exit_current_and_run_next();
+<a href=#80 id=80 data-nosnippet>80</a>        }
+<a href=#81 id=81 data-nosnippet>81</a>        Trap::Interrupt(Interrupt::SupervisorTimer) =&gt; {
+<a href=#82 id=82 data-nosnippet>82</a>            set_next_trigger();
+<a href=#83 id=83 data-nosnippet>83</a>            suspend_current_and_run_next();
+<a href=#84 id=84 data-nosnippet>84</a>        }
+<a href=#85 id=85 data-nosnippet>85</a>        <span class="kw">_ </span>=&gt; {
+<a href=#86 id=86 data-nosnippet>86</a>            <span class="macro">panic!</span>(
+<a href=#87 id=87 data-nosnippet>87</a>                <span class="string">"Unsupported trap {:?}, stval = {:#x}!"</span>,
+<a href=#88 id=88 data-nosnippet>88</a>                scause.cause(),
+<a href=#89 id=89 data-nosnippet>89</a>                stval
+<a href=#90 id=90 data-nosnippet>90</a>            );
+<a href=#91 id=91 data-nosnippet>91</a>        }
+<a href=#92 id=92 data-nosnippet>92</a>    }
+<a href=#93 id=93 data-nosnippet>93</a>    trap_return();
+<a href=#94 id=94 data-nosnippet>94</a>}
+<a href=#95 id=95 data-nosnippet>95</a>
+<a href=#96 id=96 data-nosnippet>96</a><span class="attr">#[<span class="kw">unsafe</span>(no_mangle)]
+<a href=#97 id=97 data-nosnippet>97</a></span><span class="doccomment">/// set the new addr of __restore asm function in TRAMPOLINE page,
+<a href=#98 id=98 data-nosnippet>98</a>/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,
+<a href=#99 id=99 data-nosnippet>99</a>/// finally, jump to new addr of __restore asm function
+<a href=#100 id=100 data-nosnippet>100</a></span><span class="kw">pub fn </span>trap_return() -&gt; ! {
+<a href=#101 id=101 data-nosnippet>101</a>    set_user_trap_entry();
+<a href=#102 id=102 data-nosnippet>102</a>    <span class="kw">let </span>trap_cx_ptr = TRAP_CONTEXT;
+<a href=#103 id=103 data-nosnippet>103</a>    <span class="kw">let </span>user_satp = current_user_token();
+<a href=#104 id=104 data-nosnippet>104</a>    <span class="kw">unsafe extern </span><span class="string">"C" </span>{
+<a href=#105 id=105 data-nosnippet>105</a>        <span class="kw">unsafe fn </span>__alltraps();
+<a href=#106 id=106 data-nosnippet>106</a>        <span class="kw">unsafe fn </span>__restore();
+<a href=#107 id=107 data-nosnippet>107</a>    }
+<a href=#108 id=108 data-nosnippet>108</a>    <span class="kw">let </span>restore_va = __restore <span class="kw">as </span>usize - __alltraps <span class="kw">as </span>usize + TRAMPOLINE;
+<a href=#109 id=109 data-nosnippet>109</a>    <span class="kw">unsafe </span>{
+<a href=#110 id=110 data-nosnippet>110</a>        <span class="macro">asm!</span>(
+<a href=#111 id=111 data-nosnippet>111</a>            <span class="string">"fence.i"</span>,
+<a href=#112 id=112 data-nosnippet>112</a>            <span class="string">"jr {restore_va}"</span>,             <span class="comment">// jump to new addr of __restore asm function
+<a href=#113 id=113 data-nosnippet>113</a>            </span>restore_va = <span class="kw">in</span>(reg) restore_va,
+<a href=#114 id=114 data-nosnippet>114</a>            <span class="kw">in</span>(<span class="string">"a0"</span>) trap_cx_ptr,      <span class="comment">// a0 = virt addr of Trap Context
+<a href=#115 id=115 data-nosnippet>115</a>            </span><span class="kw">in</span>(<span class="string">"a1"</span>) user_satp,        <span class="comment">// a1 = phy addr of usr page table
+<a href=#116 id=116 data-nosnippet>116</a>            </span>options(noreturn)
+<a href=#117 id=117 data-nosnippet>117</a>        );
+<a href=#118 id=118 data-nosnippet>118</a>    }
+<a href=#119 id=119 data-nosnippet>119</a>}
+<a href=#120 id=120 data-nosnippet>120</a>
+<a href=#121 id=121 data-nosnippet>121</a><span class="attr">#[<span class="kw">unsafe</span>(no_mangle)]
+<a href=#122 id=122 data-nosnippet>122</a></span><span class="doccomment">/// Unimplement: traps/interrupts/exceptions from kernel mode
+<a href=#123 id=123 data-nosnippet>123</a>/// Todo: Chapter 9: I/O device
+<a href=#124 id=124 data-nosnippet>124</a></span><span class="kw">pub fn </span>trap_from_kernel() -&gt; ! {
+<a href=#125 id=125 data-nosnippet>125</a>    <span class="macro">panic!</span>(<span class="string">"a trap from kernel!"</span>);
+<a href=#126 id=126 data-nosnippet>126</a>}
+<a href=#127 id=127 data-nosnippet>127</a>
+<a href=#128 id=128 data-nosnippet>128</a><span class="kw">pub use </span>context::TrapContext;</code></pre></div></section></main></body></html>
