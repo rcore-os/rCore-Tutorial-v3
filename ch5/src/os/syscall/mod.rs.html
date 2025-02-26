@@ -1,83 +1,41 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/syscall/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b21aa549bf6d91ff.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (f705de596 2024-04-30)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../os/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
-<a href="#2" id="2">2</a>
-<a href="#3" id="3">3</a>
-<a href="#4" id="4">4</a>
-<a href="#5" id="5">5</a>
-<a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
-<a href="#8" id="8">8</a>
-<a href="#9" id="9">9</a>
-<a href="#10" id="10">10</a>
-<a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a>
-<a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-<a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implementation of syscalls
-//!
-//! The single entry point to all system calls, [`syscall()`], is called
-//! whenever userspace wishes to perform a system call using the `ecall`
-//! instruction. In this case, the processor raises an 'Environment call from
-//! U-mode' exception, which is handled as one of the cases in
-//! [`crate::trap::trap_handler`].
-//!
-//! For clarity, each single syscall is implemented as its own function, named
-//! `sys_` then the name of the syscall. You can find functions like this in
-//! submodules, and you should also implement syscalls this way.
-</span><span class="kw">const </span>SYSCALL_READ: usize = <span class="number">63</span>;
-<span class="kw">const </span>SYSCALL_WRITE: usize = <span class="number">64</span>;
-<span class="kw">const </span>SYSCALL_EXIT: usize = <span class="number">93</span>;
-<span class="kw">const </span>SYSCALL_YIELD: usize = <span class="number">124</span>;
-<span class="kw">const </span>SYSCALL_GET_TIME: usize = <span class="number">169</span>;
-<span class="kw">const </span>SYSCALL_GETPID: usize = <span class="number">172</span>;
-<span class="kw">const </span>SYSCALL_FORK: usize = <span class="number">220</span>;
-<span class="kw">const </span>SYSCALL_EXEC: usize = <span class="number">221</span>;
-<span class="kw">const </span>SYSCALL_WAITPID: usize = <span class="number">260</span>;
-
-<span class="kw">mod </span>fs;
-<span class="kw">mod </span>process;
-
-<span class="kw">use </span>fs::<span class="kw-2">*</span>;
-<span class="kw">use </span>process::<span class="kw-2">*</span>;
-<span class="doccomment">/// handle syscall exception with `syscall_id` and other arguments
-</span><span class="kw">pub fn </span>syscall(syscall_id: usize, args: [usize; <span class="number">3</span>]) -&gt; isize {
-    <span class="kw">match </span>syscall_id {
-        SYSCALL_READ =&gt; sys_read(args[<span class="number">0</span>], args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8, args[<span class="number">2</span>]),
-        SYSCALL_WRITE =&gt; sys_write(args[<span class="number">0</span>], args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8, args[<span class="number">2</span>]),
-        SYSCALL_EXIT =&gt; sys_exit(args[<span class="number">0</span>] <span class="kw">as </span>i32),
-        SYSCALL_YIELD =&gt; sys_yield(),
-        SYSCALL_GET_TIME =&gt; sys_get_time(),
-        SYSCALL_GETPID =&gt; sys_getpid(),
-        SYSCALL_FORK =&gt; sys_fork(),
-        SYSCALL_EXEC =&gt; sys_exec(args[<span class="number">0</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8),
-        SYSCALL_WAITPID =&gt; sys_waitpid(args[<span class="number">0</span>] <span class="kw">as </span>isize, args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*mut </span>i32),
-        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unsupported syscall_id: {}"</span>, syscall_id),
-    }
-}
-</code></pre></div></section></main></body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/syscall/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6c3ea77c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="os" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0-nightly (ce36a966c 2025-02-17)" data-channel="nightly" data-search-js="search-f7327375.js" data-settings-js="settings-6dad6058.js" ><script src="../../../static.files/storage-3a5871a4.js"></script><script defer src="../../../static.files/src-script-b8d3f215.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5332ae0c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">os/syscall/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Implementation of syscalls
+<a href=#2 id=2 data-nosnippet>2</a>//!
+<a href=#3 id=3 data-nosnippet>3</a>//! The single entry point to all system calls, [`syscall()`], is called
+<a href=#4 id=4 data-nosnippet>4</a>//! whenever userspace wishes to perform a system call using the `ecall`
+<a href=#5 id=5 data-nosnippet>5</a>//! instruction. In this case, the processor raises an 'Environment call from
+<a href=#6 id=6 data-nosnippet>6</a>//! U-mode' exception, which is handled as one of the cases in
+<a href=#7 id=7 data-nosnippet>7</a>//! [`crate::trap::trap_handler`].
+<a href=#8 id=8 data-nosnippet>8</a>//!
+<a href=#9 id=9 data-nosnippet>9</a>//! For clarity, each single syscall is implemented as its own function, named
+<a href=#10 id=10 data-nosnippet>10</a>//! `sys_` then the name of the syscall. You can find functions like this in
+<a href=#11 id=11 data-nosnippet>11</a>//! submodules, and you should also implement syscalls this way.
+<a href=#12 id=12 data-nosnippet>12</a></span><span class="kw">const </span>SYSCALL_READ: usize = <span class="number">63</span>;
+<a href=#13 id=13 data-nosnippet>13</a><span class="kw">const </span>SYSCALL_WRITE: usize = <span class="number">64</span>;
+<a href=#14 id=14 data-nosnippet>14</a><span class="kw">const </span>SYSCALL_EXIT: usize = <span class="number">93</span>;
+<a href=#15 id=15 data-nosnippet>15</a><span class="kw">const </span>SYSCALL_YIELD: usize = <span class="number">124</span>;
+<a href=#16 id=16 data-nosnippet>16</a><span class="kw">const </span>SYSCALL_GET_TIME: usize = <span class="number">169</span>;
+<a href=#17 id=17 data-nosnippet>17</a><span class="kw">const </span>SYSCALL_GETPID: usize = <span class="number">172</span>;
+<a href=#18 id=18 data-nosnippet>18</a><span class="kw">const </span>SYSCALL_FORK: usize = <span class="number">220</span>;
+<a href=#19 id=19 data-nosnippet>19</a><span class="kw">const </span>SYSCALL_EXEC: usize = <span class="number">221</span>;
+<a href=#20 id=20 data-nosnippet>20</a><span class="kw">const </span>SYSCALL_WAITPID: usize = <span class="number">260</span>;
+<a href=#21 id=21 data-nosnippet>21</a>
+<a href=#22 id=22 data-nosnippet>22</a><span class="kw">mod </span>fs;
+<a href=#23 id=23 data-nosnippet>23</a><span class="kw">mod </span>process;
+<a href=#24 id=24 data-nosnippet>24</a>
+<a href=#25 id=25 data-nosnippet>25</a><span class="kw">use </span>fs::<span class="kw-2">*</span>;
+<a href=#26 id=26 data-nosnippet>26</a><span class="kw">use </span>process::<span class="kw-2">*</span>;
+<a href=#27 id=27 data-nosnippet>27</a><span class="doccomment">/// handle syscall exception with `syscall_id` and other arguments
+<a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">pub fn </span>syscall(syscall_id: usize, args: [usize; <span class="number">3</span>]) -&gt; isize {
+<a href=#29 id=29 data-nosnippet>29</a>    <span class="kw">match </span>syscall_id {
+<a href=#30 id=30 data-nosnippet>30</a>        SYSCALL_READ =&gt; sys_read(args[<span class="number">0</span>], args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8, args[<span class="number">2</span>]),
+<a href=#31 id=31 data-nosnippet>31</a>        SYSCALL_WRITE =&gt; sys_write(args[<span class="number">0</span>], args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8, args[<span class="number">2</span>]),
+<a href=#32 id=32 data-nosnippet>32</a>        SYSCALL_EXIT =&gt; sys_exit(args[<span class="number">0</span>] <span class="kw">as </span>i32),
+<a href=#33 id=33 data-nosnippet>33</a>        SYSCALL_YIELD =&gt; sys_yield(),
+<a href=#34 id=34 data-nosnippet>34</a>        SYSCALL_GET_TIME =&gt; sys_get_time(),
+<a href=#35 id=35 data-nosnippet>35</a>        SYSCALL_GETPID =&gt; sys_getpid(),
+<a href=#36 id=36 data-nosnippet>36</a>        SYSCALL_FORK =&gt; sys_fork(),
+<a href=#37 id=37 data-nosnippet>37</a>        SYSCALL_EXEC =&gt; sys_exec(args[<span class="number">0</span>] <span class="kw">as </span><span class="kw-2">*const </span>u8),
+<a href=#38 id=38 data-nosnippet>38</a>        SYSCALL_WAITPID =&gt; sys_waitpid(args[<span class="number">0</span>] <span class="kw">as </span>isize, args[<span class="number">1</span>] <span class="kw">as </span><span class="kw-2">*mut </span>i32),
+<a href=#39 id=39 data-nosnippet>39</a>        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unsupported syscall_id: {}"</span>, syscall_id),
+<a href=#40 id=40 data-nosnippet>40</a>    }
+<a href=#41 id=41 data-nosnippet>41</a>}</code></pre></div></section></main></body></html>
