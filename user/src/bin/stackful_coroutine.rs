@@ -10,7 +10,7 @@ extern crate alloc;
 #[macro_use]
 extern crate user_lib;
 
-use core::arch::asm;
+use core::arch::naked_asm;
 
 //#[macro_use]
 use alloc::vec;
@@ -262,7 +262,7 @@ pub fn yield_task() {
 #[no_mangle]
 unsafe extern "C" fn switch(old: *mut TaskContext, new: *const TaskContext) {
     // a0: _old, a1: _new
-    asm!(
+    naked_asm!(
         "
         sd x1, 0x00(a0)
         sd x2, 0x08(a0)
@@ -298,7 +298,6 @@ unsafe extern "C" fn switch(old: *mut TaskContext, new: *const TaskContext) {
 
         jr t0
     ",
-        options(noreturn)
     );
 }
 

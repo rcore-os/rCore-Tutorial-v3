@@ -33,7 +33,7 @@ unsafe fn second() -> ! {
     loop {
         mutex_lock(MUTEX_ID);
         if A == 0 {
-            println!("Second: A is {}", A);
+            println!("Second: A is {}", &raw mut A as usize);
             mutex_unlock(MUTEX_ID);
             semaphore_down(SEM_ID);
         } else {
@@ -41,7 +41,7 @@ unsafe fn second() -> ! {
             break;
         }
     }
-    println!("A is {}, Second can work now", A);
+    println!("A is {}, Second can work now", &raw mut A as usize);
     exit(0)
 }
 

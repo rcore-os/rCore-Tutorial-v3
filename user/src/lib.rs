@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(linkage)]
-#![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
 #[macro_use]
@@ -33,7 +32,7 @@ pub fn handle_alloc_error(layout: core::alloc::Layout) -> ! {
 pub extern "C" fn _start(argc: usize, argv: usize) -> ! {
     unsafe {
         HEAP.lock()
-            .init(HEAP_SPACE.as_ptr() as usize, USER_HEAP_SIZE);
+            .init(&raw mut HEAP_SPACE as usize, USER_HEAP_SIZE);
     }
     let mut v: Vec<&'static str> = Vec::new();
     for i in 0..argc {
