@@ -1,12 +1,40 @@
 use super::{BlockDevice, BLOCK_SZ};
 use alloc::collections::VecDeque;
 use alloc::sync::Arc;
+use alloc::vec;
+use alloc::vec::Vec;
+use core::ptr::{addr_of, addr_of_mut};
+use core::slice;
 use lazy_static::*;
 use spin::Mutex;
+
+/// use `Vec<u64>` to ensure the alignment of addr is `8`
+struct CacheData(Vec<u64>);
+
+impl CacheData {
+    fn new() -> Self {
+        Self(vec![0u64; BLOCK_SZ / 8])
+    }
+}
+
+impl AsRef<[u8]> for CacheData {
+    fn as_ref(&self) -> &[u8] {
+        let ptr = self.0.as_ptr() as *const u8;
+        unsafe { slice::from_raw_parts(ptr, BLOCK_SZ) }
+    }
+}
+
+impl AsMut<[u8]> for CacheData {
+    fn as_mut(&mut self) -> &mut [u8] {
+        let ptr = self.0.as_mut_ptr() as *mut u8;
+        unsafe { slice::from_raw_parts_mut(ptr, BLOCK_SZ) }
+    }
+}
+
 /// Cached block inside memory
 pub struct BlockCache {
     /// cached block data
-    cache: [u8; BLOCK_SZ],
+    cache: CacheData,
     /// underlying block id
     block_id: usize,
     /// underlying block device
@@ -18,8 +46,9 @@ pub struct BlockCache {
 impl BlockCache {
     /// Load a new BlockCache from disk.
     pub fn new(block_id: usize, block_device: Arc<dyn BlockDevice>) -> Self {
-        let mut cache = [0u8; BLOCK_SZ];
-        block_device.read_block(block_id, &mut cache);
+        // for alignment and move effciency
+        let mut cache = CacheData::new();
+        block_device.read_block(block_id, cache.as_mut());
         Self {
             cache,
             block_id,
@@ -28,8 +57,12 @@ impl BlockCache {
         }
     }
     /// Get the address of an offset inside the cached block data
-    fn addr_of_offset(&self, offset: usize) -> usize {
-        &self.cache[offset] as *const _ as usize
+    fn addr_of_offset(&self, offset: usize) -> *const u8 {
+        addr_of!(self.cache.as_ref()[offset])
+    }
+
+    fn addr_of_offset_mut(&mut self, offset: usize) -> *mut u8 {
+        addr_of_mut!(self.cache.as_mut()[offset])
     }
 
     pub fn get_ref<T>(&self, offset: usize) -> &T
@@ -38,8 +71,8 @@ impl BlockCache {
     {
         let type_size = core::mem::size_of::<T>();
         assert!(offset + type_size <= BLOCK_SZ);
-        let addr = self.addr_of_offset(offset);
-        unsafe { &*(addr as *const T) }
+        let addr = self.addr_of_offset(offset) as *const T;
+        unsafe { &*addr }
     }
 
     pub fn get_mut<T>(&mut self, offset: usize) -> &mut T
@@ -49,8 +82,8 @@ impl BlockCache {
         let type_size = core::mem::size_of::<T>();
         assert!(offset + type_size <= BLOCK_SZ);
         self.modified = true;
-        let addr = self.addr_of_offset(offset);
-        unsafe { &mut *(addr as *mut T) }
+        let addr = self.addr_of_offset_mut(offset) as *mut T;
+        unsafe { &mut *addr }
     }
 
     pub fn read<T, V>(&self, offset: usize, f: impl FnOnce(&T) -> V) -> V {
@@ -64,7 +97,8 @@ impl BlockCache {
     pub fn sync(&mut self) {
         if self.modified {
             self.modified = false;
-            self.block_device.write_block(self.block_id, &self.cache);
+            self.block_device
+                .write_block(self.block_id, self.cache.as_ref());
         }
     }
 }
