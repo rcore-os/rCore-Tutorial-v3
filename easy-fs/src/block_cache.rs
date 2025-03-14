@@ -1,20 +1,36 @@
+use core::alloc::Layout;
+use core::mem::ManuallyDrop;
 use core::ptr::{addr_of, addr_of_mut};
 use core::slice;
 
 use super::{BlockDevice, BLOCK_SZ};
+use alloc::boxed::Box;
 use alloc::collections::VecDeque;
 use alloc::sync::Arc;
-use alloc::vec;
-use alloc::vec::Vec;
 use lazy_static::*;
 use spin::Mutex;
 
-/// use `Vec<u64>` to ensure the alignment of addr is `8`
-struct CacheData(Vec<u64>);
+/// Use `ManuallyDrop` to ensure data is deallocated with an alignment of `BLOCK_SZ`
+struct CacheData(ManuallyDrop<Box<[u8; BLOCK_SZ]>>);
 
 impl CacheData {
-    fn new() -> Self {
-        Self(vec![0u64; BLOCK_SZ / 8])
+    pub fn new() -> Self {
+        let data = unsafe {
+            let raw = alloc::alloc::alloc(Self::layout());
+            Box::from_raw(raw as *mut [u8; BLOCK_SZ])
+        };
+        Self(ManuallyDrop::new(data))
+    }
+
+    fn layout() -> Layout {
+        Layout::from_size_align(BLOCK_SZ, BLOCK_SZ).unwrap()
+    }
+}
+
+impl Drop for CacheData {
+    fn drop(&mut self) {
+        let ptr = self.0.as_mut_ptr();
+        unsafe { alloc::alloc::dealloc(ptr, Self::layout()) };
     }
 }
 
