@@ -190,81 +190,34 @@ impl PhysPageNum {
     }
 }
 
-pub trait StepByOne {
-    fn step(&mut self);
-}
-impl StepByOne for VirtPageNum {
-    fn step(&mut self) {
-        self.0 += 1;
+impl core::iter::Step for VirtPageNum {
+    fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
+        (end.0 - start.0, Some(end.0 - start.0))
     }
-}
-impl StepByOne for PhysPageNum {
-    fn step(&mut self) {
-        self.0 += 1;
+
+    fn forward_checked(mut start: Self, count: usize) -> Option<Self> {
+        start.0 = start.0.checked_add(count)?;
+        Some(start)
+    }
+
+    fn backward_checked(mut start: Self, count: usize) -> Option<Self> {
+        start.0 = start.0.checked_sub(count)?;
+        Some(start)
     }
 }
 
-#[derive(Copy, Clone)]
-pub struct SimpleRange<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    l: T,
-    r: T,
-}
-impl<T> SimpleRange<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    pub fn new(start: T, end: T) -> Self {
-        assert!(start <= end, "start {:?} > end {:?}!", start, end);
-        Self { l: start, r: end }
+impl core::iter::Step for PhysPageNum {
+    fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
+        (end.0 - start.0, Some(end.0 - start.0))
     }
-    pub fn get_start(&self) -> T {
-        self.l
+
+    fn forward_checked(mut start: Self, count: usize) -> Option<Self> {
+        start.0 = start.0.checked_add(count)?;
+        Some(start)
     }
-    pub fn get_end(&self) -> T {
-        self.r
+
+    fn backward_checked(mut start: Self, count: usize) -> Option<Self> {
+        start.0 = start.0.checked_sub(count)?;
+        Some(start)
     }
 }
-impl<T> IntoIterator for SimpleRange<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    type Item = T;
-    type IntoIter = SimpleRangeIterator<T>;
-    fn into_iter(self) -> Self::IntoIter {
-        SimpleRangeIterator::new(self.l, self.r)
-    }
-}
-pub struct SimpleRangeIterator<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    current: T,
-    end: T,
-}
-impl<T> SimpleRangeIterator<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    pub fn new(l: T, r: T) -> Self {
-        Self { current: l, end: r }
-    }
-}
-impl<T> Iterator for SimpleRangeIterator<T>
-where
-    T: StepByOne + Copy + PartialEq + PartialOrd + Debug,
-{
-    type Item = T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.current == self.end {
-            None
-        } else {
-            let t = self.current;
-            self.current.step();
-            Some(t)
-        }
-    }
-}
-pub type VPNRange = SimpleRange<VirtPageNum>;

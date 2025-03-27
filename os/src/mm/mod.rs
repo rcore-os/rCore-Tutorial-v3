@@ -4,8 +4,7 @@ mod heap_allocator;
 mod memory_set;
 mod page_table;
 
-pub use address::VPNRange;
-pub use address::{PhysAddr, PhysPageNum, StepByOne, VirtAddr, VirtPageNum};
+pub use address::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
 pub use frame_allocator::{frame_alloc, frame_alloc_more, frame_dealloc, FrameTracker};
 pub use memory_set::{kernel_token, MapArea, MapPermission, MapType, MemorySet, KERNEL_SPACE};
 use page_table::PTEFlags;
