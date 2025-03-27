@@ -317,14 +317,22 @@ impl MapArea {
     /// assume that all frames were cleared before
     pub fn copy_data(&mut self, page_table: &PageTable, data: &[u8]) {
         assert_eq!(self.map_type, MapType::Framed);
-        for (vpn, src) in self
-            .vpn_range
-            .clone()
-            .into_iter()
-            .zip(data.chunks(PAGE_SIZE))
-        {
-            let dst = &mut page_table.translate(vpn).unwrap().ppn().get_bytes_array()[..src.len()];
+        let mut start: usize = 0;
+        let mut current_vpn = self.vpn_range.start;
+        let len = data.len();
+        loop {
+            let src = &data[start..len.min(start + PAGE_SIZE)];
+            let dst = &mut page_table
+                .translate(current_vpn)
+                .unwrap()
+                .ppn()
+                .get_bytes_array()[..src.len()];
             dst.copy_from_slice(src);
+            start += PAGE_SIZE;
+            if start >= len {
+                break;
+            }
+            current_vpn = core::iter::Step::forward(current_vpn, 1);
         }
     }
 }
