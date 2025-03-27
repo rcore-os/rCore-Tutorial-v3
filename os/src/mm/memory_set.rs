@@ -1,7 +1,6 @@
 use super::{frame_alloc, FrameTracker};
 use super::{PTEFlags, PageTable, PageTableEntry};
 use super::{PhysAddr, PhysPageNum, VirtAddr, VirtPageNum};
-use super::{StepByOne, VPNRange};
 use crate::config::{MEMORY_END, MMIO, PAGE_SIZE, TRAMPOLINE};
 use crate::sync::UPIntrFreeCell;
 use alloc::collections::BTreeMap;
@@ -65,7 +64,7 @@ impl MemorySet {
             .areas
             .iter_mut()
             .enumerate()
-            .find(|(_, area)| area.vpn_range.get_start() == start_vpn)
+            .find(|(_, area)| area.vpn_range.start == start_vpn)
         {
             area.unmap(&mut self.page_table);
             self.areas.remove(idx);
@@ -196,7 +195,7 @@ impl MemorySet {
                     map_perm |= MapPermission::X;
                 }
                 let map_area = MapArea::new(start_va, end_va, MapType::Framed, map_perm);
-                max_end_vpn = map_area.vpn_range.get_end();
+                max_end_vpn = map_area.vpn_range.end;
                 memory_set.push(
                     map_area,
                     Some(&elf.input[ph.offset() as usize..(ph.offset() + ph.file_size()) as usize]),
@@ -248,7 +247,7 @@ impl MemorySet {
 }
 
 pub struct MapArea {
-    vpn_range: VPNRange,
+    vpn_range: core::range::Range<VirtPageNum>,
     data_frames: BTreeMap<VirtPageNum, FrameTracker>,
     map_type: MapType,
     map_perm: MapPermission,
@@ -264,7 +263,7 @@ impl MapArea {
         let start_vpn: VirtPageNum = start_va.floor();
         let end_vpn: VirtPageNum = end_va.ceil();
         Self {
-            vpn_range: VPNRange::new(start_vpn, end_vpn),
+            vpn_range: (start_vpn..end_vpn).into(),
             data_frames: BTreeMap::new(),
             map_type,
             map_perm,
@@ -272,7 +271,7 @@ impl MapArea {
     }
     pub fn from_another(another: &MapArea) -> Self {
         Self {
-            vpn_range: VPNRange::new(another.vpn_range.get_start(), another.vpn_range.get_end()),
+            vpn_range: another.vpn_range,
             data_frames: BTreeMap::new(),
             map_type: another.map_type,
             map_perm: another.map_perm,
@@ -319,7 +318,7 @@ impl MapArea {
     pub fn copy_data(&mut self, page_table: &PageTable, data: &[u8]) {
         assert_eq!(self.map_type, MapType::Framed);
         let mut start: usize = 0;
-        let mut current_vpn = self.vpn_range.get_start();
+        let mut current_vpn = self.vpn_range.start;
         let len = data.len();
         loop {
             let src = &data[start..len.min(start + PAGE_SIZE)];
@@ -333,7 +332,7 @@ impl MapArea {
             if start >= len {
                 break;
             }
-            current_vpn.step();
+            current_vpn = core::iter::Step::forward(current_vpn, 1);
         }
     }
 }

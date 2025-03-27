@@ -1,6 +1,6 @@
 use crate::mm::{
     frame_alloc_more, frame_dealloc, kernel_token, FrameTracker, PageTable, PhysAddr, PhysPageNum,
-    StepByOne, VirtAddr,
+    VirtAddr,
 };
 use crate::sync::UPIntrFreeCell;
 use alloc::vec::Vec;
@@ -30,7 +30,7 @@ impl Hal for VirtioHal {
         let mut ppn_base: PhysPageNum = pa.into();
         for _ in 0..pages {
             frame_dealloc(ppn_base);
-            ppn_base.step();
+            ppn_base = core::iter::Step::forward(ppn_base, 1);
         }
         0
     }

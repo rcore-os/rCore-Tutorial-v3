@@ -1,5 +1,7 @@
 #![no_std]
 #![no_main]
+#![feature(step_trait)]
+#![feature(new_range_api)]
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
 
