@@ -238,6 +238,9 @@ impl MemorySet {
     pub fn translate(&self, vpn: VirtPageNum) -> Option<PageTableEntry> {
         self.page_table.translate(vpn)
     }
+    pub fn translate_va(&self, va: VirtAddr) -> Option<PhysAddr> {
+        self.page_table.translate_va(va)
+    }
     pub fn recycle_data_pages(&mut self) {
         //*self = Self::new_bare();
         self.areas.clear();

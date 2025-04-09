@@ -1,6 +1,7 @@
-use crate::sync::{Condvar, Mutex, MutexBlocking, MutexSpin, Semaphore};
-use crate::task::{block_current_and_run_next, current_process, current_task};
+use crate::sync::{Condvar, Mutex, Futex, MutexSpin, Semaphore};
+use crate::task::{block_current_and_run_next, current_process, current_task, wakeup_task, block_task, take_current_task};
 use crate::timer::{add_timer, get_time_ms};
+use crate::sync::{FUTEX_WAIT, FUTEX_WAKE};
 use alloc::sync::Arc;
 
 pub fn sys_sleep(ms: usize) -> isize {
@@ -16,7 +17,7 @@ pub fn sys_mutex_create(blocking: bool) -> isize {
     let mutex: Option<Arc<dyn Mutex>> = if !blocking {
         Some(Arc::new(MutexSpin::new()))
     } else {
-        Some(Arc::new(MutexBlocking::new()))
+        Some(Arc::new(Futex::new()))
     };
     let mut process_inner = process.inner_exclusive_access();
     if let Some(id) = process_inner
@@ -130,5 +131,41 @@ pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
     let mutex = Arc::clone(process_inner.mutex_list[mutex_id].as_ref().unwrap());
     drop(process_inner);
     condvar.wait(mutex);
+    0
+}
+
+/// 封装在 Futex 方法中，不应直接调用
+pub fn sys_futex(uaddr: *const i32, futex_op: usize, val: usize) -> isize{
+    let process = current_process();
+    let process_inner = process.inner_exclusive_access();
+    let futex_q = process_inner.futex_queues.get(&(uaddr as usize)).unwrap();
+    let phys_addr = process_inner
+        .memory_set
+        .translate_va((uaddr as usize).into())
+        .unwrap()
+        .0 as *const i32;
+    match futex_op {
+        FUTEX_WAIT => {
+            futex_q.guard.lock();
+            if unsafe { *phys_addr == (val as i32)} {
+                // *addr等于预期值，标记 task 为阻塞，加入 futex 等待队列
+                let task = take_current_task().unwrap();
+                block_task(task.clone());
+                futex_q.push_back(task);
+                futex_q.guard.unlock();
+
+            } else {
+                futex_q.guard.unlock();
+                return 0;
+            }
+        },
+        FUTEX_WAKE => {
+            futex_q.guard.lock();
+            let task = futex_q.pop_front();  
+            wakeup_task(task);
+            futex_q.guard.unlock();
+        },
+        _ => panic!("Unsupported futex_op: {}", futex_op)
+    };
     0
 }
