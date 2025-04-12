@@ -16,7 +16,7 @@ impl MutexSpin {
         }
     }
 
-    fn lock(&self) {
+    pub fn lock(&self) {
         let addr = self.locked.get() as *const u32;
         loop {
             while load_reserved(addr) == 1 {}
@@ -24,7 +24,7 @@ impl MutexSpin {
         }
     }
 
-    fn unlock(&self) {
+    pub fn unlock(&self) {
         let addr = self.locked.get();
         unsafe { *addr = 0; }
     }
@@ -44,7 +44,7 @@ impl Futex {
         }
     }
 
-    fn lock(&self) {
+    pub fn lock(&self) {
         let addr = self.flag.get();
         if atomic_test_and_set(addr as *mut u32, 31) == 0 {
             // fastpath
@@ -64,7 +64,7 @@ impl Futex {
         }
     }
 
-    fn unlock(&self) {
+    pub fn unlock(&self) {
         let addr = self.flag.get();
         if atomic_add_and_compare(addr as *mut u32, 0x80000000, 0) {
             // no threads are waiting

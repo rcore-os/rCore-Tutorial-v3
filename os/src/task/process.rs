@@ -5,7 +5,7 @@ use super::{add_task, SignalFlags};
 use super::{pid_alloc, PidHandle};
 use crate::fs::{File, Stdin, Stdout};
 use crate::mm::{translated_refmut, MemorySet, KERNEL_SPACE};
-use crate::sync::{Condvar, Mutex, Semaphore, UPSafeCell, FutexQ};
+use crate::sync::{Semaphore, UPSafeCell, FutexQ};
 use crate::trap::{trap_handler, TrapContext};
 use alloc::string::String;
 use alloc::sync::{Arc, Weak};
@@ -33,7 +33,6 @@ pub struct ProcessControlBlockInner {
     pub task_res_allocator: RecycleAllocator,
     pub futex_queues: BTreeMap<usize, FutexQ>,
     pub semaphore_list: Vec<Option<Arc<Semaphore>>>,
-    pub condvar_list: Vec<Option<Arc<Condvar>>>,
 }
 
 impl ProcessControlBlockInner {
@@ -100,7 +99,6 @@ impl ProcessControlBlock {
                     task_res_allocator: RecycleAllocator::new(),
                     futex_queues: BTreeMap::new(),
                     semaphore_list: Vec::new(),
-                    condvar_list: Vec::new(),
                 })
             },
         });
@@ -219,7 +217,6 @@ impl ProcessControlBlock {
                     task_res_allocator: RecycleAllocator::new(),
                     futex_queues: BTreeMap::new(),
                     semaphore_list: Vec::new(),
-                    condvar_list: Vec::new(),
                 })
             },
         });
