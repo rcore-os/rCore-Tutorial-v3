@@ -123,8 +123,9 @@ pub fn sys_futex(uaddr: *const i32, futex_op: usize, val: usize) -> isize{
         },
         FUTEX_WAKE => {
             futex_q.guard.lock();
-            let task = futex_q.pop_front();  
-            wakeup_task(task);
+            if let Some(task) = futex_q.pop_front() {
+                wakeup_task(task);
+            } 
             futex_q.guard.unlock();
         },
         _ => panic!("Unsupported futex_op: {}", futex_op)

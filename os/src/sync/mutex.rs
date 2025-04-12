@@ -60,7 +60,7 @@ impl FutexQ {
     } 
 
     /// 外部调用必须确保已拿到 FutexQ 的自旋锁
-    pub fn pop_front(&self) -> Arc<TaskControlBlock> {
-        unsafe { &mut *self.queue.get() }.pop_front().unwrap()
+    pub fn pop_front(&self) -> Option<Arc<TaskControlBlock>> {
+        unsafe { &mut *self.queue.get() }.pop_front()
     }
 }
