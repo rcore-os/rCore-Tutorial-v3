@@ -1,5 +1,6 @@
 use crate::sync::{Condvar, Mutex, Semaphore};
-use crate::task::{block_current_and_run_next, current_process, current_task, wakeup_task, block_task, take_current_task};
+use crate::task::{TaskStatus, TaskContext};
+use crate::task::{block_current_and_run_next, current_process, current_task, schedule, take_current_task, wakeup_task};
 use crate::timer::{add_timer, get_time_ms};
 use crate::sync::{FUTEX_WAIT, FUTEX_WAKE};
 use alloc::sync::Arc;
@@ -107,10 +108,14 @@ pub fn sys_futex(uaddr: *const i32, futex_op: usize, val: usize) -> isize{
             if unsafe { *phys_addr == (val as i32)} {
                 // *addr等于预期值，标记 task 为阻塞，加入 futex 等待队列
                 let task = take_current_task().unwrap();
-                block_task(task.clone());
+                let mut task_inner = task.inner_exclusive_access();    
+                task_inner.task_status = TaskStatus::Blocked;
+                let task_cx_ptr = &mut task_inner.task_cx as *mut TaskContext;
+                drop(task_inner);
                 futex_q.push_back(task);
                 futex_q.guard.unlock();
-
+                // switch to other task
+                schedule(task_cx_ptr);
             } else {
                 futex_q.guard.unlock();
                 return 0;

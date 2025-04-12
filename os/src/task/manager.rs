@@ -44,12 +44,6 @@ pub fn add_task(task: Arc<TaskControlBlock>) {
     TASK_MANAGER.exclusive_access().add(task);
 }
 
-pub fn block_task(task: Arc<TaskControlBlock>) {
-    let mut task_inner = task.inner_exclusive_access();    
-    task_inner.task_status = TaskStatus::Blocked;
-    drop(task_inner);
-}
-
 pub fn wakeup_task(task: Arc<TaskControlBlock>) {
     let mut task_inner = task.inner_exclusive_access();
     task_inner.task_status = TaskStatus::Ready;
