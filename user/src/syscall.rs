@@ -14,19 +14,21 @@ const SYSCALL_GET_TIME: usize = 169;
 const SYSCALL_GETPID: usize = 172;
 const SYSCALL_FORK: usize = 220;
 const SYSCALL_EXEC: usize = 221;
+const SYSCALL_FUTEX: usize = 240;
 const SYSCALL_WAITPID: usize = 260;
 const SYSCALL_THREAD_CREATE: usize = 1000;
 const SYSCALL_GETTID: usize = 1001;
 const SYSCALL_WAITTID: usize = 1002;
-const SYSCALL_MUTEX_CREATE: usize = 1010;
-const SYSCALL_MUTEX_LOCK: usize = 1011;
-const SYSCALL_MUTEX_UNLOCK: usize = 1012;
 const SYSCALL_SEMAPHORE_CREATE: usize = 1020;
 const SYSCALL_SEMAPHORE_UP: usize = 1021;
 const SYSCALL_SEMAPHORE_DOWN: usize = 1022;
 const SYSCALL_CONDVAR_CREATE: usize = 1030;
 const SYSCALL_CONDVAR_SIGNAL: usize = 1031;
 const SYSCALL_CONDVAR_WAIT: usize = 1032;
+
+pub const FUTEX_WAIT: usize = 0;
+pub const FUTEX_WAKE: usize = 1;
+
 
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let mut ret: isize;
@@ -121,16 +123,12 @@ pub fn sys_waittid(tid: usize) -> isize {
     syscall(SYSCALL_WAITTID, [tid, 0, 0])
 }
 
-pub fn sys_mutex_create(blocking: bool) -> isize {
-    syscall(SYSCALL_MUTEX_CREATE, [blocking as usize, 0, 0])
+pub fn sys_futex_wait(flag_addr: *mut i32, expect: i32) -> isize {
+    syscall(SYSCALL_FUTEX, [flag_addr as usize, FUTEX_WAIT, expect as usize])
 }
 
-pub fn sys_mutex_lock(id: usize) -> isize {
-    syscall(SYSCALL_MUTEX_LOCK, [id, 0, 0])
-}
-
-pub fn sys_mutex_unlock(id: usize) -> isize {
-    syscall(SYSCALL_MUTEX_UNLOCK, [id, 0, 0])
+pub fn sys_futex_wake(flag_addr: *mut i32) -> isize {
+    syscall(SYSCALL_FUTEX, [flag_addr as usize, FUTEX_WAKE, 0])
 }
 
 pub fn sys_semaphore_create(res_count: usize) -> isize {

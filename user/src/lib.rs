@@ -6,6 +6,7 @@
 pub mod console;
 mod lang_items;
 mod syscall;
+mod sync;
 
 extern crate alloc;
 #[macro_use]
@@ -166,18 +167,14 @@ pub fn waittid(tid: usize) -> isize {
     }
 }
 
-pub fn mutex_create() -> isize {
-    sys_mutex_create(false)
+pub fn futex_wait(flag_addr: *mut i32, expect: i32) -> isize {
+    sys_futex_wait(flag_addr, expect)
 }
-pub fn mutex_blocking_create() -> isize {
-    sys_mutex_create(true)
+
+pub fn futex_wake(flag_addr: *mut i32) -> isize {
+    sys_futex_wake(flag_addr)
 }
-pub fn mutex_lock(mutex_id: usize) {
-    sys_mutex_lock(mutex_id);
-}
-pub fn mutex_unlock(mutex_id: usize) {
-    sys_mutex_unlock(mutex_id);
-}
+
 pub fn semaphore_create(res_count: usize) -> isize {
     sys_semaphore_create(res_count)
 }

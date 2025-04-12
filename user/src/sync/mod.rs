@@ -1,13 +1,6 @@
-mod condvar;
 mod mutex;
-mod semaphore;
-mod up;
 
-pub use condvar::Condvar;
-pub use mutex::{FUTEX_WAIT, FUTEX_WAKE};
-pub use mutex::{Mutex, MutexSpin, FutexQ};
-pub use semaphore::Semaphore;
-pub use up::UPSafeCell;
+pub use mutex::*;
 
 #[inline(always)]
 pub fn load_reserved(addr: *const u32) -> u32 {

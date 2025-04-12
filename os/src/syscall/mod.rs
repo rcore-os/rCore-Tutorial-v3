@@ -17,9 +17,6 @@ pub const SYSCALL_WAITPID: usize = 260;
 pub const SYSCALL_THREAD_CREATE: usize = 1000;
 pub const SYSCALL_GETTID: usize = 1001;
 pub const SYSCALL_WAITTID: usize = 1002;
-pub const SYSCALL_MUTEX_CREATE: usize = 1010;
-pub const SYSCALL_MUTEX_LOCK: usize = 1011;
-pub const SYSCALL_MUTEX_UNLOCK: usize = 1012;
 pub const SYSCALL_SEMAPHORE_CREATE: usize = 1020;
 pub const SYSCALL_SEMAPHORE_UP: usize = 1021;
 pub const SYSCALL_SEMAPHORE_DOWN: usize = 1022;
@@ -36,20 +33,6 @@ use fs::*;
 use process::*;
 use sync::*;
 use thread::*;
-
-pub fn syscall(id: usize, args: [usize; 3]) -> isize {
-    let mut ret: isize;
-    unsafe {
-        core::arch::asm!(
-            "ecall",
-            inlateout("x10") args[0] => ret,
-            in("x11") args[1],
-            in("x12") args[2],
-            in("x17") id
-        );
-    }
-    ret
-}
 
 pub fn syscall_handler(syscall_id: usize, args: [usize; 3]) -> isize {
     match syscall_id {
@@ -72,9 +55,6 @@ pub fn syscall_handler(syscall_id: usize, args: [usize; 3]) -> isize {
         SYSCALL_THREAD_CREATE => sys_thread_create(args[0], args[1]),
         SYSCALL_GETTID => sys_gettid(),
         SYSCALL_WAITTID => sys_waittid(args[0]) as isize,
-        SYSCALL_MUTEX_CREATE => sys_mutex_create(args[0] == 1),
-        SYSCALL_MUTEX_LOCK => sys_mutex_lock(args[0]),
-        SYSCALL_MUTEX_UNLOCK => sys_mutex_unlock(args[0]),
         SYSCALL_SEMAPHORE_CREATE => sys_semaphore_create(args[0]),
         SYSCALL_SEMAPHORE_UP => sys_semaphore_up(args[0]),
         SYSCALL_SEMAPHORE_DOWN => sys_semaphore_down(args[0]),
