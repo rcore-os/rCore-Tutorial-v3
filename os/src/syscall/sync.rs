@@ -1,4 +1,4 @@
-use crate::sync::{Condvar, Mutex, Semaphore};
+use crate::sync::{Condvar, Mutex, Semaphore, FutexQ};
 use crate::task::{TaskStatus, TaskContext};
 use crate::task::{block_current_and_run_next, current_process, current_task, schedule, take_current_task, wakeup_task};
 use crate::timer::{add_timer, get_time_ms};
@@ -95,13 +95,16 @@ pub fn sys_condvar_wait(condvar_id: usize, mutex_id: usize) -> isize {
 /// 封装在 Futex 方法中，不应直接调用
 pub fn sys_futex(uaddr: *const i32, futex_op: usize, val: usize) -> isize{
     let process = current_process();
-    let process_inner = process.inner_exclusive_access();
-    let futex_q = process_inner.futex_queues.get(&(uaddr as usize)).unwrap();
+    let mut process_inner = process.inner_exclusive_access();
     let phys_addr = process_inner
         .memory_set
         .translate_va((uaddr as usize).into())
         .unwrap()
         .0 as *const i32;
+    // 如果 Futex 第一次调用 sys_futex，则插入新的队列
+    let futex_q = process_inner.futex_queues
+        .entry(uaddr as usize)
+        .or_insert(FutexQ::new());
     match futex_op {
         FUTEX_WAIT => {
             futex_q.guard.lock();
@@ -115,6 +118,7 @@ pub fn sys_futex(uaddr: *const i32, futex_op: usize, val: usize) -> isize{
                 futex_q.push_back(task);
                 futex_q.guard.unlock();
                 // switch to other task
+                drop(process_inner);
                 schedule(task_cx_ptr);
             } else {
                 futex_q.guard.unlock();
