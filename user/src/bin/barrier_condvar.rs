@@ -9,28 +9,28 @@ use alloc::vec::Vec;
 use core::cell::UnsafeCell;
 use lazy_static::*;
 use user_lib::{
-    condvar_create, condvar_signal, condvar_wait, exit, mutex_create, mutex_lock, mutex_unlock,
+    exit, MutexSpin, Condvar,
     thread_create, waittid,
 };
 
 const THREAD_NUM: usize = 3;
 
 struct Barrier {
-    mutex_id: usize,
-    condvar_id: usize,
+    mutex: MutexSpin,
+    condvar: Condvar,
     count: UnsafeCell<usize>,
 }
 
 impl Barrier {
     pub fn new() -> Self {
         Self {
-            mutex_id: mutex_create() as usize,
-            condvar_id: condvar_create() as usize,
+            mutex: MutexSpin::new(),
+            condvar: Condvar::new(),
             count: UnsafeCell::new(0),
         }
     }
     pub fn block(&self) {
-        mutex_lock(self.mutex_id);
+        self.mutex.lock();
         let count = self.count.get();
         // SAFETY: Here, the accesses of the count is in the
         // critical section protected by the mutex.
@@ -38,12 +38,12 @@ impl Barrier {
             *count = *count + 1;
         }
         if unsafe { *count } == THREAD_NUM {
-            condvar_signal(self.condvar_id);
+            self.condvar.notify_one();
         } else {
-            condvar_wait(self.condvar_id, self.mutex_id);
-            condvar_signal(self.condvar_id);
+            self.condvar.wait(&self.mutex);
+            self.condvar.notify_one();
         }
-        mutex_unlock(self.mutex_id);
+        self.mutex.unlock();
     }
 }
 

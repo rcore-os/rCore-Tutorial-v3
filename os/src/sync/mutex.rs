@@ -30,7 +30,7 @@ impl Mutex for MutexSpin {
         let addr = self.locked.get() as *const u32;
         loop {
             while load_reserved(addr) == 1 {}
-            if store_conditional(addr, 0) { break; }
+            if store_conditional(addr, 1) { return; }
         }
     }
 

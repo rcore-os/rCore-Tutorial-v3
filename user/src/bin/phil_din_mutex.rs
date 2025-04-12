@@ -8,13 +8,17 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use user_lib::{exit, get_time, sleep};
-use user_lib::{mutex_blocking_create, mutex_lock, mutex_unlock};
+use user_lib::MutexSpin;
 use user_lib::{thread_create, waittid};
+use lazy_static::lazy_static;
 
 const N: usize = 5;
 const ROUND: usize = 4;
 // A round: think -> wait for forks -> eat
 const GRAPH_SCALE: usize = 100;
+lazy_static! {
+    static ref mutex: [MutexSpin; N] = [MutexSpin::new(), MutexSpin::new(), MutexSpin::new(), MutexSpin::new(), MutexSpin::new()];
+}
 
 fn get_time_u() -> usize {
     get_time() as usize
@@ -47,8 +51,8 @@ fn philosopher_dining_problem(id: *const usize) {
             THINK[id][2 * round + 1] = get_time_u();
         }
         // wait for forks
-        mutex_lock(min);
-        mutex_lock(max);
+        mutex[min].lock();
+        mutex[max].lock();
         // eating
         unsafe {
             EAT[id][2 * round] = get_time_u();
@@ -57,8 +61,8 @@ fn philosopher_dining_problem(id: *const usize) {
         unsafe {
             EAT[id][2 * round + 1] = get_time_u();
         }
-        mutex_unlock(max);
-        mutex_unlock(min);
+        mutex[max].unlock();
+        mutex[min].unlock();
     }
     exit(0)
 }
@@ -69,7 +73,6 @@ pub fn main() -> i32 {
     let ids: Vec<_> = (0..N).collect();
     let start = get_time_u();
     for i in 0..N {
-        assert_eq!(mutex_blocking_create(), i as isize);
         v.push(thread_create(
             philosopher_dining_problem as usize,
             &ids.as_slice()[i] as *const _ as usize,

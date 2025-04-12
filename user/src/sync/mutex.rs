@@ -1,6 +1,6 @@
 use super::*;
 use core::cell::UnsafeCell;
-use crate::syscall::{self, sys_futex_wait, sys_futex_wake};
+use crate::syscall::{sys_futex_wait, sys_futex_wake};
 
 pub struct MutexSpin {
     locked: UnsafeCell<u32>,
@@ -20,7 +20,7 @@ impl MutexSpin {
         let addr = self.locked.get() as *const u32;
         loop {
             while load_reserved(addr) == 1 {}
-            if store_conditional(addr, 0) { break; }
+            if store_conditional(addr, 1) { return; }
         }
     }
 

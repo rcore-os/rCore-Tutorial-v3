@@ -3,7 +3,7 @@ mod semaphore;
 mod up;
 
 pub use mutex::{FUTEX_WAIT, FUTEX_WAKE};
-pub use mutex::{Mutex, MutexSpin, FutexQ};
+pub use mutex::{Mutex, FutexQ};
 pub use semaphore::Semaphore;
 pub use up::UPSafeCell;
 
@@ -22,6 +22,7 @@ pub fn load_reserved(addr: *const u32) -> u32 {
 
 /// return true if successfully modify `addr` in memory
 #[inline(always)]
+#[allow(unused)]
 pub fn store_conditional(addr: *const u32, val: u32) -> bool {
     let res: u32;
     unsafe {
@@ -36,6 +37,7 @@ pub fn store_conditional(addr: *const u32, val: u32) -> bool {
 }
 
 #[inline(always)]
+#[allow(unused)]
 pub fn atomic_increment(addr: *mut u32) {
     loop {
         let val = load_reserved(addr);
@@ -44,6 +46,7 @@ pub fn atomic_increment(addr: *mut u32) {
 }
 
 #[inline(always)]
+#[allow(unused)]
 pub fn atomic_decrement(addr: *mut u32) {
     loop {
         let val = load_reserved(addr);
@@ -52,6 +55,7 @@ pub fn atomic_decrement(addr: *mut u32) {
 }
 
 #[inline(always)]
+#[allow(unused)]
 pub fn atomic_test_and_set(addr: *mut u32, bit: u32) -> u32 {
     loop {
         let val = load_reserved(addr);
@@ -62,6 +66,7 @@ pub fn atomic_test_and_set(addr: *mut u32, bit: u32) -> u32 {
 /// 原子地使 `(addr)` 自加 `addend`，并比较结果与 `expected` 是否相等。
 /// 相等则返回 `true`
 #[inline(always)]
+#[allow(unused)]
 pub fn atomic_add_and_compare(addr: *mut u32, addend: u32, expected: u32) -> bool {
     loop {
         let val = load_reserved(addr);

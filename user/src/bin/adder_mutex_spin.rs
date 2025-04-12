@@ -8,12 +8,16 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::ptr::addr_of_mut;
 use user_lib::{exit, get_time, thread_create, waittid};
-use user_lib::{mutex_create, mutex_lock, mutex_unlock};
+use user_lib::MutexSpin;
+use lazy_static::lazy_static;
 
 static mut A: usize = 0;
 const PER_THREAD_DEFAULT: usize = 10000;
 const THREAD_COUNT_DEFAULT: usize = 16;
 static mut PER_THREAD: usize = 0;
+lazy_static! {
+    static ref spinlock: MutexSpin = MutexSpin::new();
+}
 
 unsafe fn critical_section(t: &mut usize) {
     let a = addr_of_mut!(A);
@@ -27,9 +31,9 @@ unsafe fn critical_section(t: &mut usize) {
 unsafe fn f() -> ! {
     let mut t = 2usize;
     for _ in 0..PER_THREAD {
-        mutex_lock(0);
+        spinlock.lock();
         critical_section(&mut t);
-        mutex_unlock(0);
+        spinlock.unlock();
     }
     exit(t as i32)
 }
@@ -49,7 +53,6 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
     }
 
     let start = get_time();
-    assert_eq!(mutex_create(), 0);
     let mut v = Vec::new();
     for _ in 0..thread_count {
         v.push(thread_create(f as usize, 0) as usize);

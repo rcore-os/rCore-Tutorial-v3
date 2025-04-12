@@ -2,6 +2,7 @@ mod mutex;
 mod condvar;
 
 pub use mutex::*;
+pub use condvar::*;
 
 #[inline(always)]
 pub fn load_reserved(addr: *const u32) -> u32 {

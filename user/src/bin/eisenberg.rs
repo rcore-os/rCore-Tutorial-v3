@@ -7,9 +7,7 @@ extern crate alloc;
 extern crate core;
 
 use alloc::vec::Vec;
-use core::{
-    sync::atomic::{AtomicUsize, Ordering},
-};
+use core::sync::atomic::{AtomicUsize, Ordering};
 use user_lib::{exit, sleep, thread_create, waittid};
 
 const N: usize = 2;

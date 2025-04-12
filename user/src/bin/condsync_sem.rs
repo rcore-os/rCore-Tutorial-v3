@@ -9,35 +9,38 @@ extern crate alloc;
 use alloc::vec;
 use user_lib::exit;
 use user_lib::{
-    mutex_blocking_create, mutex_lock, mutex_unlock, semaphore_create, semaphore_down, semaphore_up,
+    MutexSpin, Condvar, semaphore_create, semaphore_down, semaphore_up,
 };
 use user_lib::{sleep, thread_create, waittid};
+use lazy_static::lazy_static;
 
 static mut A: usize = 0;
-
 const SEM_ID: usize = 0;
-const MUTEX_ID: usize = 0;
+lazy_static! {
+    static ref mutex: MutexSpin = MutexSpin::new();
+    static ref condvar: Condvar = Condvar::new();
+}
 
 unsafe fn first() -> ! {
     sleep(10);
     println!("First work, Change A --> 1 and wakeup Second");
-    mutex_lock(MUTEX_ID);
+    mutex.lock();
     A = 1;
     semaphore_up(SEM_ID);
-    mutex_unlock(MUTEX_ID);
+    mutex.unlock();
     exit(0)
 }
 
 unsafe fn second() -> ! {
     println!("Second want to continue,but need to wait A=1");
     loop {
-        mutex_lock(MUTEX_ID);
+        mutex.lock();
         if A == 0 {
             println!("Second: A is {}", &raw mut A as usize);
-            mutex_unlock(MUTEX_ID);
+            mutex.unlock();
             semaphore_down(SEM_ID);
         } else {
-            mutex_unlock(MUTEX_ID);
+            mutex.unlock();
             break;
         }
     }
@@ -49,7 +52,6 @@ unsafe fn second() -> ! {
 pub fn main() -> i32 {
     // create semaphore & mutex
     assert_eq!(semaphore_create(0) as usize, SEM_ID);
-    assert_eq!(mutex_blocking_create() as usize, MUTEX_ID);
     // create threads
     let threads = vec![
         thread_create(first as usize, 0),
