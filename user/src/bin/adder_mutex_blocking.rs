@@ -16,13 +16,13 @@ const PER_THREAD_DEFAULT: usize = 10000;
 const THREAD_COUNT_DEFAULT: usize = 16;
 static mut PER_THREAD: usize = 0;
 lazy_static! {
-    static ref futex: Futex = Futex::new();
+    static ref mutex: Futex = Futex::new();
 }
 
 unsafe fn critical_section(t: &mut usize) {
     let a = addr_of_mut!(A);
     let cur = a.read_volatile();
-    for _ in 0..500 {
+    for _ in 0..5 {
         *t = (*t) * (*t) % 10007;
     }
     a.write_volatile(cur + 1);
@@ -30,9 +30,9 @@ unsafe fn critical_section(t: &mut usize) {
 unsafe fn f() -> ! {
     let mut t = 2usize;
     for _ in 0..PER_THREAD {
-        futex.lock();
+        mutex.lock();
         critical_section(&mut t);
-        futex.unlock();
+        mutex.unlock();
     }
     exit(t as i32)
 }
