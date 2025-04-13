@@ -22,17 +22,20 @@ lazy_static! {
 unsafe fn critical_section(t: &mut usize) {
     let a = addr_of_mut!(A);
     let cur = a.read_volatile();
-    for _ in 0..5 {
+    for _ in 0..500 {
         *t = (*t) * (*t) % 10007;
     }
     a.write_volatile(cur + 1);
 }
-unsafe fn f() -> ! {
+unsafe fn f(_id: usize) -> ! {
     let mut t = 2usize;
     for _ in 0..PER_THREAD {
+        // println!("Thread {} is getting lock...", id);
         mutex.lock();
+        // println!("Thread {} already get lock", id);
         critical_section(&mut t);
         mutex.unlock();
+        // println!("Thread {} release lock", id);
     }
     exit(t as i32)
 }
@@ -53,8 +56,8 @@ pub fn main(argc: usize, argv: &[&str]) -> i32 {
 
     let start = get_time();
     let mut v = Vec::new();
-    for _ in 0..thread_count {
-        v.push(thread_create(f as usize, 0) as usize);
+    for id in 0..thread_count {
+        v.push(thread_create(f as usize, id) as usize);
     }
     for tid in v.into_iter() {
         waittid(tid);

@@ -48,11 +48,15 @@ pub fn atomic_decrement(addr: *mut u32) {
     }
 }
 
+/// 原子地测试 `*addr & (1 << bit)` 并设置 `(addr)` 为 `*addr | (1 << bit)`.
+/// 返回测试结果，为 0 说明对应位原本是 0. 
 #[inline(always)]
 pub fn atomic_test_and_set(addr: *mut u32, bit: u32) -> u32 {
     loop {
         let val = load_reserved(addr);
-        if store_conditional(addr, val | (1 << bit)) { return val; }
+        if store_conditional(addr, val | (1 << bit)) {
+            return val & (1 << bit);
+        }
     }
 }
 
