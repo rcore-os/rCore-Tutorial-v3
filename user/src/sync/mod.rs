@@ -19,7 +19,7 @@ pub fn load_reserved(addr: *const u32) -> u32 {
 
 /// return true if successfully modify `addr` in memory
 #[inline(always)]
-pub fn store_conditional(addr: *const u32, val: u32) -> bool {
+pub fn store_conditional(addr: *mut u32, val: u32) -> bool {
     let res: u32;
     unsafe {
         core::arch::asm!(
