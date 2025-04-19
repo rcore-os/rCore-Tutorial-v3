@@ -1,10 +1,8 @@
 mod mutex;
-mod semaphore;
 mod up;
 
 pub use mutex::{FUTEX_WAIT, FUTEX_WAKE};
 pub use mutex::{Mutex, FutexQ};
-pub use semaphore::Semaphore;
 pub use up::UPSafeCell;
 
 #[inline(always)]

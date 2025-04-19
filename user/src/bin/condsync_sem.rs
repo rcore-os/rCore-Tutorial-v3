@@ -9,16 +9,15 @@ extern crate alloc;
 use alloc::vec;
 use user_lib::exit;
 use user_lib::{
-    MutexSpin, Condvar, semaphore_create, semaphore_down, semaphore_up,
+    MutexSpin, Semaphore,
 };
 use user_lib::{sleep, thread_create, waittid};
 use lazy_static::lazy_static;
 
 static mut A: usize = 0;
-const SEM_ID: usize = 0;
 lazy_static! {
     static ref mutex: MutexSpin = MutexSpin::new();
-    static ref condvar: Condvar = Condvar::new();
+    static ref sem: Semaphore = Semaphore::new(0);
 }
 
 unsafe fn first() -> ! {
@@ -26,7 +25,8 @@ unsafe fn first() -> ! {
     println!("First work, Change A --> 1 and wakeup Second");
     mutex.lock();
     A = 1;
-    semaphore_up(SEM_ID);
+    println!("First is going to sem.post()");
+    sem.post();
     mutex.unlock();
     exit(0)
 }
@@ -38,7 +38,7 @@ unsafe fn second() -> ! {
         if A == 0 {
             println!("Second: A is {}", &raw mut A as usize);
             mutex.unlock();
-            semaphore_down(SEM_ID);
+            sem.wait();
         } else {
             mutex.unlock();
             break;
@@ -50,8 +50,6 @@ unsafe fn second() -> ! {
 
 #[no_mangle]
 pub fn main() -> i32 {
-    // create semaphore & mutex
-    assert_eq!(semaphore_create(0) as usize, SEM_ID);
     // create threads
     let threads = vec![
         thread_create(first as usize, 0),

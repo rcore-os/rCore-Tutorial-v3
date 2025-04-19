@@ -19,9 +19,6 @@ const SYSCALL_WAITPID: usize = 260;
 const SYSCALL_THREAD_CREATE: usize = 1000;
 const SYSCALL_GETTID: usize = 1001;
 const SYSCALL_WAITTID: usize = 1002;
-const SYSCALL_SEMAPHORE_CREATE: usize = 1020;
-const SYSCALL_SEMAPHORE_UP: usize = 1021;
-const SYSCALL_SEMAPHORE_DOWN: usize = 1022;
 
 pub const FUTEX_WAIT: usize = 0;
 pub const FUTEX_WAKE: usize = 1;
@@ -126,16 +123,4 @@ pub fn sys_futex_wait(flag_addr: *mut i32, expect: i32) -> isize {
 
 pub fn sys_futex_wake(flag_addr: *mut i32) -> isize {
     syscall(SYSCALL_FUTEX, [flag_addr as usize, FUTEX_WAKE, 0])
-}
-
-pub fn sys_semaphore_create(res_count: usize) -> isize {
-    syscall(SYSCALL_SEMAPHORE_CREATE, [res_count, 0, 0])
-}
-
-pub fn sys_semaphore_up(sem_id: usize) -> isize {
-    syscall(SYSCALL_SEMAPHORE_UP, [sem_id, 0, 0])
-}
-
-pub fn sys_semaphore_down(sem_id: usize) -> isize {
-    syscall(SYSCALL_SEMAPHORE_DOWN, [sem_id, 0, 0])
 }

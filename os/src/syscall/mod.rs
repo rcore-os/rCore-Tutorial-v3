@@ -17,9 +17,6 @@ pub const SYSCALL_WAITPID: usize = 260;
 pub const SYSCALL_THREAD_CREATE: usize = 1000;
 pub const SYSCALL_GETTID: usize = 1001;
 pub const SYSCALL_WAITTID: usize = 1002;
-pub const SYSCALL_SEMAPHORE_CREATE: usize = 1020;
-pub const SYSCALL_SEMAPHORE_UP: usize = 1021;
-pub const SYSCALL_SEMAPHORE_DOWN: usize = 1022;
 
 mod fs;
 mod process;
@@ -52,9 +49,6 @@ pub fn syscall_handler(syscall_id: usize, args: [usize; 3]) -> isize {
         SYSCALL_THREAD_CREATE => sys_thread_create(args[0], args[1]),
         SYSCALL_GETTID => sys_gettid(),
         SYSCALL_WAITTID => sys_waittid(args[0]) as isize,
-        SYSCALL_SEMAPHORE_CREATE => sys_semaphore_create(args[0]),
-        SYSCALL_SEMAPHORE_UP => sys_semaphore_up(args[0]),
-        SYSCALL_SEMAPHORE_DOWN => sys_semaphore_down(args[0]),
         _ => panic!("Unsupported syscall_id: {}", syscall_id),
     }
 }

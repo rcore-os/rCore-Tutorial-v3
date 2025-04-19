@@ -1,8 +1,10 @@
 mod mutex;
 mod condvar;
+mod semaphore;
 
 pub use mutex::*;
 pub use condvar::*;
+pub use semaphore::*;
 
 #[inline(always)]
 pub fn load_reserved(addr: *const u32) -> u32 {
