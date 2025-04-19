@@ -1,9 +1,10 @@
 use super::*;
 use core::cell::UnsafeCell;
-use crate::syscall::{sys_futex_wait, sys_futex_wake};
 
 pub struct Semaphore {
     count: UnsafeCell<i32>,
+    cond: Condvar,
+    mutex: MutexSpin,
 }
 
 unsafe impl Send for Semaphore {}
@@ -12,24 +13,27 @@ unsafe impl Sync for Semaphore {}
 impl Semaphore {
     pub fn new(count: i32) -> Self {
         Self {
-            count: UnsafeCell::new(count)
+            count: UnsafeCell::new(count),
+            cond: Condvar::new(),
+            mutex: MutexSpin::new(),
         }
     }
     
     pub fn wait(&self) {
-        let addr = self.count.get();
-        atomic_decrement(addr as *mut u32);
-        let val = unsafe { *addr };
-        if val >= 0 { return; }
-        sys_futex_wait(addr, val);
+        self.mutex.lock();
+        let cnt_p = self.count.get();
+        while unsafe { *cnt_p <= 0 } {
+            self.cond.wait(&self.mutex);
+        }
+        unsafe { *cnt_p -= 1; }
+        self.mutex.unlock();
     }
 
     pub fn post(&self) {
-        let addr = self.count.get();
-        atomic_increment(addr as *mut u32);
-        let val = unsafe { *addr };
-        if val <= 0 {
-            sys_futex_wake(addr);
-        }
+        self.mutex.lock();
+        let cnt_p = self.count.get();
+        unsafe { *cnt_p += 1; }
+        self.cond.notify_one();
+        self.mutex.unlock();
     }
 }
