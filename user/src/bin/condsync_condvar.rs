@@ -35,10 +35,10 @@ unsafe fn second() -> ! {
     println!("Second want to continue,but need to wait A=1");
     mutex.lock();
     while A == 0 {
-        println!("Second: A is {}", &raw mut A as usize);
+        println!("Second: A is {}", A as usize);
         condvar.wait(&mutex);
     }
-    println!("A is {}, Second can work now", &raw mut A as usize);
+    println!("A is {}, Second can work now", A as usize);
     mutex.unlock();
     exit(0)
 }

@@ -36,7 +36,7 @@ unsafe fn second() -> ! {
     loop {
         mutex.lock();
         if A == 0 {
-            println!("Second: A is {}", &raw mut A as usize);
+            println!("Second: A is {}", A as usize);
             mutex.unlock();
             sem.wait();
         } else {
@@ -44,7 +44,7 @@ unsafe fn second() -> ! {
             break;
         }
     }
-    println!("A is {}, Second can work now", &raw mut A as usize);
+    println!("A is {}, Second can work now", A as usize);
     exit(0)
 }
 
