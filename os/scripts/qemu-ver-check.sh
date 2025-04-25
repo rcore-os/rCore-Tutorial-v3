@@ -13,7 +13,7 @@ then
     exit 1
 else
     QEMU_VERSION=$($1 --version|head -n 1|awk '{print $4}')
-    MAJOR_VERSION=$(echo $QEMU_VERSION|cut -c1-1)
+    MAJOR_VERSION=$(echo $QEMU_VERSION | awk -F '.' '{print $1}')
     if [ $MAJOR_VERSION -lt $MINIMUM_MAJOR_VERSION ]
     then
         echo "${RED}Error: Required major version of QEMU is ${MINIMUM_MAJOR_VERSION}, " \
