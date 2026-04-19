@@ -14,7 +14,7 @@
 //! We then call [`batch::run_next_app()`] and for the first time go to
 //! userspace.
 
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 #![deny(warnings)]
 #![no_std]
 #![no_main]
@@ -22,11 +22,13 @@
 use core::arch::global_asm;
 
 use log::*;
+
 #[macro_use]
 mod console;
 pub mod batch;
 mod lang_items;
 mod logging;
+pub mod register;
 mod sbi;
 mod sync;
 pub mod syscall;

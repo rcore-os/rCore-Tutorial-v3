@@ -2,6 +2,7 @@
 
 use crate::sbi::shutdown;
 use crate::sync::UPSafeCell;
+use crate::syscall::info::*;
 use crate::trap::TrapContext;
 use core::arch::asm;
 use lazy_static::*;
@@ -69,13 +70,14 @@ impl AppManager {
 
     fn load_app(&self, app_id: usize) {
         if app_id >= self.num_app {
-            println!("All applications completed!");
+            crate::syscall::info::print_statistics();
             shutdown(false);
         }
         println!("[kernel] Loading app_{}", app_id);
         unsafe {
             // clear app area
             core::slice::from_raw_parts_mut(APP_BASE_ADDRESS as *mut u8, APP_SIZE_LIMIT).fill(0);
+            // load each app to APP_BASE_ADDRESS
             let app_src = core::slice::from_raw_parts(
                 self.app_start[app_id] as *const u8,
                 self.app_start[app_id + 1] - self.app_start[app_id],
@@ -111,6 +113,7 @@ lazy_static! {
             let num_app_ptr = _num_app as usize as *const usize;
             let num_app = num_app_ptr.read_volatile();
             let mut app_start: [usize; MAX_APP_NUM + 1] = [0; MAX_APP_NUM + 1];
+            // load apps address into the array
             let app_start_raw: &[usize] =
                 core::slice::from_raw_parts(num_app_ptr.add(1), num_app + 1);
             app_start[..=num_app].copy_from_slice(app_start_raw);
@@ -140,6 +143,7 @@ pub fn run_next_app() -> ! {
     app_manager.load_app(current_app);
     app_manager.move_to_next_app();
     drop(app_manager);
+    EXECUTE_TIME.exclusive_access().start();
     // before this we have to drop local variables related to resources manually
     // and release the resources
     unsafe extern "C" {

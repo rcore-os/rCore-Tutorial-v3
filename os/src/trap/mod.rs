@@ -14,15 +14,15 @@
 
 mod context;
 
-use crate::batch::run_next_app;
 use crate::syscall::syscall;
+use crate::{batch::run_next_app, register::print_load_store};
 use core::arch::global_asm;
 use riscv::register::{
     mtvec::TrapMode,
     scause::{self, Exception, Trap},
-    stval, stvec,
+    sepc, stval, stvec,
 };
-
+use riscv_decode::decode;
 global_asm!(include_str!("trap.S"));
 
 /// initialize CSR `stvec` as the entry of `__alltraps`
@@ -40,12 +40,17 @@ pub fn init() {
 pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
     let scause = scause::read(); // get trap cause
     let stval = stval::read(); // get extra value
+    let sepc = sepc::read();
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => {
             cx.sepc += 4;
             cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
         }
         Trap::Exception(Exception::StoreFault) | Trap::Exception(Exception::StorePageFault) => {
+            println!("sepc: {:#x}", sepc);
+            let instruction_code = unsafe { *(sepc as *const u32) };
+            let instruction = decode(instruction_code).unwrap();
+            print_load_store(&instruction);
             println!("[kernel] PageFault in application, kernel killed it.");
             run_next_app();
         }
