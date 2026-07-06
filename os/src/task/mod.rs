@@ -164,3 +164,11 @@ pub fn current_add_signal(signal: SignalFlags) {
     let mut process_inner = process.inner_exclusive_access();
     process_inner.signals |= signal;
 }
+
+/// Change the current process's program break.
+/// Returns the old break value on success, or None on failure.
+pub fn change_program_brk(size: i32) -> Option<usize> {
+    let process = current_process();
+    let mut process_inner = process.inner_exclusive_access();
+    process_inner.change_program_brk(size)
+}

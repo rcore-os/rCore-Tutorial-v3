@@ -1,8 +1,8 @@
 use crate::fs::{OpenFlags, open_file};
 use crate::mm::{translated_ref, translated_refmut, translated_str};
 use crate::task::{
-    SignalFlags, current_process, current_task, current_user_token, exit_current_and_run_next,
-    pid2process, suspend_current_and_run_next,
+    SignalFlags, change_program_brk, current_process, current_task, current_user_token,
+    exit_current_and_run_next, pid2process, suspend_current_and_run_next,
 };
 use crate::timer::get_time_ms;
 use alloc::string::String;
@@ -25,6 +25,15 @@ pub fn sys_get_time() -> isize {
 
 pub fn sys_getpid() -> isize {
     current_task().unwrap().process.upgrade().unwrap().getpid() as isize
+}
+
+/// change data segment size
+pub fn sys_sbrk(size: i32) -> isize {
+    if let Some(old_brk) = change_program_brk(size) {
+        old_brk as isize
+    } else {
+        -1
+    }
 }
 
 pub fn sys_fork() -> isize {

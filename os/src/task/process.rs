@@ -3,8 +3,9 @@ use super::id::RecycleAllocator;
 use super::manager::insert_into_pid2process;
 use super::{PidHandle, pid_alloc};
 use super::{SignalFlags, add_task};
+use crate::config::USER_STACK_SIZE;
 use crate::fs::{File, Stdin, Stdout};
-use crate::mm::{KERNEL_SPACE, MemorySet, translated_refmut};
+use crate::mm::{KERNEL_SPACE, MapArea, MapPermission, MapType, MemorySet, VirtAddr, translated_refmut};
 use crate::sync::{Condvar, Mutex, Semaphore, UPIntrFreeCell, UPIntrRefMut};
 use crate::trap::{TrapContext, trap_handler};
 use alloc::string::String;
@@ -32,6 +33,8 @@ pub struct ProcessControlBlockInner {
     pub mutex_list: Vec<Option<Arc<dyn Mutex>>>,
     pub semaphore_list: Vec<Option<Arc<Semaphore>>>,
     pub condvar_list: Vec<Option<Arc<Condvar>>>,
+    pub heap_bottom: usize,
+    pub program_brk: usize,
 }
 
 impl ProcessControlBlockInner {
@@ -64,6 +67,29 @@ impl ProcessControlBlockInner {
     pub fn get_task(&self, tid: usize) -> Arc<TaskControlBlock> {
         self.tasks[tid].as_ref().unwrap().clone()
     }
+
+    /// Change the location of the program break. Return None if failed.
+    pub fn change_program_brk(&mut self, size: i32) -> Option<usize> {
+        let old_break = self.program_brk;
+        let new_brk = self.program_brk as isize + size as isize;
+        if new_brk < self.heap_bottom as isize {
+            return None;
+        }
+        let heap_bottom = self.heap_bottom;
+        let result = if size < 0 {
+            self.memory_set
+                .shrink_to(VirtAddr(heap_bottom), VirtAddr(new_brk as usize))
+        } else {
+            self.memory_set
+                .append_to(VirtAddr(heap_bottom), VirtAddr(new_brk as usize))
+        };
+        if result {
+            self.program_brk = new_brk as usize;
+            Some(old_break)
+        } else {
+            None
+        }
+    }
 }
 
 impl ProcessControlBlock {
@@ -73,7 +99,19 @@ impl ProcessControlBlock {
 
     pub fn new(elf_data: &[u8]) -> Arc<Self> {
         // memory_set with elf program headers/trampoline/trap context/user stack
-        let (memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
+        let (mut memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
+        // heap starts right after the main thread's user stack
+        let heap_bottom = ustack_base + USER_STACK_SIZE;
+        // map an initial empty heap area (grows via sbrk)
+        memory_set.push(
+            MapArea::new(
+                heap_bottom.into(),
+                heap_bottom.into(),
+                MapType::Framed,
+                MapPermission::R | MapPermission::W | MapPermission::U,
+            ),
+            None,
+        );
         // allocate a pid
         let pid_handle = pid_alloc();
         let process = Arc::new(Self {
@@ -99,6 +137,8 @@ impl ProcessControlBlock {
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
+                    heap_bottom,
+                    program_brk: heap_bottom,
                 })
             },
         });
@@ -135,10 +175,27 @@ impl ProcessControlBlock {
     pub fn exec(self: &Arc<Self>, elf_data: &[u8], args: Vec<String>) {
         assert_eq!(self.inner_exclusive_access().thread_count(), 1);
         // memory_set with elf program headers/trampoline/trap context/user stack
-        let (memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
+        let (mut memory_set, ustack_base, entry_point) = MemorySet::from_elf(elf_data);
+        // heap starts right after the main thread's user stack
+        let heap_bottom = ustack_base + USER_STACK_SIZE;
+        // map an initial empty heap area (grows via sbrk)
+        memory_set.push(
+            MapArea::new(
+                heap_bottom.into(),
+                heap_bottom.into(),
+                MapType::Framed,
+                MapPermission::R | MapPermission::W | MapPermission::U,
+            ),
+            None,
+        );
         let new_token = memory_set.token();
         // substitute memory_set
-        self.inner_exclusive_access().memory_set = memory_set;
+        let mut process_inner = self.inner_exclusive_access();
+        process_inner.memory_set = memory_set;
+        // initialize heap info
+        process_inner.heap_bottom = heap_bottom;
+        process_inner.program_brk = heap_bottom;
+        drop(process_inner);
         // then we alloc user resource for main thread again
         // since memory_set has been changed
         let task = self.inner_exclusive_access().get_task(0);
@@ -218,6 +275,8 @@ impl ProcessControlBlock {
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
+                    heap_bottom: parent.heap_bottom,
+                    program_brk: parent.program_brk,
                 })
             },
         });

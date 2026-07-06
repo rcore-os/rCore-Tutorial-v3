@@ -81,3 +81,7 @@ pub fn waittid(tid: usize) -> isize {
         }
     }
 }
+
+pub fn sbrk(size: i32) -> isize {
+    sys_sbrk(size)
+}
